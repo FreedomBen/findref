@@ -1,2 +1,2 @@
 # findref
-Findref is a program that helps you find strings in files
+Findref is a program that helps you find strings in files.  I use it to grep a source code repo for something I'm looking for.  It is roughly similar to git grep and a recursive grep, but simpler to use and a little smarter.  If inside a git repo it will honor your git ignore list, for example, but it also works outside of a git repo (unlike git grep).  It also requires much fewer flags than using grep directly.
