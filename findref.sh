@@ -175,7 +175,7 @@ do
     else
         topBoundary=numlines;
     fi;
-    sed -n $i,$(( i + topBoundary ))p $TEMP_FILE | sed 's/ /\\ /g' | sed "s/'//g" | xargs grep $ignore_case --color --binary-files=without-match --directories=skip --devices=skip --line-number $what;
+    sed -n $i,$(( i + topBoundary ))p $TEMP_FILE | sed 's/ /\\ /g' | sed "s/'//g" | xargs grep $ignore_case --extended-regexp --color --binary-files=without-match --directories=skip --devices=skip --line-number $what;
     numlines=$(( numlines - topBoundary ));
     if (( numlines <= 0 )); then
         break;
