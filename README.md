@@ -30,13 +30,13 @@ To go case insensitive, simply add -i or --ignore-case as the first arg:
 
     findref -i getMethodName
 
+We could also get case-insensitive by using "smart-case" by just using lower case letters in our regex pattern:
+
+    findref getmethodname
+
 Or search by regex:
 
     findref "str[i1]ng.*"
-
-Or by regex but case insensitive:
-
-    findref -i "str[i1]ng.*"
 
 You can add a starting directory, which defaults to the current directory if not specified:
 

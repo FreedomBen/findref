@@ -112,10 +112,14 @@ else
 fi
 
 DEBUG "Checking for ignore case setting"
+# If there are no capital letters, be case insensitive even if not passed the flag
 if [ "$1" = "-i" ] || [ "$1" = "--ignore-case" ]; then
     ignore_case='--ignore-case'
     shift
-    DEBUG "Ignoring case"
+    DEBUG "Ignoring case due to explicit flag"
+elif [[ ! $1 =~ [A-Z] ]]; then
+    ignore_case='--ignore-case'
+    DEBUG "Ignoring case cause pattern contains no upper case letters (smartcase)"
 else
     ignore_case=''
     DEBUG "Not ignoring case"
