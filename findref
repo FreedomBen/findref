@@ -125,15 +125,18 @@ else
     DEBUG "Not ignoring case"
 fi
 
-# where needs to have an absolute path to properly work with our git ignore list
 if [ -z "$2" ] || [ ! -e "$2" ]; then
-    where="$(pwd)";
+    where_abs="$(pwd)";
+    where_rel=""
 else
+    # strip off trailing / if it exists
+    where_rel="$(echo $2 | sed -e 's|/$||g')"
+
     # prefer realpath if installed, otherwise use readlink to get absolute path
-    where="$(eval $ABS_PATH_COMMAND $2)"
+    where_abs="$(eval $ABS_PATH_COMMAND $directory)"
 fi
 
-DEBUG "Determined to search from $where"
+DEBUG "Determined to search from $where_abs. rel path is $where_rel"
 
 if [ -z "$1" ]; then
     print_usage
@@ -155,8 +158,7 @@ DEBUG "Determined to search filenames matching $filename"
 DEBUG "Populating the TEMP_FILE $TEMP_FILE with filenames to search"
 if (( $IN_GIT_REPO )); then
     DEBUG "In Git repo, so using git's list of files"
-    #for i in $(git ls-files --ignore --exclude=${2}* --full-name); do
-    for i in $(git ls-files --ignore --exclude=${2}*); do
+    for i in $(git ls-files --ignore --exclude=${where_rel}*); do
         [ -f "$i" ] && echo "$i" >> "$TEMP_FILE"
     done
     for i in $(git ls-files --others --exclude-standard); do
@@ -164,7 +166,7 @@ if (( $IN_GIT_REPO )); then
     done
 else
     DEBUG "Not in git repo, finding all filenames matching pattern $filename"
-    eval find "$where" -type f "$filename" > $TEMP_FILE;
+    eval find "$where_abs" -type f "$filename" > $TEMP_FILE;
 fi
 
 DEBUG "Done populating the TEMP_FILE"
