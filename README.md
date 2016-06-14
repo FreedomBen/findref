@@ -8,6 +8,14 @@ Usage:
 
     findref [-f|--fast (skip git ignore list)] [-i|--ignore-case] "what text (RegEx) to look for" "[starting location (root dir)]" "[filenames to check (must match pattern)]"
 
+Installation:
+-------------------------------------------------------------------
+
+You can either clone this repo and copy `findref` into a location in you path, or else do something like this (assuming the destination is in your PATH):
+
+    curl https://raw.githubusercontent.com/FreedomBen/findref/master/findref > ~/bin/findref
+    chmod +x ~/bin/findref
+
 How it compares to other tools (or why it is better in my opinion):
 -------------------------------------------------------------------
 
