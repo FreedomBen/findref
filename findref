@@ -134,7 +134,7 @@ else
     where_rel="$(echo $2 | sed -e 's|/$||g')"
 
     # prefer realpath if installed, otherwise use readlink to get absolute path
-    where_abs="$(eval $ABS_PATH_COMMAND $directory)"
+    where_abs="$(eval $ABS_PATH_COMMAND $where_rel)"
 fi
 
 DEBUG "Determined to search from $where_abs. rel path is $where_rel"
