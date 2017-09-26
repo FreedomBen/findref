@@ -44,6 +44,8 @@ put it somewhere in your PATH.  I recommend /usr/local/bin:
   end
 %>
 
+Current Release Version: <%= fr_version %>
+
 | Release | Linux                     | macOS | Windows |
 |:-------:|:-------------------------:|:-------------:|:-------------:|
 <%= releases.map{ |r| release_line(r) }.join("\n") %>

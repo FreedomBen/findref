@@ -2,7 +2,7 @@
 
 require 'fileutils'
 
-FR_VERSION = '0.0.1'.freeze
+FR_VERSION = `cat findref.go | grep 'const Version' | sed -e 's/.*=//g' | sed -e 's/"//g' | sed -e 's/\s*//g'`.chomp
 GO_VERSION = '1.9-alpine'.freeze
 
 # See: https://stackoverflow.com/a/30068222/2062384 for list of valid targets

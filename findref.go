@@ -10,8 +10,8 @@ import (
 	"strconv"
 )
 
-const Version = "0.0.1"
-const Date = "2017-09-24"
+const Version = "0.0.2"
+const Date = "2017-09-26"
 
 const Red = "\033[0;31m"
 const Blue = "\033[0;34m"

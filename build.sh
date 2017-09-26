@@ -20,7 +20,7 @@ declare -r color_light_purple='\033[1;35m'
 declare -r color_light_cyan='\033[1;36m'
 declare -r color_white='\033[1;37m'
 
-VERSION=0.0.1
+VERSION="$(cat findref.go | grep 'const Version' | sed -e 's/.*=//g' | sed -e 's/"//g' | sed -e 's/\s*//g')"
 
 # See: https://stackoverflow.com/a/30068222/2062384 for list of valid targets
 OSES=("linux" "windows" "darwin")
