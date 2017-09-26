@@ -8,6 +8,7 @@ desc 'Build README.md from README.md.erb'
 task :readme do
   puts 'Building README.md'
   sh "erb fr_version=#{findref_version} README.md.erb > README.md"
+  sh "erb fr_version=#{findref_version} ARCHIVES.md.erb > ARCHIVES.md"
   #File.write('README.md', ERB.new(File.open('README.md.erb').read).result)
 end
 

@@ -2,24 +2,11 @@
 
 <% require_relative 'erb_helpers' %>
 
-findref is
-
-## Installing
-
-If you wish, you can download prebuilt binaries for your system.  After downloading,
-put it somewhere in your PATH.  I recommend /usr/local/bin:
+Here you can download older releases of the findref tool.
 
 Current Release Version: <%= fr_version %>
 
 | Release | Linux                     | macOS | Windows |
 |:-------:|:-------------------------:|:-------------:|:-------------:|
 <%= ErbHelpers.releases.map{ |r| ErbHelpers.release_line(r) }.join("\n") %>
-
-
-Alternatively, you can build it yourself from source:
-
-```bash
-go get github.com/FreedomBen/findref
-go install findref
-```
 

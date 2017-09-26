@@ -2,7 +2,6 @@
 
 require 'fileutils'
 
-FR_VERSION = `cat findref.go | grep 'const Version' | sed -e 's/.*=//g' | sed -e 's/"//g' | sed -e 's/\s*//g'`.chomp
 GO_VERSION = '1.9-alpine'.freeze
 
 # See: https://stackoverflow.com/a/30068222/2062384 for list of valid targets
@@ -34,6 +33,11 @@ def cyan(message)
   puts "#{CYAN}#{message}#{RESTORE}"
 end
 
+def die(message)
+  puts "[die]: #{message}"
+  exit 1
+end
+
 def docker_run(os, arch)
   <<-EOS.gsub(/\s+/, ' ').gsub(/[\s\t]*\n/, ' ').strip
     docker run
@@ -46,11 +50,12 @@ def docker_run(os, arch)
   EOS
 end
 
-def main
+def main(release)
+  die('Must pass release version as first arg') if release.nil? || release.empty?
   OSES_ARCHES.each do |os, arches|
     arches.each do |arch|
-      dest_dir = "findref-bin/#{FR_VERSION}/#{os}/#{arch}"
-      cyan "Building findref v#{FR_VERSION} for #{os} #{arch}..."
+      dest_dir = "findref-bin/#{release}/#{os}/#{arch}"
+      cyan "Building findref v#{release} for #{os} #{arch}..."
       system(docker_run(os, arch))
       FileUtils.mkdir_p(dest_dir)
       fr = os == 'windows' ? 'findref.exe' : 'findref'
@@ -60,4 +65,4 @@ def main
   cyan 'Done!'
 end
 
-main
+main(ARGV.first)
