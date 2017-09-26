@@ -25,12 +25,12 @@ installing to a location that isn't writeable by your normal user:
 
 # In your home directory (Make sure this destination is in your PATH variable)
 ```bash
-curl -s https://raw.githubusercontent.com/FreedomBen/findref/master/install.sh | bash $HOME/bin
+curl -s https://raw.githubusercontent.com/FreedomBen/findref/master/install.sh | bash -s $HOME/bin
 ```
 
 # Systemwide for all users (requires root access)
 ```bash
-curl -s https://raw.githubusercontent.com/FreedomBen/findref/master/install.sh | sudo bash /usr/local/bin
+curl -s https://raw.githubusercontent.com/FreedomBen/findref/master/install.sh | sudo bash -s /usr/local/bin
 ```
 
 ### Pre-built binaries
