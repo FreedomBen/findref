@@ -68,9 +68,9 @@ main ()
     [ -n "$1" ] && DEST_DIR="$1"
 
     if runningLinux; then
-        downlink_link "${DEST_DIR} $(linux_link)"
+        downlink_link "${DEST_DIR}" "$(linux_link)"
     elif runningOSX; then
-        downlink_link "${DEST_DIR} $(mac_link)"
+        downlink_link "${DEST_DIR}" "$(mac_link)"
     else
         die "Unsupported platform!"
     fi
