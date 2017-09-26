@@ -4,13 +4,16 @@ module ErbHelpers
       .map{ |d| File.basename(d) }
   end
 
+  def self.latest_release
+    releases.first
+  end
+
   def self.releases
-    retval = glob('findref-bin/*')
+    glob('findref-bin/*')
       .select{ |rel| File.directory?("findref-bin/#{rel}") }
       .map{ |rel| File.basename(rel) }
       .sort
       .reverse
-    retval
   end
 
   def self.links(release, os)

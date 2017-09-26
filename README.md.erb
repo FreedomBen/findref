@@ -13,7 +13,7 @@ Current Release Version: <%= fr_version %>
 
 | Release | Linux                     | macOS | Windows |
 |:-------:|:-------------------------:|:-------------:|:-------------:|
-<%= ErbHelpers.releases.map{ |r| ErbHelpers.release_line(r) }.join("\n") %>
+<%= ErbHelpers.release_line(ErbHelpers.latest_release) %>
 
 
 Alternatively, you can build it yourself from source:

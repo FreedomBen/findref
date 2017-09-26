@@ -4,9 +4,8 @@ end
 
 task default: 'build'
 
-desc 'Build README.md from README.md.erb'
-task :readme do
-  puts 'Building README.md'
+desc 'Build the md docs from erb sources'
+task :docs do
   sh "erb fr_version=#{findref_version} README.md.erb > README.md"
   sh "erb fr_version=#{findref_version} ARCHIVES.md.erb > ARCHIVES.md"
   #File.write('README.md', ERB.new(File.open('README.md.erb').read).result)
@@ -17,7 +16,7 @@ task :release do
   ruby "build.rb #{findref_version}"
 end
 
-task build: [:readme, :release]
+task build: [:docs, :release]
 
 def alias_task(*tasks)
   tasks.each do |new_name, old_name|
