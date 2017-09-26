@@ -1,0 +1,58 @@
+# fr / findref
+
+findref is
+
+## Installing
+
+If you wish, you can download prebuilt binaries for your system.  After downloading,
+put it somewhere in your PATH.  I recommend /usr/local/bin:
+
+<%
+  def glob(dir)
+    Dir.glob(dir)
+      .map{ |d| File.basename(d) }
+  end
+
+  def releases
+    retval = glob('findref-bin/*')
+      .select{ |rel| File.directory?("findref-bin/#{rel}") }
+      .map{ |rel| File.basename(rel) }
+      .sort
+    retval
+  end
+
+  def links(release, os)
+    glob("findref-bin/#{release}/#{os}/*").map do |arch|
+      "[#{arch}](https://github.com/FreedomBen/findref-bin/blob/master/#{release}/#{os}/#{arch}/#{os == 'windows' ? 'findref.exe' : 'findref'}?raw=true)"
+    end
+  end
+
+  def linux_links(release)
+    links(release, 'linux').join(' - ')
+  end
+
+  def mac_links(release)
+    links(release, 'darwin').join(' - ')
+  end
+
+  def windows_links(release)
+    links(release, 'windows').join(' - ')
+  end
+
+  def release_line(release)
+    "| #{release} | #{linux_links(release)} | #{mac_links(release)} | #{windows_links(release)} |"
+  end
+%>
+
+| Release | Linux                     | macOS | Windows |
+|:-------:|:-------------------------:|:-------------:|:-------------:|
+<%= releases.map{ |r| release_line(r) }.join("\n") %>
+
+
+Alternatively, you can build it yourself from source:
+
+```bash
+go get github.com/FreedomBen/findref
+go install findref
+```
+
