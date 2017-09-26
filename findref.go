@@ -58,7 +58,7 @@ func debug(a ...interface{}) {
 
 func printMatch(path string, lineNumber int, line []byte, match []int) {
 	//fmt.Println(Purple + path + Restore + Green + ":" + strconv.Itoa(lineNumber) + ":" + Restore + string(line[:match[0]]) + LightRed + string(line[match[0]:match[1]]) + Restore + string(line[match[1]:]))
-	fmt.Printf("%s%s%s%s:%s:%s%s%s%s%s%s",
+	fmt.Printf("%s%s%s%s:%s:%s%s%s%s%s%s\n",
 		Purple,
 		path,
 		Restore,
@@ -177,7 +177,7 @@ func determineIgnoreCase(ignoreCasePtr *bool, icPtr *bool) {
 }
 
 func printVersionAndExit() {
-	fmt.Printf("%s%s%s%s%s%s", Cyan, "findref version ", Version, " released on ", Date, Restore)
+	fmt.Printf("%s%s%s%s%s%s\n", Cyan, "findref version ", Version, " released on ", Date, Restore)
 }
 
 func main() {
