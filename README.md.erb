@@ -4,7 +4,36 @@
 
 findref is
 
+## Why use this tool instead of X?
+
+
+
+## Usage
+
+
+
 ## Installing
+
+### Use the install script
+
+If you are on an intel-based linux or mac, there is an install script located at
+`install.sh`.  If on ARM or Windows, you should probably download the
+[pre-built binary](#pre-built-binaries) below.
+
+To let the script do the work, run this command.  Make sure to add `sudo` if
+installing to a location that isn't writeable by your normal user:
+
+# In your home directory (Make sure this destination is in your PATH variable)
+```bash
+$HOME/bin/
+```
+
+# Systemwide for all users (requires root access)
+```bash
+install.sh /usr/local/bin/
+```
+
+### Pre-built binaries
 
 If you wish, you can download prebuilt binaries for your system.  After downloading,
 put it somewhere in your PATH.  I recommend /usr/local/bin:

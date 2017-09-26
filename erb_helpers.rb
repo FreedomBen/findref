@@ -11,15 +11,22 @@ module ErbHelpers
   def self.releases
     glob('findref-bin/*')
       .select{ |rel| File.directory?("findref-bin/#{rel}") }
+      .select{ |rel| rel != 'current_version' }
       .map{ |rel| File.basename(rel) }
       .sort
       .reverse
   end
 
+  def self.url(release, os, arch)
+      "https://github.com/FreedomBen/findref-bin/blob/master/#{release}/#{os}/#{arch}/#{os == 'windows' ? 'findref.exe' : 'findref'}?raw=true"
+  end
+
+  def self.link(release, os, arch)
+      "[#{arch}](#{url(release, os, arch)})"
+  end
+
   def self.links(release, os)
-    glob("findref-bin/#{release}/#{os}/*").map do |arch|
-      "[#{arch}](https://github.com/FreedomBen/findref-bin/blob/master/#{release}/#{os}/#{arch}/#{os == 'windows' ? 'findref.exe' : 'findref'}?raw=true)"
-    end
+    glob("findref-bin/#{release}/#{os}/*").map{ |arch| link(release, os, arch) }
   end
 
   def self.linux_links(release)
