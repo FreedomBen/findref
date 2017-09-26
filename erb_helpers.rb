@@ -18,7 +18,7 @@ module ErbHelpers
   end
 
   def self.url(release, os, arch)
-      "https://github.com/FreedomBen/findref-bin/blob/master/#{release}/#{os}/#{arch}/#{os == 'windows' ? 'findref.exe' : 'findref'}?raw=true"
+      "https://raw.githubusercontent.com/FreedomBen/findref-bin/master/#{release}/#{os}/#{arch}/#{os == 'windows' ? 'findref.exe' : 'findref'}"
   end
 
   def self.link(release, os, arch)
