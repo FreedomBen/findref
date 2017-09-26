@@ -18,6 +18,7 @@ put it somewhere in your PATH.  I recommend /usr/local/bin:
       .select{ |rel| File.directory?("findref-bin/#{rel}") }
       .map{ |rel| File.basename(rel) }
       .sort
+      .reverse
     retval
   end
 
