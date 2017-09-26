@@ -49,12 +49,12 @@ running386 ()
 
 mac_link ()
 {
-    echo "https://github.com/FreedomBen/findref-bin/blob/master/current_version/darwin/amd64/findref?raw=true"
+    echo "https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/darwin/amd64/findref"
 }
 
 linux_link ()
 {
-    echo "https://github.com/FreedomBen/findref-bin/blob/master/current_version/linux/amd64/findref?raw=true"
+    echo "https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/linux/amd64/findref"
 }
 
 downlink_link ()
