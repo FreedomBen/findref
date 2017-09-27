@@ -11,7 +11,7 @@ module ErbHelpers
   def self.releases
     glob('findref-bin/*')
       .select{ |rel| File.directory?("findref-bin/#{rel}") }
-      .select{ |rel| rel != 'current_version' }
+      .select{ |rel| rel != 'latest' }
       .map{ |rel| File.basename(rel) }
       .sort
       .reverse
@@ -45,13 +45,13 @@ module ErbHelpers
     "| #{release} | #{linux_links(release)} | #{mac_links(release)} | #{windows_links(release)} |"
   end
 
-  def self.release_line_current_version
-    release_line('current_version')
+  def self.release_line_latest
+    release_line('latest')
   end
 
   def self.release_table_header
     <<-EOS.split("\n").map(&:strip).join("\n").concat("\n")
-      | Release | Linux | macOS | Windows |
+      | Version | Linux | macOS | Windows |
       |:-------:|:-----:|:-----:|:-------:|
     EOS
   end

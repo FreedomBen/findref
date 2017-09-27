@@ -54,7 +54,7 @@ def main(release)
   die('Must pass release version as first arg') if release.nil? || release.empty?
   OSES_ARCHES.each do |os, arches|
     arches.each do |arch|
-      dest_dirs = ['current_version', release].map{ |rel| "findref-bin/#{rel}/#{os}/#{arch}" }
+      dest_dirs = ['latest', release].map{ |rel| "findref-bin/#{rel}/#{os}/#{arch}" }
       cyan "Building findref v#{release} for #{os} #{arch}..."
       system(docker_run(os, arch))
       fr = os == 'windows' ? 'findref.exe' : 'findref'

@@ -49,9 +49,7 @@ scripts to get the latest version without having to adjust the version number fo
 releases.  Of course if you want to point to a specific release, find the permanent link
 on the [ARCHIVES.md](ARCHIVES.md) page.
 
-| Linux | macOS | Windows |
-|:-----:|:-----:|:-------:|
-| [arm](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/linux/arm/findref) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/linux/amd64/findref) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/linux/arm64/findref) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/linux/386/findref) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/darwin/amd64/findref) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/darwin/386/findref) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/windows/amd64/findref.exe) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/windows/386/findref.exe) |
+<%= ErbHelpers.release_table(ErbHelpers.release_line_latest) %>
 
 These links are perma-links to the binaries for version <%= fr_version %>, meaning even after
 a new version is released, these will still get you version <%= fr_version %>.
