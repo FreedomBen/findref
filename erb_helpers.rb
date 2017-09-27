@@ -44,4 +44,25 @@ module ErbHelpers
   def self.release_line(release)
     "| #{release} | #{linux_links(release)} | #{mac_links(release)} | #{windows_links(release)} |"
   end
+
+  def self.release_line_current_version
+    release_line('current_version')
+  end
+
+  def self.release_table_header
+    <<-EOS.split("\n").map(&:strip).join("\n").concat("\n")
+      | Release | Linux | macOS | Windows |
+      |:-------:|:-----:|:-----:|:-------:|
+    EOS
+#    <<-EOS
+#| Release | Linux | macOS | Windows |
+#|:-------:|:-----:|:-----:|:-------:|
+#    EOS
+  end
+
+  def self.release_table(release_lines = nil)
+    release_lines ||= releases.map{ |r| release_line(r) }
+    release_lines = Array(release_lines)
+    "#{release_table_header}#{release_lines.join("\n")}"
+  end
 end

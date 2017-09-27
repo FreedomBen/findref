@@ -40,9 +40,16 @@ put it somewhere in your PATH.  I recommend /usr/local/bin:
 
 Current Release Version: 0.0.2
 
-| Release | Linux                     | macOS | Windows |
-|:-------:|:-------------------------:|:-------------:|:-------------:|
+| Release | Linux | macOS | Windows |
+|:-------:|:-----:|:-----:|:-------:|
 | 0.0.2 | [arm](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.2/linux/arm/findref) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.2/linux/amd64/findref) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.2/linux/arm64/findref) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.2/linux/386/findref) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.2/darwin/amd64/findref) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.2/darwin/386/findref) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.2/windows/amd64/findref.exe) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.2/windows/386/findref.exe) |
+
+These links will always point to the current version (includable in scripts if you
+want the latest without having to update the script)
+
+| Release | Linux | macOS | Windows |
+|:-------:|:-----:|:-----:|:-------:|
+| current_version | [arm](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/linux/arm/findref) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/linux/amd64/findref) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/linux/arm64/findref) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/linux/386/findref) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/darwin/amd64/findref) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/darwin/386/findref) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/windows/amd64/findref.exe) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/windows/386/findref.exe) |
 
 ### Older releases
 
@@ -60,10 +67,12 @@ go get github.com/FreedomBen/findref
 go install findref
 ```
 
-To use the docker build, the easiest way is to use the rake task:
+To use the docker build, the easiest way is to clone this repo and use the rake task:
 
 ```bash
-rake
+git clone https://github.com/FreedomBen/findref.git \
+ && cd findref \
+ && rake
 ```
 
 Pretty easy, tho that will build for every supported platform.  You can find the binary you
@@ -74,38 +83,48 @@ You can also build for just
 your platform.  Specify your OS for the `GOOS` value, and your arch for `GOARCH`.  See [here
 for a list of valid targets](https://stackoverflow.com/a/30068222/2062384).
 
+Clone the repo if you haven't already:
+
+```bash
+git clone https://github.com/FreedomBen/findref.git && cd findref
+```
+
+Then run the build:
+
 Example for Linux x64 (amd64):
 
 ```bash
-    docker run \
-      --rm \
-      --volume "$(pwd):/usr/src/findref" \
-      --workdir "/usr/src/findref" \
-      --env GOOS=linux \
-      --env GOARCH=amd64 \
-      golang:#{GO_VERSION} go build
+docker run \
+  --rm \
+  --volume "$(pwd):/usr/src/findref" \
+  --workdir "/usr/src/findref" \
+  --env GOOS=linux \
+  --env GOARCH=amd64 \
+  golang:#{GO_VERSION} go build
 ```
 
 Example for Linux x32 (386):
 
 ```bash
-    docker run \
-      --rm \
-      --volume "$(pwd):/usr/src/findref" \
-      --workdir "/usr/src/findref" \
-      --env GOOS=linux \
-      --env GOARCH=386 \
-      golang:#{GO_VERSION} go build
+docker run \
+  --rm \
+  --volume "$(pwd):/usr/src/findref" \
+  --workdir "/usr/src/findref" \
+  --env GOOS=linux \
+  --env GOARCH=386 \
+  golang:#{GO_VERSION} go build
 ```
 
 Example for macOS x64 (amd64)
 
 ```bash
-    docker run \
-      --rm \
-      --volume "$(pwd):/usr/src/findref" \
-      --workdir "/usr/src/findref" \
-      --env GOOS=darwin \
-      --env GOARCH=amd64 \
-      golang:#{GO_VERSION} go build
+docker run \
+  --rm \
+  --volume "$(pwd):/usr/src/findref" \
+  --workdir "/usr/src/findref" \
+  --env GOOS=darwin \
+  --env GOARCH=amd64 \
+  golang:#{GO_VERSION} go build
 ```
+
+After the build your binary should be sitting in the root directory of the repo!

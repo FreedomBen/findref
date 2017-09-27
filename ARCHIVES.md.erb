@@ -8,5 +8,5 @@ Current Release Version: <%= fr_version %>
 
 | Release | Linux                     | macOS | Windows |
 |:-------:|:-------------------------:|:-------------:|:-------------:|
-<%= ErbHelpers.releases.map{ |r| ErbHelpers.release_line(r) }.join("\n") %>
+<%= ErbHelpers.release_table %>
 
