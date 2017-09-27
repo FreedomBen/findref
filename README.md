@@ -2,9 +2,16 @@
 
 
 
-`findref` helps you find strings, or match regular expressions, in a directory of files.  It is inspired by `git grep` which is a good tool, but has limitations that made writing a replacement a worthy endeavor.
+`findref` (commonly aliased to `fr`) helps you find strings, or match regular expressions, in a directory of files.  It is inspired by `git grep` which is a good tool, but has limitations that made writing a replacement a worthy endeavor.
 
-`findref` regular expressions are the same as `grep` regular expressions (the ones you use with `grep -E` or `egrep`).  `findref` respects the `.gitignore` file if in a `git` repo, unless you tell it not to.
+`findref` regular expressions are golang regexes.  Golang regexes have "the [same general
+syntax](https://github.com/google/re2/wiki/Syntax) used by Perl, Python, and other languages.
+More precisely, it is [the syntax accepted by RE2](https://github.com/google/re2/wiki/Syntax)."
+A large benefit of this, is that "the regexp implementation ... [is guaranteed to run in
+time linear in the size of the input](https://swtch.com/~rsc/regexp/regexp1.html).
+(This is a property not guaranteed by most open source implementations of regular expressions.)" (see: https://golang.org/pkg/regexp/).  This regex run-time is one of the things that makes
+`findref` faster than many other tools.
+
 
 ## How it compares to other tools (or why it is better in my opinion):
 
@@ -18,13 +25,41 @@ identical to grep's line numbers and colors (but are on by default).
 reading it *much* easier.  `findref` also works on non-git repos, unlike git grep.
 `findref` is also faster
 
-**Ag (or the silver searcher)**:  `findref` is a little slower, but has much better
-formatting and coloring.  `findref` does not currently have a vim plugin tho,
-so for searching within vim, [ag](https://github.com/vim-scripts/ag.vim) is the way to go.
+**Ag (or the silver searcher)**:  `findref` is a little slower (tho not by much),
+but has much better formatting and coloring.  `findref` does not currently have a vim
+plugin tho, so for searching within vim, [ag](https://github.com/vim-scripts/ag.vim)
+is the way to go.
+
 
 ## Usage
 
-    findref [-f|--fast (skip git ignore list)] [-i|--ignore-case] "what text (RegEx) to look for" "[starting location (root dir)]" "[filenames to check (must match pattern)]"
+    findref [options] match_regex [start_dir] [filename_regex]
+
+		Arguments:
+
+				match_regex:  This is an RE2 regular expression that will be matched against lines
+											in each file, with matches being displayed to the user.
+
+				start_dir:  This optional argument sets the starting ddirectory to crawl looking
+										for eligible files with lines matching match_regex.  Default value
+										is the current working directory, AKA `pwd` or `.`
+
+				filename_regex:  This optional argument restricts the set of files checked for
+												 matching lines.  Eligible files must match this expression.
+												 Default value matches all files
+
+    Options:
+
+				-d | --debug
+							Enable debug mode
+				-h | --hidden
+							Include hidden files and files in hidden directories
+				-i | --ignore-case
+							Ignore case in regex (overrides smart-case)
+				-m | --match-case
+							Match regex case (if unset smart-case is used)
+				-v | --version
+							Print current version and exit
 
 
 ### Examples:
