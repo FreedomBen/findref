@@ -17,7 +17,7 @@ task :release do
   ruby "build.rb #{findref_version}"
 end
 
-task build: [:erb, :release]
+task build: [:release, :erb]
 
 def alias_task(*tasks)
   tasks.each do |new_name, old_name|
