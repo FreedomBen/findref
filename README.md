@@ -130,7 +130,7 @@ put it somewhere in your [PATH](http://www.linfo.org/path_env_var.html).
 I recommend putting it in `~/bin` if you are the only user (`sudo` isn't required
 to install in that location), or `/usr/local/bin` if there are multiple users on the system:
 
-#### Current Release Version: 0.0.5
+#### Current Release Version: 0.0.6
 
 These links will always point to the latest released version, so they are includable in
 scripts to get the latest version without having to adjust the version number for new
@@ -141,12 +141,12 @@ on the [ARCHIVES.md](ARCHIVES.md) page.
 |:-------:|:-----:|:-----:|:-------:|
 | latest | [arm](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/arm/findref) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/amd64/findref) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/arm64/findref) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/386/findref) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/darwin/amd64/findref) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/darwin/386/findref) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/windows/amd64/findref.exe) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/windows/386/findref.exe) |
 
-These links are perma-links to the binaries for version 0.0.5, meaning even after
-a new version is released, these will still get you version 0.0.5.
+These links are perma-links to the binaries for version 0.0.6, meaning even after
+a new version is released, these will still get you version 0.0.6.
 
 | Version | Linux | macOS | Windows |
 |:-------:|:-----:|:-----:|:-------:|
-| 0.0.5 | [arm](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.5/linux/arm/findref) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.5/linux/amd64/findref) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.5/linux/arm64/findref) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.5/linux/386/findref) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.5/darwin/amd64/findref) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.5/darwin/386/findref) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.5/windows/amd64/findref.exe) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.5/windows/386/findref.exe) |
+| 0.0.6 | [arm](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.6/linux/arm/findref) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.6/linux/amd64/findref) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.6/linux/arm64/findref) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.6/linux/386/findref) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.6/darwin/amd64/findref) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.6/darwin/386/findref) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.6/windows/amd64/findref.exe) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.6/windows/386/findref.exe) |
 
 ### Older releases
 

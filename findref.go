@@ -47,7 +47,7 @@ const Usage = `
               Print current version and exit
 `
 
-const Version = "0.0.5"
+const Version = "0.0.6"
 const Date = "2017-09-27"
 
 const Red = "\033[0;31m"
@@ -183,7 +183,6 @@ func checkForMatches(path string) error {
 			// we have a match! loc == nil means no match so just ignore that case
 			incrMatchCount()
 			printMatch(path, lineNumber, line, matchIndex)
-			return FILE_PROCESSING_COMPLETE
 		}
 	}
 
