@@ -35,31 +35,31 @@ is the way to go.
 
     findref [options] match_regex [start_dir] [filename_regex]
 
-		Arguments:
+    Arguments:
 
-				match_regex:  This is an RE2 regular expression that will be matched against lines
-											in each file, with matches being displayed to the user.
+        match_regex:  This is an RE2 regular expression that will be matched against lines
+                      in each file, with matches being displayed to the user.
 
-				start_dir:  This optional argument sets the starting ddirectory to crawl looking
-										for eligible files with lines matching match_regex.  Default value
-										is the current working directory, AKA `pwd` or `.`
+        start_dir:  This optional argument sets the starting directory to crawl looking
+                    for eligible files with lines matching match_regex.  Default value
+                    is the current working directory, AKA `pwd` or `.`
 
-				filename_regex:  This optional argument restricts the set of files checked for
-												 matching lines.  Eligible files must match this expression.
-												 Default value matches all files
+        filename_regex:  This optional argument restricts the set of files checked for
+                         matching lines.  Eligible files must match this expression.
+                         Default value matches all files
 
     Options:
 
-				-d | --debug
-							Enable debug mode
-				-h | --hidden
-							Include hidden files and files in hidden directories
-				-i | --ignore-case
-							Ignore case in regex (overrides smart-case)
-				-m | --match-case
-							Match regex case (if unset smart-case is used)
-				-v | --version
-							Print current version and exit
+        -d | --debug
+              Enable debug mode
+        -h | --hidden
+              Include hidden files and files in hidden directories
+        -i | --ignore-case
+              Ignore case in regex (overrides smart-case)
+        -m | --match-case
+              Match regex case (if unset smart-case is used)
+        -v | --version
+              Print current version and exit
 
 
 ### Examples:
