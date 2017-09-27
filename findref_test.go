@@ -15,7 +15,7 @@ func TestContainsNullByte(t *testing.T) {
 }
 
 func TestPassesFileFilter(t *testing.T) {
-    fileFilter = regexp.MustCompile("abcd")
+    filenameRegex = regexp.MustCompile("abcd")
     if !passesFileFilter("abcd.txt") {
         t.Fail()
     }
@@ -25,7 +25,7 @@ func TestPassesFileFilter(t *testing.T) {
     if !passesFileFilter("abcd") {
         t.Fail()
     }
-    fileFilter = regexp.MustCompile(`.*\.txt`)
+    filenameRegex = regexp.MustCompile(`.*\.txt`)
     if !passesFileFilter("abcd.txt") {
         t.Fail()
     }
@@ -101,30 +101,6 @@ func TestGetMatchRegex(t *testing.T) {
         t.Fail()
     }
     if r4.MatchString("abc") {
-        t.Fail()
-    }
-}
-
-func TestDetermineIgnoreCase(t *testing.T) {
-    ignoreCase := false
-    ic := false
-    determineIgnoreCase(&ignoreCase, &ic)
-    if ignoreCase {
-        t.Fail()
-    }
-    ignoreCase = true
-    determineIgnoreCase(&ignoreCase, &ic)
-    if !ignoreCase {
-        t.Fail()
-    }
-    ic = true
-    determineIgnoreCase(&ignoreCase, &ic)
-    if !ignoreCase {
-        t.Fail()
-    }
-    ignoreCase = false
-    determineIgnoreCase(&ignoreCase, &ic)
-    if !ignoreCase {
         t.Fail()
     }
 }

@@ -10,6 +10,38 @@ import (
 	"strconv"
 )
 
+const Usage = `
+    Usage of findref:
+
+    findref [options] match_regex [start_dir] [filename_regex]
+
+    Arguments:
+
+        match_regex:  This is an RE2 regular expression that will be matched against lines
+                      in each file, with matches being displayed to the user.
+
+        start_dir:  This optional argument sets the starting directory to crawl looking
+                    for eligible files with lines matching match_regex.  Default value
+                    is the current working directory, AKA $PWD or '.'
+
+        filename_regex:  This optional argument restricts the set of files checked for
+                         matching lines.  Eligible files must match this expression.
+                         Default value matches all files
+
+    Options:
+
+        -d | --debug
+              Enable debug mode
+        -h | --hidden
+              Include hidden files and files in hidden directories
+        -i | --ignore-case
+              Ignore case in regex (overrides smart-case)
+        -m | --match-case
+              Match regex case (if unset smart-case is used)
+        -v | --version
+              Print current version and exit
+`
+
 const Version = "0.0.2"
 const Date = "2017-09-26"
 
@@ -42,7 +74,7 @@ var IncludeHidden bool = false
 
 /* Shared regular expressions */
 var matchRegex *regexp.Regexp = nil
-var fileFilter *regexp.Regexp = regexp.MustCompile(".*")
+var filenameRegex *regexp.Regexp = regexp.MustCompile(".*")
 var hiddenFileRegex *regexp.Regexp = regexp.MustCompile(`(^|\/)\.`)
 
 func usageAndExit() {
@@ -74,7 +106,7 @@ func printMatch(path string, lineNumber int, line []byte, match []int) {
 }
 
 func passesFileFilter(path string) bool {
-	return fileFilter.MatchString(path)
+	return filenameRegex.MatchString(path)
 }
 
 func isHidden(path string) bool {
@@ -164,26 +196,17 @@ func getMatchRegex(ignoreCase bool, matchCase bool, usersRegex string) *regexp.R
 	}
 }
 
-func determineMatchCase(matchCasePtr *bool, mcPtr *bool) {
-	if *mcPtr {
-		*matchCasePtr = true
-	}
-}
-
-func determineIgnoreCase(ignoreCasePtr *bool, icPtr *bool) {
-	if *icPtr {
-		*ignoreCasePtr = true
-	}
-}
-
 func printVersionAndExit() {
 	fmt.Printf("%s%s%s%s%s%s\n", Cyan, "findref version ", Version, " released on ", Date, Restore)
 }
 
 func main() {
+	dPtr := flag.Bool("d", false, "Alias for --debug")
+	hPtr := flag.Bool("h", false, "Alias for --hidden")
 	vPtr := flag.Bool("v", false, "Alias for --version")
-	mcPtr := flag.Bool("mc", false, "Alias for --match-case")
-	icPtr := flag.Bool("ic", false, "Alias for --ignore-case")
+	mPtr := flag.Bool("m", false, "Alias for --match-case")
+	iPtr := flag.Bool("i", false, "Alias for --ignore-case")
+	helpPtr := flag.Bool("help", false, "Show usage")
 	debugPtr := flag.Bool("debug", false, "Enable debug mode")
 	hiddenPtr := flag.Bool("hidden", false, "Include hidden files and files in hidden directories")
 	versionPtr := flag.Bool("version", false, "Print current version and exit")
@@ -191,31 +214,36 @@ func main() {
 	ignoreCasePtr := flag.Bool("ignore-case", false, "Ignore case in regex (overrides smart-case)")
 
 	flag.Parse()
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "%s\n", Usage)
+	}
 
 	if *vPtr || *versionPtr {
 		printVersionAndExit()
 		os.Exit(0)
 	}
 
-	determineMatchCase(matchCasePtr, mcPtr)
-	determineIgnoreCase(ignoreCasePtr, icPtr)
+	if *helpPtr {
+	    usageAndExit()
+	}
 
-	IncludeHidden = *hiddenPtr
-	Debug = *debugPtr
+	*matchCasePtr = *matchCasePtr || *mPtr
+	*ignoreCasePtr = *ignoreCasePtr || *iPtr
+	IncludeHidden = *hiddenPtr || *hPtr
+	Debug = *debugPtr || *dPtr
 
-	debug("match-case set: ", *matchCasePtr)
-	debug("ignore-case set: ", *ignoreCasePtr)
-	debug("hidden: ", IncludeHidden)
-	debug("debug: ", Debug)
-	debug("tail: ", flag.Args())
+	debug("match-case enabled: ", *matchCasePtr)
+	debug("ignore-case enabled: ", *ignoreCasePtr)
+	debug("include hidden files: ", IncludeHidden)
+	debug("debug mode: ", Debug)
 
 	rootDir := "."
 
 	if len(flag.Args()) < 1 {
-		fmt.Println("Must specify regex to match against files")
+		fmt.Errorf("%s", "Must specify regex to match against files")
 		usageAndExit()
 	} else if len(flag.Args()) > 3 {
-		fmt.Println("Too many args")
+		fmt.Errorf("%s", "Too many args (expected 1 <= 3)")
 		usageAndExit()
 	} else {
 		matchRegex = getMatchRegex(*ignoreCasePtr, *matchCasePtr, flag.Args()[0])
@@ -224,9 +252,13 @@ func main() {
 			rootDir = flag.Args()[1]
 		}
 		if len(flag.Args()) == 3 {
-			fileFilter = regexp.MustCompile(flag.Args()[2])
+			filenameRegex = regexp.MustCompile(flag.Args()[2])
 		}
 	}
+
+	debug("matchRegex: ", matchRegex.String())
+	debug("rootDir: ", rootDir)
+	debug("fileRegex: ", filenameRegex.String())
 
 	// TODO: Switch to powerwalk for performance:  https://github.com/stretchr/powerwalk
 	filepath.Walk(rootDir, processFile)
