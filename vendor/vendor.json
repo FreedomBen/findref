@@ -1,0 +1,13 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "Q7W1yZKXt0wWl5TjkJa7KVNIilo=",
+			"path": "github.com/stretchr/powerwalk",
+			"revision": "bceb9d014549ded75e042cc2895f8ee007864c78",
+			"revisionTime": "2015-11-24T15:04:08Z"
+		}
+	],
+	"rootPath": "github.com/freedomben/findref"
+}
