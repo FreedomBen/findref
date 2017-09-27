@@ -58,6 +58,8 @@ is the way to go.
               Ignore case in regex (overrides smart-case)
         -m | --match-case
               Match regex case (if unset smart-case is used)
+        -s | --stats
+              Track basic statistics and print them on exit
         -v | --version
               Print current version and exit
 

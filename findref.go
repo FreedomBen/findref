@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strconv"
+	"time"
 )
 
 const Usage = `
@@ -38,6 +39,8 @@ const Usage = `
               Ignore case in regex (overrides smart-case)
         -m | --match-case
               Match regex case (if unset smart-case is used)
+        -s | --stats
+              Track basic statistics and print them on exit
         -v | --version
               Print current version and exit
 `
@@ -71,11 +74,22 @@ var FILE_PROCESSING_COMPLETE error = nil
 /* Shared flags */
 var Debug bool = false
 var IncludeHidden bool = false
+var TrackStats bool = false
 
 /* Shared regular expressions */
 var matchRegex *regexp.Regexp = nil
 var filenameRegex *regexp.Regexp = regexp.MustCompile(".*")
 var hiddenFileRegex *regexp.Regexp = regexp.MustCompile(`(^|\/)\.`)
+
+/* Statistics */
+var filesScanned int = 0
+var linesScanned int = 0
+var matchesFound int = 0
+var startTime time.Time
+
+func elapsedTime() time.Duration {
+	return time.Now().Sub(startTime)
+}
 
 func usageAndExit() {
 	flag.Usage()
@@ -123,6 +137,25 @@ func containsNullByte(line []byte) bool {
 	return false
 }
 
+func incrLineCount() {
+	if TrackStats {
+		linesScanned++
+	}
+}
+
+func incrFileCount() {
+
+	if TrackStats {
+		filesScanned++
+	}
+}
+
+func incrMatchCount() {
+	if TrackStats {
+		matchesFound++
+	}
+}
+
 func checkForMatches(path string) error {
 	debug(Blue+"Checking file for matches:"+Restore, path)
 
@@ -138,6 +171,7 @@ func checkForMatches(path string) error {
 	for scanner.Scan() {
 		line := scanner.Bytes()
 		lineNumber++
+		incrLineCount()
 		if containsNullByte(line) {
 			// This is a binary file.  Skip it!
 			debug(Blue+"Not processing binary file:"+Restore, path)
@@ -145,6 +179,7 @@ func checkForMatches(path string) error {
 		}
 		if matchIndex := matchRegex.FindIndex(line); matchIndex != nil {
 			// we have a match! loc == nil means no match so just ignore that case
+			incrMatchCount()
 			printMatch(path, lineNumber, line, matchIndex)
 			return FILE_PROCESSING_COMPLETE
 		}
@@ -158,6 +193,8 @@ func checkForMatches(path string) error {
 }
 
 func processFile(path string, info os.FileInfo, err error) error {
+	incrFileCount()
+
 	if err != nil {
 		debug("filepath.Walk encountered error with path '"+path+"'", err)
 		return FILE_PROCESSING_COMPLETE
@@ -203,12 +240,14 @@ func printVersionAndExit() {
 }
 
 func main() {
+	sPtr := flag.Bool("s", false, "Alias for --stats")
 	dPtr := flag.Bool("d", false, "Alias for --debug")
 	hPtr := flag.Bool("h", false, "Alias for --hidden")
 	vPtr := flag.Bool("v", false, "Alias for --version")
 	mPtr := flag.Bool("m", false, "Alias for --match-case")
 	iPtr := flag.Bool("i", false, "Alias for --ignore-case")
 	helpPtr := flag.Bool("help", false, "Show usage")
+	statsPtr := flag.Bool("stats", false, "Track and display statistics")
 	debugPtr := flag.Bool("debug", false, "Enable debug mode")
 	hiddenPtr := flag.Bool("hidden", false, "Include hidden files and files in hidden directories")
 	versionPtr := flag.Bool("version", false, "Print current version and exit")
@@ -231,9 +270,16 @@ func main() {
 
 	*matchCasePtr = *matchCasePtr || *mPtr
 	*ignoreCasePtr = *ignoreCasePtr || *iPtr
+	TrackStats = *statsPtr || *sPtr
 	IncludeHidden = *hiddenPtr || *hPtr
 	Debug = *debugPtr || *dPtr
 
+	if TrackStats {
+		startTime = time.Now()
+		debug(Blue, "Start time is:", Restore, startTime.String())
+	}
+
+	debug(Blue, "stats enabled: ", Restore, TrackStats)
 	debug(Blue, "match-case enabled: ", Restore, *matchCasePtr)
 	debug(Blue, "ignore-case enabled: ", Restore, *ignoreCasePtr)
 	debug(Blue, "include hidden files: ", Restore, IncludeHidden)
@@ -264,4 +310,11 @@ func main() {
 
 	// TODO: Switch to powerwalk for performance:  https://github.com/stretchr/powerwalk
 	filepath.Walk(rootDir, processFile)
+
+	if TrackStats {
+		fmt.Printf("%sElapsed time:%s  %s\n", Cyan, Restore, elapsedTime().String())
+		fmt.Printf("%sLines scanned:%s %d\n", Cyan, Restore, linesScanned)
+		fmt.Printf("%sFiles scanned:%s %d\n", Cyan, Restore, filesScanned)
+		fmt.Printf("%sMatches found:%s %d\n", Cyan, Restore, matchesFound)
+	}
 }
