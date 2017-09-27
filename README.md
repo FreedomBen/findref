@@ -23,33 +23,47 @@ If you are on an intel-based linux or mac, there is an install script located at
 To let the script do the work, run this command.  Make sure to add `sudo` if
 installing to a location that isn't writeable by your normal user:
 
-#### In your home directory (Make sure this destination is in your PATH variable)
+#### In your home directory (Make sure this destination is in your
+#[PATH](http://www.linfo.org/path_env_var.html) variable)
+
 ```bash
 curl -s https://raw.githubusercontent.com/FreedomBen/findref/master/install.sh | bash -s $HOME/bin
 ```
 
-#### Systemwide for all users (requires root access)
+#### System-wide for all users (requires root access)
 ```bash
 curl -s https://raw.githubusercontent.com/FreedomBen/findref/master/install.sh | sudo bash -s /usr/local/bin
 ```
 
 ### Pre-built binaries
 
-If you wish, you can download prebuilt binaries for your system.  After downloading,
-put it somewhere in your PATH.  I recommend /usr/local/bin:
+If you wish, you can download pre-built binaries for your system.  After downloading,
+put it somewhere in your [PATH](http://www.linfo.org/path_env_var.html).
 
-Current Release Version: 0.0.2
+I recommend putting it in `~/bin` if you are the only user (`sudo` isn't required
+to install in that location), or `/usr/local/bin` if there are multiple users on the system:
 
-| Release | Linux | macOS | Windows |
-|:-------:|:-----:|:-----:|:-------:|
-| 0.0.2 | [arm](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.2/linux/arm/findref) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.2/linux/amd64/findref) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.2/linux/arm64/findref) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.2/linux/386/findref) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.2/darwin/amd64/findref) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.2/darwin/386/findref) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.2/windows/amd64/findref.exe) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.2/windows/386/findref.exe) |
+#### Current Release Version: 0.0.2
 
-These links will always point to the current version (includable in scripts if you
-want the latest without having to update the script)
+These links will always point to the latest released version, so they are includable in
+scripts to get the latest version without having to adjust the version number for new
+releases.  Of course if you want to point to a specific release, find the permanent link
+on the [ARCHIVES.md](ARCHIVES.md) page.
 
 | Release | Linux | macOS | Windows |
 |:-------:|:-----:|:-----:|:-------:|
 | current_version | [arm](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/linux/arm/findref) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/linux/amd64/findref) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/linux/arm64/findref) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/linux/386/findref) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/darwin/amd64/findref) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/darwin/386/findref) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/windows/amd64/findref.exe) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/windows/386/findref.exe) |
+
+| Linux | macOS | Windows |
+|:-----:|:-----:|:-------:|
+| [arm](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/linux/arm/findref) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/linux/amd64/findref) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/linux/arm64/findref) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/linux/386/findref) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/darwin/amd64/findref) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/darwin/386/findref) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/windows/amd64/findref.exe) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/current_version/windows/386/findref.exe) |
+
+These links are perma-links to the version 0.0.2, meaning after a new version
+is release, these will still get you version 0.0.2.
+
+| Release | Linux | macOS | Windows |
+|:-------:|:-----:|:-----:|:-------:|
+| 0.0.2 | [arm](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.2/linux/arm/findref) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.2/linux/amd64/findref) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.2/linux/arm64/findref) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.2/linux/386/findref) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.2/darwin/amd64/findref) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.2/darwin/386/findref) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.2/windows/amd64/findref.exe) - [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/0.0.2/windows/386/findref.exe) |
 
 ### Older releases
 

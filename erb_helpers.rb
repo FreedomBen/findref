@@ -54,10 +54,6 @@ module ErbHelpers
       | Release | Linux | macOS | Windows |
       |:-------:|:-----:|:-----:|:-------:|
     EOS
-#    <<-EOS
-#| Release | Linux | macOS | Windows |
-#|:-------:|:-----:|:-----:|:-------:|
-#    EOS
   end
 
   def self.release_table(release_lines = nil)
