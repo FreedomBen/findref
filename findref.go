@@ -47,8 +47,8 @@ const Usage = `
               Print current version and exit
 `
 
-const Version = "0.0.4"
-const Date = "2017-09-26"
+const Version = "0.0.5"
+const Date = "2017-09-27"
 
 const Red = "\033[0;31m"
 const Blue = "\033[0;34m"

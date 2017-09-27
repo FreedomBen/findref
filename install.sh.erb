@@ -66,6 +66,7 @@ main ()
 {
     DEST_DIR="$HOME/bin"
     [ -n "$1" ] && DEST_DIR="$1"
+    mkdir -p $DEST_DIR
 
     if runningLinux; then
         downlink_link "${DEST_DIR}" "$(linux_link)"
