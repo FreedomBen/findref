@@ -111,7 +111,7 @@ func passesFileFilter(path string) bool {
 
 func isHidden(path string) bool {
 	// Ignore hidden files unless the IncludeHidden flag is set
-	return !IncludeHidden && hiddenFileRegex.MatchString(path)
+	return path != "." && !IncludeHidden && hiddenFileRegex.MatchString(path)
 }
 
 func containsNullByte(line []byte) bool {
@@ -165,6 +165,7 @@ func processFile(path string, info os.FileInfo, err error) error {
 
 	if info.IsDir() {
 		if isHidden(path) {
+			debug(Blue, "Directory", path, "is hidden and will be pruned", Restore)
 			return filepath.SkipDir // skip the whole sub-contents of this hidden directory
 		} else {
 			return FILE_PROCESSING_COMPLETE
@@ -172,6 +173,7 @@ func processFile(path string, info os.FileInfo, err error) error {
 	}
 
 	if passesFileFilter(path) {
+		debug(Blue+"Passes file filter:", path)
 		if isHidden(path) {
 			debug(Blue + "Hidden file '" + Restore + path + Blue + "' not processed")
 			return FILE_PROCESSING_COMPLETE
@@ -188,10 +190,10 @@ func getMatchRegex(ignoreCase bool, matchCase bool, usersRegex string) *regexp.R
 	// if match-case is not set, use smart case which means if it's all lower case be case-insensitive,
 	// but if there's capitals then be case-sensitive
 	if ignoreCase || (!matchCase && !regexp.MustCompile("[A-Z]").MatchString(usersRegex)) {
-		debug(Blue + "Match regex will be case-insensitive" + Restore)
+		debug(Blue, "Match regex will be case-insensitive", Restore)
 		return regexp.MustCompile("(?i)" + usersRegex)
 	} else {
-		debug(Blue + "Match regex will be exactly as user provided" + Restore)
+		debug(Blue, "Match regex will be exactly as user provided", Restore)
 		return regexp.MustCompile(usersRegex)
 	}
 }
@@ -224,7 +226,7 @@ func main() {
 	}
 
 	if *helpPtr {
-	    usageAndExit()
+		usageAndExit()
 	}
 
 	*matchCasePtr = *matchCasePtr || *mPtr
@@ -232,10 +234,10 @@ func main() {
 	IncludeHidden = *hiddenPtr || *hPtr
 	Debug = *debugPtr || *dPtr
 
-	debug("match-case enabled: ", *matchCasePtr)
-	debug("ignore-case enabled: ", *ignoreCasePtr)
-	debug("include hidden files: ", IncludeHidden)
-	debug("debug mode: ", Debug)
+	debug(Blue, "match-case enabled: ", Restore, *matchCasePtr)
+	debug(Blue, "ignore-case enabled: ", Restore, *ignoreCasePtr)
+	debug(Blue, "include hidden files: ", Restore, IncludeHidden)
+	debug(Blue, "debug mode: ", Restore, Debug)
 
 	rootDir := "."
 
@@ -256,9 +258,9 @@ func main() {
 		}
 	}
 
-	debug("matchRegex: ", matchRegex.String())
-	debug("rootDir: ", rootDir)
-	debug("fileRegex: ", filenameRegex.String())
+	debug(Blue, "matchRegex: ", Restore, matchRegex.String())
+	debug(Blue, "rootDir: ", Restore, rootDir)
+	debug(Blue, "fileRegex: ", Restore, filenameRegex.String())
 
 	// TODO: Switch to powerwalk for performance:  https://github.com/stretchr/powerwalk
 	filepath.Walk(rootDir, processFile)
