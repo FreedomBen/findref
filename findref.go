@@ -1,5 +1,6 @@
 package main
 
+//import "github.com/stretchr/powerwalk"
 import "flag"
 import "fmt"
 import (
@@ -9,6 +10,7 @@ import (
 	"regexp"
 	"strconv"
 	"time"
+	//"runtime"
 )
 
 const Usage = `
@@ -308,8 +310,11 @@ func main() {
 	debug(Blue, "rootDir: ", Restore, rootDir)
 	debug(Blue, "fileRegex: ", Restore, filenameRegex.String())
 
-	// TODO: Switch to powerwalk for performance:  https://github.com/stretchr/powerwalk
 	filepath.Walk(rootDir, processFile)
+
+	// TODO: Switch to powerwalk for performance:  https://github.com/stretchr/powerwalk
+	//runtime.GOMAXPROCS(runtime.NumCPU())
+	//powerwalk.Walk(rootDir, processFile)
 
 	if TrackStats {
 		fmt.Printf("%sElapsed time:%s  %s\n", Cyan, Restore, elapsedTime().String())
