@@ -33,6 +33,8 @@ const Usage = `
 
     Options:
 
+        -n | --no-color
+              Disable colorized output
         -d | --debug
               Enable debug mode
         -h | --hidden
@@ -50,26 +52,24 @@ const Usage = `
 const Version = "0.0.6"
 const Date = "2017-09-27"
 
-const Red = "\033[0;31m"
-const Blue = "\033[0;34m"
-const Cyan = "\033[0;36m"
-const Green = "\033[0;32m"
-const Purple = "\033[0;35m"
-const Restore = "\033[0m"
-const LightRed = "\033[1;31m"
-
-/* Not currently used
-const Black = "\033[0;30m"
-const Brown = "\033[0;33m"
-const White = "\033[1;37m"
-const Yellow = "\033[1;33m"
-const DarkGray = "\033[1;30m"
-const LightGray = "\033[0;37m"
-const LightBlue = "\033[1;34m"
-const LightCyan = "\033[1;36m"
-const LightGreen = "\033[1;32m"
-const LightPurple = "\033[1;35m"
-*/
+/* Colors */
+var Red string = "\033[0;31m"
+var Blue string = "\033[0;34m"
+var Cyan string = "\033[0;36m"
+var Green string = "\033[0;32m"
+var Black string = "\033[0;30m"
+var Brown string = "\033[0;33m"
+var White string = "\033[1;37m"
+var Yellow string = "\033[1;33m"
+var Purple string = "\033[0;35m"
+var Restore string = "\033[0m"
+var LightRed string = "\033[1;31m"
+var DarkGray string = "\033[1;30m"
+var LightGray string = "\033[0;37m"
+var LightBlue string = "\033[1;34m"
+var LightCyan string = "\033[1;36m"
+var LightGreen string = "\033[1;32m"
+var LightPurple string = "\033[1;35m"
 
 var FILE_PROCESSING_COMPLETE error = nil
 
@@ -88,6 +88,26 @@ var filesScanned int = 0
 var linesScanned int = 0
 var matchesFound int = 0
 var startTime time.Time
+
+func zeroColors() {
+	Red = ""
+	Blue = ""
+	Cyan = ""
+	Green = ""
+	Black = ""
+	Brown = ""
+	White = ""
+	Yellow = ""
+	Purple = ""
+	Restore = ""
+	LightRed = ""
+	DarkGray = ""
+	LightGray = ""
+	LightBlue = ""
+	LightCyan = ""
+	LightGreen = ""
+	LightPurple = ""
+}
 
 func elapsedTime() time.Duration {
 	return time.Now().Sub(startTime)
@@ -245,6 +265,7 @@ func main() {
 	dPtr := flag.Bool("d", false, "Alias for --debug")
 	hPtr := flag.Bool("h", false, "Alias for --hidden")
 	vPtr := flag.Bool("v", false, "Alias for --version")
+	nPtr := flag.Bool("n", false, "Alias for --no-color")
 	mPtr := flag.Bool("m", false, "Alias for --match-case")
 	iPtr := flag.Bool("i", false, "Alias for --ignore-case")
 	helpPtr := flag.Bool("help", false, "Show usage")
@@ -252,13 +273,14 @@ func main() {
 	debugPtr := flag.Bool("debug", false, "Enable debug mode")
 	hiddenPtr := flag.Bool("hidden", false, "Include hidden files and files in hidden directories")
 	versionPtr := flag.Bool("version", false, "Print current version and exit")
+	nocolorPtr := flag.Bool("no-color", false, "Don't use color in output")
 	matchCasePtr := flag.Bool("match-case", false, "Match regex case (if unset smart-case is used)")
 	ignoreCasePtr := flag.Bool("ignore-case", false, "Ignore case in regex (overrides smart-case)")
 
-	flag.Parse()
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "%s\n", Usage)
 	}
+	flag.Parse()
 
 	if *vPtr || *versionPtr {
 		printVersionAndExit()
@@ -267,6 +289,11 @@ func main() {
 
 	if *helpPtr {
 		usageAndExit()
+	}
+
+	if *nPtr || *nocolorPtr {
+		debug("Color output is disabled")
+		zeroColors()
 	}
 
 	*matchCasePtr = *matchCasePtr || *mPtr
