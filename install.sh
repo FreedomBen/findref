@@ -6,112 +6,112 @@ declare -r color_red='\033[0;31m'
 
 red ()
 {
-    echo -e "${color_red}${1}${color_restore}\n"
+    echo -e "${color_red}${1}${color_restore}"
 }
 
 declare -r color_blue='\033[0;34m'
 
 blue ()
 {
-    echo -e "${color_blue}${1}${color_restore}\n"
+    echo -e "${color_blue}${1}${color_restore}"
 }
 
 declare -r color_cyan='\033[0;36m'
 
 cyan ()
 {
-    echo -e "${color_cyan}${1}${color_restore}\n"
+    echo -e "${color_cyan}${1}${color_restore}"
 }
 
 declare -r color_green='\033[0;32m'
 
 green ()
 {
-    echo -e "${color_green}${1}${color_restore}\n"
+    echo -e "${color_green}${1}${color_restore}"
 }
 
 declare -r color_brown='\033[0;33m'
 
 brown ()
 {
-    echo -e "${color_brown}${1}${color_restore}\n"
+    echo -e "${color_brown}${1}${color_restore}"
 }
 
 declare -r color_black='\033[0;30m'
 
 black ()
 {
-    echo -e "${color_black}${1}${color_restore}\n"
+    echo -e "${color_black}${1}${color_restore}"
 }
 
 declare -r color_white='\033[1;37m'
 
 white ()
 {
-    echo -e "${color_white}${1}${color_restore}\n"
+    echo -e "${color_white}${1}${color_restore}"
 }
 
 declare -r color_purple='\033[0;35m'
 
 purple ()
 {
-    echo -e "${color_purple}${1}${color_restore}\n"
+    echo -e "${color_purple}${1}${color_restore}"
 }
 
 declare -r color_yellow='\033[1;33m'
 
 yellow ()
 {
-    echo -e "${color_yellow}${1}${color_restore}\n"
+    echo -e "${color_yellow}${1}${color_restore}"
 }
 
 declare -r color_light_red='\033[1;31m'
 
 light_red ()
 {
-    echo -e "${color_light_red}${1}${color_restore}\n"
+    echo -e "${color_light_red}${1}${color_restore}"
 }
 
 declare -r color_dark_gray='\033[1;30m'
 
 dark_gray ()
 {
-    echo -e "${color_dark_gray}${1}${color_restore}\n"
+    echo -e "${color_dark_gray}${1}${color_restore}"
 }
 
 declare -r color_light_gray='\033[0;37m'
 
 light_gray ()
 {
-    echo -e "${color_light_gray}${1}${color_restore}\n"
+    echo -e "${color_light_gray}${1}${color_restore}"
 }
 
 declare -r color_light_blue='\033[1;34m'
 
 light_blue ()
 {
-    echo -e "${color_light_blue}${1}${color_restore}\n"
+    echo -e "${color_light_blue}${1}${color_restore}"
 }
 
 declare -r color_light_cyan='\033[1;36m'
 
 light_cyan ()
 {
-    echo -e "${color_light_cyan}${1}${color_restore}\n"
+    echo -e "${color_light_cyan}${1}${color_restore}"
 }
 
 declare -r color_light_green='\033[1;32m'
 
 light_green ()
 {
-    echo -e "${color_light_green}${1}${color_restore}\n"
+    echo -e "${color_light_green}${1}${color_restore}"
 }
 
 declare -r color_light_purple='\033[1;35m'
 
 light_purple ()
 {
-    echo -e "${color_light_purple}${1}${color_restore}\n"
+    echo -e "${color_light_purple}${1}${color_restore}"
 }
 
 

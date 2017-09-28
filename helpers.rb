@@ -41,7 +41,7 @@ module Helpers
 
       #{color} ()
       {
-          echo -e "${color_#{color}}${1}${color_restore}\\n"
+          echo -e "${color_#{color}}${1}${color_restore}"
       }
     EOS
   end
