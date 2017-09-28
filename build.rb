@@ -2,6 +2,8 @@
 
 require 'fileutils'
 
+require_relative 'erb_helpers'
+
 GO_VERSION = '1.9-alpine'.freeze
 
 # See: https://stackoverflow.com/a/30068222/2062384 for list of valid targets
@@ -34,7 +36,7 @@ def cyan(message)
 end
 
 def die(message)
-  puts "[die]: #{message}"
+  puts "#{RED}[die]: #{message}#{RESTORE}"
   exit 1
 end
 
@@ -54,19 +56,19 @@ def main(release)
   die('Must pass release version as first arg') if release.nil? || release.empty?
   OSES_ARCHES.each do |os, arches|
     arches.each do |arch|
-      dest_dirs = ['latest', release].map{ |rel| "findref-bin/#{rel}/#{os}/#{arch}" }
+      dest_dirs = [ErbHelpers.latest_release_name, release].map{ |rel| "#{ErbHelpers.findref_bin_repo}/#{rel}/#{os}/#{arch}" }
       cyan "Building findref v#{release} for #{os} #{arch}..."
       system(docker_run(os, arch))
-      fr = os == 'windows' ? 'findref.exe' : 'findref'
-      fr_zip = 'findref.zip'
-      cyan "Zipping #{fr} into #{fr_zip}"
-      system("zip -9 #{fr_zip} #{fr}")
+      fr_bin = ErbHelpers.bin_name(os)
+      fr_zip = ErbHelpers.zip_name
+      cyan "Zipping #{fr_bin} into #{fr_zip}"
+      system("zip -9 #{fr_zip} #{fr_bin}")
       dest_dirs.each do |dest_dir|
         FileUtils.mkdir_p(dest_dir)
         FileUtils.cp(fr_zip, "#{dest_dir}/")
       end
       FileUtils.rm(fr_zip)
-      FileUtils.rm(fr)
+      FileUtils.rm(fr_bin)
     end
   end
   cyan 'Done!'

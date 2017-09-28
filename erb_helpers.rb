@@ -4,21 +4,37 @@ module ErbHelpers
       .map{ |d| File.basename(d) }
   end
 
+  def self.latest_release_name
+    'latest'
+  end
+
   def self.latest_release
     releases.first
   end
 
+  def self.findref_bin_repo
+    'findref-bin'
+  end
+
   def self.releases
-    glob('findref-bin/*')
-      .select{ |rel| File.directory?("findref-bin/#{rel}") }
-      .select{ |rel| rel != 'latest' }
+    glob("#{findref_bin_repo}/*")
+      .select{ |rel| File.directory?("#{findref_bin_repo}/#{rel}") }
+      .select{ |rel| rel != latest_release_name }
       .map{ |rel| File.basename(rel) }
       .sort
       .reverse
   end
 
+  def self.zip_name
+    'findref.zip'
+  end
+
+  def self.bin_name(os)
+    os == 'windows' ? 'findref.exe' : 'findref'
+  end
+
   def self.url(release, os, arch)
-    "https://raw.githubusercontent.com/FreedomBen/findref-bin/master/#{release}/#{os}/#{arch}/findref.zip"
+    "https://raw.githubusercontent.com/FreedomBen/#{findref_bin_repo}/master/#{release}/#{os}/#{arch}/#{zip_name}"
   end
 
   def self.link(release, os, arch)
@@ -26,7 +42,7 @@ module ErbHelpers
   end
 
   def self.links(release, os)
-    glob("findref-bin/#{release}/#{os}/*").map{ |arch| link(release, os, arch) }
+    glob("#{findref_bin_repo}/#{release}/#{os}/*").map{ |arch| link(release, os, arch) }
   end
 
   def self.linux_links(release)
@@ -46,7 +62,7 @@ module ErbHelpers
   end
 
   def self.release_line_latest
-    release_line('latest')
+    release_line(latest_release_name)
   end
 
   def self.release_table_header
