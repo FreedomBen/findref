@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
 <% require_relative 'helpers' %>
+<%= Helpers.bash_color_funcs %>
 
 die ()
 {
-    echo "[die]: $1"
+    echo "${color_red}[die]: ${1}${color_restore}"
     exit 1
 }
 
@@ -66,15 +67,18 @@ main ()
 {
     dest_dir="${HOME}/bin"
     [ -n "$1" ] && dest_dir="$1"
+    cyan "Creating destination directory '${dest_dir}' if it doesn't exist"
     mkdir -p "${dest_dir}"
 
     bin_name=''
 
     if runningLinux; then
-        bin_name='<%= Helpers.bin_name('linux') %>'
+        cyan 'You are running linux!  Downloading findref v<%= Helpers.latest_release %> for linux...'
+        bin_name='findref'
         downlink_link "${dest_dir}" "$(linux_link)"
     elif runningOSX; then
-        bin_name='<%= Helpers.bin_name('darwin') %>'
+        cyan 'You are running macOS!  Downloading findref v<%= Helpers.latest_release %> for macOS...'
+        bin_name='findref'
         downlink_link "${dest_dir}" "$(mac_link)"
     else
         die 'Unsupported platform!'
@@ -83,10 +87,15 @@ main ()
     cd "${dest_dir}"
 
     # If there's already a findref version, remove it
+    cyan 'Cleaning out any old versions'
     rm -f "${bin_name}"
+    cyan 'Unzipping v<%= Helpers.latest_release %>'
     unzip '<%= Helpers.zip_name %>'
+    cyan 'Cleaning up the zip file for v<%= Helpers.latest_release %>'
     rm -f '<%= Helpers.zip_name %>'
+    cyan 'Making ${bin_name} v<%= Helpers.latest_release %> executable'
     chmod +x "${bin_name}"
+    cyan "All done!  If you can't run findref now, make sure that '${dest_dir}' is in your PATH"
 }
 
 main $@
