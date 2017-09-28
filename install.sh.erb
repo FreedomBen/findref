@@ -59,7 +59,7 @@ linux_link ()
 
 downlink_link ()
 {
-    curl -o "${1}/findref" "${2}"
+    curl -o "${1}/findref.zip" "${2}"
 }
 
 main ()
@@ -76,6 +76,9 @@ main ()
         die "Unsupported platform!"
     fi
 
+    cd $DEST_DIR
+    unzip findref.zip
+    rm findref.zip
     chmod +x "$DEST_DIR/findref"
 }
 

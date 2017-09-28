@@ -49,17 +49,17 @@ running386 ()
 
 mac_link ()
 {
-    echo "https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/darwin/amd64/findref"
+    echo "https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/darwin/amd64/findref.zip"
 }
 
 linux_link ()
 {
-    echo "https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/amd64/findref"
+    echo "https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/amd64/findref.zip"
 }
 
 downlink_link ()
 {
-    curl -o "${1}/findref" "${2}"
+    curl -o "${1}/findref.zip" "${2}"
 }
 
 main ()
@@ -76,6 +76,9 @@ main ()
         die "Unsupported platform!"
     fi
 
+    cd $DEST_DIR
+    unzip findref.zip
+    rm findref.zip
     chmod +x "$DEST_DIR/findref"
 }
 
