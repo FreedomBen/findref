@@ -117,7 +117,7 @@ light_purple ()
 
 die ()
 {
-    echo "${color_red}[die]: ${1}${color_restore}"
+    echo -e "${color_red}[die]: ${1}${color_restore}"
     exit 1
 }
 
@@ -172,7 +172,7 @@ linux_link ()
 
 downlink_link ()
 {
-    curl -o "${1}/findref.zip" "${2}"
+    curl -o "${1}/findref.zip" "${2}" || die "Error downloading findref.zip.  Please check your connection and try again"
 }
 
 main ()
@@ -180,7 +180,7 @@ main ()
     dest_dir="${HOME}/bin"
     [ -n "$1" ] && dest_dir="$1"
     cyan "Creating destination directory '${dest_dir}' if it doesn't exist"
-    mkdir -p "${dest_dir}"
+    mkdir -p "${dest_dir}" || die "Could not create directory '${dest_dir}'!"
 
     bin_name=''
 
@@ -193,21 +193,25 @@ main ()
         bin_name='findref'
         downlink_link "${dest_dir}" "$(mac_link)"
     else
-        die 'Unsupported platform!'
+        die 'Platform not supported by this install script.\nPre-built binaries may be available for manual download.\n\tSee:  https://github.com/FreedomBen/findref#pre-built-binaries'
     fi
 
     cd "${dest_dir}"
 
     # If there's already a findref version, remove it
     cyan 'Cleaning out any old versions'
-    rm -f "${bin_name}"
+    rm -f "${bin_name}" || red "Error removing old version of ${bin_name}"
+
     cyan 'Unzipping v0.0.7'
-    unzip 'findref.zip'
+    unzip 'findref.zip' || die 'Error unzipping findref.zip'
+
     cyan 'Cleaning up the zip file for v0.0.7'
-    rm -f 'findref.zip'
+    rm -f 'findref.zip' || red "Error removing findref.zip"
+
     cyan 'Making ${bin_name} v0.0.7 executable'
-    chmod +x "${bin_name}"
-    cyan "All done!  If you can't run findref now, make sure that '${dest_dir}' is in your PATH"
+    chmod +x "${bin_name}" || die "Unable to make $(pwd)/${bin_name}' executable!"
+
+    cyan "All done!  If you can't run '${bin_name}' now, make sure that '${dest_dir}' is in your PATH"
 }
 
 main $@
