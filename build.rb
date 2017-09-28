@@ -58,10 +58,14 @@ def main(release)
       cyan "Building findref v#{release} for #{os} #{arch}..."
       system(docker_run(os, arch))
       fr = os == 'windows' ? 'findref.exe' : 'findref'
+      fr_zip = 'findref.zip'
+      cyan "Zipping #{fr} into #{fr_zip}"
+      system("zip -9 #{fr_zip} #{fr}")
       dest_dirs.each do |dest_dir|
         FileUtils.mkdir_p(dest_dir)
-        FileUtils.cp(fr, "#{dest_dir}/")
+        FileUtils.cp(fr_zip, "#{dest_dir}/")
       end
+      FileUtils.rm(fr_zip)
       FileUtils.rm(fr)
     end
   end
