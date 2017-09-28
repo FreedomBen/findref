@@ -3,6 +3,7 @@ package main
 //import "github.com/stretchr/powerwalk"
 import "flag"
 import "fmt"
+import "sort"
 import (
 	"bufio"
 	"os"
@@ -33,16 +34,18 @@ const Usage = `
 
     Options:
 
-        -n | --no-color
-              Disable colorized output
         -d | --debug
               Enable debug mode
+        -f | --filename-only
+              Display only filenames with matches, not the matches themselves
         -h | --hidden
               Include hidden files and files in hidden directories
         -i | --ignore-case
               Ignore case in regex (overrides smart-case)
         -m | --match-case
               Match regex case (if unset smart-case is used)
+        -n | --no-color
+              Disable colorized output
         -s | --stats
               Track basic statistics and print them on exit
         -v | --version
@@ -75,8 +78,9 @@ var FILE_PROCESSING_COMPLETE error = nil
 
 /* Shared flags */
 var Debug bool = false
-var IncludeHidden bool = false
 var TrackStats bool = false
+var FilenameOnly bool = false
+var IncludeHidden bool = false
 
 /* Shared regular expressions */
 var matchRegex *regexp.Regexp = nil
@@ -88,6 +92,8 @@ var filesScanned int = 0
 var linesScanned int = 0
 var matchesFound int = 0
 var startTime time.Time
+
+var filenameOnlyFiles []string = make([]string, 0, 100)
 
 func zeroColors() {
 	Red = ""
@@ -202,7 +208,11 @@ func checkForMatches(path string) error {
 		if matchIndex := matchRegex.FindIndex(line); matchIndex != nil {
 			// we have a match! loc == nil means no match so just ignore that case
 			incrMatchCount()
-			printMatch(path, lineNumber, line, matchIndex)
+			if FilenameOnly {
+				filenameOnlyFiles = append(filenameOnlyFiles, path)
+			} else {
+				printMatch(path, lineNumber, line, matchIndex)
+			}
 		}
 	}
 
@@ -260,6 +270,19 @@ func printVersionAndExit() {
 	fmt.Printf("%s%s%s%s%s%s\n", Cyan, "findref version ", Version, " released on ", Date, Restore)
 }
 
+func uniq(stringSlice []string) []string {
+	/* There is no built-in uniq function for slices, so we will use a map */
+	stringMap := make(map[string]bool)
+	for _, v := range stringSlice {
+		stringMap[v] = true
+	}
+	retval := make([]string, 0, len(stringMap))
+	for key, _ := range stringMap {
+		retval = append(retval, key)
+	}
+	return retval
+}
+
 func main() {
 	sPtr := flag.Bool("s", false, "Alias for --stats")
 	dPtr := flag.Bool("d", false, "Alias for --debug")
@@ -268,6 +291,7 @@ func main() {
 	nPtr := flag.Bool("n", false, "Alias for --no-color")
 	mPtr := flag.Bool("m", false, "Alias for --match-case")
 	iPtr := flag.Bool("i", false, "Alias for --ignore-case")
+	fPtr := flag.Bool("f", false, "Alias for --filename-only")
 	helpPtr := flag.Bool("help", false, "Show usage")
 	statsPtr := flag.Bool("stats", false, "Track and display statistics")
 	debugPtr := flag.Bool("debug", false, "Enable debug mode")
@@ -276,6 +300,7 @@ func main() {
 	nocolorPtr := flag.Bool("no-color", false, "Don't use color in output")
 	matchCasePtr := flag.Bool("match-case", false, "Match regex case (if unset smart-case is used)")
 	ignoreCasePtr := flag.Bool("ignore-case", false, "Ignore case in regex (overrides smart-case)")
+	filenameOnlyPtr := flag.Bool("filename-only", false, "Display only filenames with matches")
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "%s\n", Usage)
@@ -296,11 +321,12 @@ func main() {
 		zeroColors()
 	}
 
+	Debug = *debugPtr || *dPtr
+	TrackStats = *statsPtr || *sPtr
+	FilenameOnly = *filenameOnlyPtr || *fPtr
+	IncludeHidden = *hiddenPtr || *hPtr
 	*matchCasePtr = *matchCasePtr || *mPtr
 	*ignoreCasePtr = *ignoreCasePtr || *iPtr
-	TrackStats = *statsPtr || *sPtr
-	IncludeHidden = *hiddenPtr || *hPtr
-	Debug = *debugPtr || *dPtr
 
 	if TrackStats {
 		startTime = time.Now()
@@ -312,6 +338,7 @@ func main() {
 	debug(Blue, "ignore-case enabled: ", Restore, *ignoreCasePtr)
 	debug(Blue, "include hidden files: ", Restore, IncludeHidden)
 	debug(Blue, "debug mode: ", Restore, Debug)
+	debug(Blue, "filename only: ", Restore, FilenameOnly)
 
 	rootDir := "."
 
@@ -341,6 +368,14 @@ func main() {
 	// TODO: Switch to powerwalk for performance:  https://github.com/stretchr/powerwalk
 	//runtime.GOMAXPROCS(runtime.NumCPU())
 	//powerwalk.Walk(rootDir, processFile)
+
+	if FilenameOnly {
+		filenames := uniq(filenameOnlyFiles)
+		sort.Strings(filenames)
+		for _, filename := range filenames {
+			fmt.Printf("%s%s%s\n", Purple, filename, Restore)
+		}
+	}
 
 	if TrackStats {
 		fmt.Printf("%sElapsed time:%s  %s\n", Cyan, Restore, elapsedTime().String())
