@@ -49,12 +49,12 @@ running386 ()
 
 mac_link ()
 {
-    echo "<%= Helpers.url(Helpers.latest_release_name, 'darwin', 'amd64') %>"
+    echo '<%= Helpers.url(Helpers.latest_release_name, 'darwin', 'amd64') %>'
 }
 
 linux_link ()
 {
-    echo "<%= Helpers.url(Helpers.latest_release_name, 'linux', 'amd64') %>"
+    echo '<%= Helpers.url(Helpers.latest_release_name, 'linux', 'amd64') %>'
 }
 
 downlink_link ()
@@ -64,22 +64,29 @@ downlink_link ()
 
 main ()
 {
-    DEST_DIR="$HOME/bin"
-    [ -n "$1" ] && DEST_DIR="$1"
-    mkdir -p $DEST_DIR
+    dest_dir="${HOME}/bin"
+    [ -n "$1" ] && dest_dir="$1"
+    mkdir -p "${dest_dir}"
+
+    bin_name=''
 
     if runningLinux; then
-        downlink_link "${DEST_DIR}" "$(linux_link)"
+        bin_name='<%= Helpers.bin_name('linux') %>'
+        downlink_link "${dest_dir}" "$(linux_link)"
     elif runningOSX; then
-        downlink_link "${DEST_DIR}" "$(mac_link)"
+        bin_name='<%= Helpers.bin_name('darwin') %>'
+        downlink_link "${dest_dir}" "$(mac_link)"
     else
-        die "Unsupported platform!"
+        die 'Unsupported platform!'
     fi
 
-    cd $DEST_DIR
-    unzip <%= Helpers.zip_name %>
-    rm <%= Helpers.zip_name %>
-    chmod +x "$DEST_DIR/findref"
+    cd "${dest_dir}"
+
+    # If there's already a findref version, remove it
+    rm -f "${bin_name}"
+    unzip '<%= Helpers.zip_name %>'
+    rm -f '<%= Helpers.zip_name %>'
+    chmod +x "${bin_name}"
 }
 
 main $@

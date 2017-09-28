@@ -49,12 +49,12 @@ running386 ()
 
 mac_link ()
 {
-    echo "https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/darwin/amd64/findref.zip"
+    echo 'https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/darwin/amd64/findref.zip'
 }
 
 linux_link ()
 {
-    echo "https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/amd64/findref.zip"
+    echo 'https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/amd64/findref.zip'
 }
 
 downlink_link ()
@@ -64,22 +64,29 @@ downlink_link ()
 
 main ()
 {
-    DEST_DIR="$HOME/bin"
-    [ -n "$1" ] && DEST_DIR="$1"
-    mkdir -p $DEST_DIR
+    dest_dir="${HOME}/bin"
+    [ -n "$1" ] && dest_dir="$1"
+    mkdir -p "${dest_dir}"
+
+    bin_name=''
 
     if runningLinux; then
-        downlink_link "${DEST_DIR}" "$(linux_link)"
+        bin_name='findref'
+        downlink_link "${dest_dir}" "$(linux_link)"
     elif runningOSX; then
-        downlink_link "${DEST_DIR}" "$(mac_link)"
+        bin_name='findref'
+        downlink_link "${dest_dir}" "$(mac_link)"
     else
-        die "Unsupported platform!"
+        die 'Unsupported platform!'
     fi
 
-    cd $DEST_DIR
-    unzip findref.zip
-    rm findref.zip
-    chmod +x "$DEST_DIR/findref"
+    cd "${dest_dir}"
+
+    # If there's already a findref version, remove it
+    rm -f "${bin_name}"
+    unzip 'findref.zip'
+    rm -f 'findref.zip'
+    chmod +x "${bin_name}"
 }
 
 main $@
