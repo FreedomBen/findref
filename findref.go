@@ -276,9 +276,11 @@ func uniq(stringSlice []string) []string {
 	for _, v := range stringSlice {
 		stringMap[v] = true
 	}
-	retval := make([]string, 0, len(stringMap))
+	retval := make([]string, len(stringMap), len(stringMap))
+	i := 0
 	for key, _ := range stringMap {
-		retval = append(retval, key)
+		retval[i] = key
+		i++
 	}
 	return retval
 }
