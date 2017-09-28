@@ -198,7 +198,7 @@ main ()
         bin_name='findref'
         downlink_link "${dest_dir}" "$(mac_link)"
     else
-        die 'Platform not supported by this install script.\n\n\t${color_yellow}Pre-built binaries may be available for manual download.\n\tSee:  https://github.com/FreedomBen/findref#pre-built-binaries'
+        die "Platform not supported by this install script.\n\n\t${color_yellow}Pre-built binaries may be available for manual download.\n\tSee:  https://github.com/FreedomBen/findref#pre-built-binaries\n"
     fi
 
     cd "${dest_dir}"
