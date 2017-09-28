@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-<% require_relative 'erb_helpers' %>
+<% require_relative 'helpers' %>
 
 die ()
 {
@@ -49,17 +49,17 @@ running386 ()
 
 mac_link ()
 {
-    echo "<%= ErbHelpers.url(ErbHelpers.latest_release_name, 'darwin', 'amd64') %>"
+    echo "<%= Helpers.url(Helpers.latest_release_name, 'darwin', 'amd64') %>"
 }
 
 linux_link ()
 {
-    echo "<%= ErbHelpers.url(ErbHelpers.latest_release_name, 'linux', 'amd64') %>"
+    echo "<%= Helpers.url(Helpers.latest_release_name, 'linux', 'amd64') %>"
 }
 
 downlink_link ()
 {
-    curl -o "${1}/<%= ErbHelpers.zip_name %>" "${2}"
+    curl -o "${1}/<%= Helpers.zip_name %>" "${2}"
 }
 
 main ()
@@ -77,8 +77,8 @@ main ()
     fi
 
     cd $DEST_DIR
-    unzip <%= ErbHelpers.zip_name %>
-    rm <%= ErbHelpers.zip_name %>
+    unzip <%= Helpers.zip_name %>
+    rm <%= Helpers.zip_name %>
     chmod +x "$DEST_DIR/findref"
 }
 

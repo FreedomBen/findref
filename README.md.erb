@@ -1,6 +1,6 @@
 # fr / findref
 
-<% require_relative 'erb_helpers' %>
+<% require_relative 'helpers' %>
 
 `findref` (commonly aliased to `fr`) helps you find strings, or match regular expressions, in a directory of files.  It is inspired by `git grep` which is a good tool, but has limitations that made writing a replacement a worthy endeavor.
 
@@ -137,12 +137,12 @@ scripts to get the latest version without having to adjust the version number fo
 releases.  Of course if you want to point to a specific release, find the permanent link
 on the [ARCHIVES.md](ARCHIVES.md) page.
 
-<%= ErbHelpers.release_table(ErbHelpers.release_line_latest) %>
+<%= Helpers.release_table(Helpers.release_line_latest) %>
 
 These links are perma-links to the binaries for version <%= fr_version %>, meaning even after
 a new version is released, these will still get you version <%= fr_version %>.
 
-<%= ErbHelpers.release_table(ErbHelpers.release_line(ErbHelpers.latest_release)) %>
+<%= Helpers.release_table(Helpers.release_line(Helpers.latest_release)) %>
 
 ### Older releases
 

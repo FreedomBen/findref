@@ -1,4 +1,4 @@
-module ErbHelpers
+module Helpers
   def self.glob(dir)
     Dir.glob(dir)
       .map{ |d| File.basename(d) }

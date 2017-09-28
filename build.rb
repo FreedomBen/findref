@@ -2,7 +2,7 @@
 
 require 'fileutils'
 
-require_relative 'erb_helpers'
+require_relative 'helpers'
 
 GO_VERSION = '1.9-alpine'.freeze
 
@@ -56,11 +56,11 @@ def main(release)
   die('Must pass release version as first arg') if release.nil? || release.empty?
   OSES_ARCHES.each do |os, arches|
     arches.each do |arch|
-      dest_dirs = [ErbHelpers.latest_release_name, release].map{ |rel| "#{ErbHelpers.findref_bin_repo}/#{rel}/#{os}/#{arch}" }
+      dest_dirs = [Helpers.latest_release_name, release].map{ |rel| "#{Helpers.findref_bin_repo}/#{rel}/#{os}/#{arch}" }
       cyan "Building findref v#{release} for #{os} #{arch}..."
       system(docker_run(os, arch))
-      fr_bin = ErbHelpers.bin_name(os)
-      fr_zip = ErbHelpers.zip_name
+      fr_bin = Helpers.bin_name(os)
+      fr_zip = Helpers.zip_name
       cyan "Zipping #{fr_bin} into #{fr_zip}"
       system("zip -9 #{fr_zip} #{fr_bin}")
       dest_dirs.each do |dest_dir|
