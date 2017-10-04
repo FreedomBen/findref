@@ -69,7 +69,7 @@ func Usage() string {
 	)
 }
 
-const Version = "0.0.8"
+const Version = "0.0.9"
 const Date = "2017-10-04"
 
 /* Colors */
