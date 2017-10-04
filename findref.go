@@ -52,8 +52,8 @@ const Usage = `
               Print current version and exit
 `
 
-const Version = "0.0.7"
-const Date = "2017-09-27"
+const Version = "0.0.8"
+const Date = "2017-10-04"
 
 /* Colors */
 var (
