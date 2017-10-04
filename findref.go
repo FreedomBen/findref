@@ -11,7 +11,8 @@ import (
 	"regexp"
 	"strconv"
 	"time"
-	//"runtime"
+	"runtime"
+	"sync"
 )
 
 const Usage = `
@@ -90,12 +91,54 @@ var filenameRegex *regexp.Regexp = regexp.MustCompile(".*")
 var hiddenFileRegex *regexp.Regexp = regexp.MustCompile(`(^|\/)\.`)
 
 /* Statistics */
-var filesScanned int = 0
-var linesScanned int = 0
-var matchesFound int = 0
+var statistics *Statistics
 var startTime time.Time
 
+type Statistics struct {
+	filesScanned int
+    linesScanned int
+    matchesFound int
+    mux sync.Mutex
+}
+
+func (s *Statistics) IncrLineCount() {
+    s.mux.Lock()
+    s.linesScanned++
+    s.mux.Unlock()
+}
+
+func (s *Statistics) IncrFileCount() {
+	s.mux.Lock()
+	s.filesScanned++
+	s.mux.Unlock()
+}
+
+func (s *Statistics) IncrMatchCount() {
+	s.mux.Lock()
+	s.matchesFound++
+	s.mux.Unlock()
+}
+
+func (s *Statistics) LineCount() int {
+    s.mux.Lock()
+    defer s.mux.Unlock()
+    return s.linesScanned
+}
+
+func (s *Statistics) FileCount() int {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+	return s.filesScanned
+}
+
+func (s *Statistics) MatchCount() int {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+	return s.matchesFound
+}
+
 var filenameOnlyFiles []string = make([]string, 0, 100)
+var filesToProcess []string = make([]string, 0, 100)
 
 func zeroColors() {
 	Red = ""
@@ -168,6 +211,7 @@ func containsNullByte(line []byte) bool {
 }
 
 func incrLineCount() {
+    lineCountMux.lo
 	if TrackStats {
 		linesScanned++
 	}
@@ -248,7 +292,8 @@ func processFile(path string, info os.FileInfo, err error) error {
 			debug(Blue + "Hidden file '" + Restore + path + Blue + "' not processed")
 			return FILE_PROCESSING_COMPLETE
 		}
-		return checkForMatches(path)
+		filesToProcess = append(filesToProcess, path)
+		return FILE_PROCESSING_COMPLETE
 	} else {
 		debug(Blue + "Ignoring file cause it doesn't match filter: " + Restore + path)
 	}
@@ -367,10 +412,15 @@ func main() {
 	debug(Blue, "rootDir: ", Restore, rootDir)
 	debug(Blue, "fileRegex: ", Restore, filenameRegex.String())
 
+	runtime.GOMAXPROCS(runtime.NumCPU())
 	filepath.Walk(rootDir, processFile)
 
+	// iterate through the array of files
+	for path := range filesToProcess {
+		go checkForMatches(path)
+	}
+
 	// TODO: Switch to powerwalk for performance:  https://github.com/stretchr/powerwalk
-	//runtime.GOMAXPROCS(runtime.NumCPU())
 	//powerwalk.Walk(rootDir, processFile)
 
 	if FilenameOnly {
