@@ -15,7 +15,7 @@ import (
 )
 
 const Usage = `
-    Usage of findref:
+    Usage of %s:
 
     findref [options] match_regex [start_dir] [filename_regex]
 
@@ -268,8 +268,16 @@ func getMatchRegex(ignoreCase bool, matchCase bool, usersRegex string) *regexp.R
 	}
 }
 
-func printVersionAndExit() {
-	fmt.Printf("%s%s%s%s%s%s\n", Cyan, "findref version ", Version, " released on ", Date, Restore)
+func versionString() string {
+	return fmt.Sprintf("%s%s%s%s%s%s%s", Cyan, "findref (version ", Version, " released on ", Date, ")", Restore)
+}
+
+func usage() string {
+	return fmt.Sprintf(Usage, versionString())
+}
+
+func printVersion() {
+	fmt.Println(versionString())
 }
 
 func uniq(stringSlice []string) []string {
@@ -280,7 +288,7 @@ func uniq(stringSlice []string) []string {
 	}
 	retval := make([]string, len(stringMap), len(stringMap))
 	i := 0
-	for key, _ := range stringMap {
+	for key := range stringMap {
 		retval[i] = key
 		i++
 	}
@@ -307,12 +315,12 @@ func main() {
 	filenameOnlyPtr := flag.Bool("filename-only", false, "Display only filenames with matches")
 
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "%s\n", Usage)
+		fmt.Print(usage())
 	}
 	flag.Parse()
 
 	if *vPtr || *versionPtr {
-		printVersionAndExit()
+		printVersion()
 		os.Exit(0)
 	}
 
