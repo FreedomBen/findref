@@ -66,8 +66,6 @@ end
 #
 # Vendoring stuff should be moved from govendor to dep:  https://github.com/golang/dep
 #
-# Use color for usage output
-#
 # Break into separate files
 #
 def main(release)

@@ -14,26 +14,28 @@ import (
 	//"runtime"
 )
 
-const Usage = `
-    Usage of %s:
+func Usage() string {
+	return fmt.Sprintf(
+		`
+    %sUsage of %s:%s
 
-    findref [options] match_regex [start_dir] [filename_regex]
+        %sfindref%s %s[options]%s %smatch_regex%s %s[start_dir]%s %s[filename_regex]%s
 
-    Arguments:
+    %sArguments:%s
 
-        match_regex:  This is an RE2 regular expression that will be matched against lines
-                      in each file, with matches being displayed to the user.
+        %smatch_regex:  This is an RE2 regular expression that will be matched against lines
+                      in each file, with matches being displayed to the user.%s
 
-        start_dir:  This optional argument sets the starting directory to crawl looking
+        %sstart_dir:  This optional argument sets the starting directory to crawl looking
                     for eligible files with lines matching match_regex.  Default value
-                    is the current working directory, AKA $PWD or '.'
+                    is the current working directory, AKA $PWD or '.'%s
 
-        filename_regex:  This optional argument restricts the set of files checked for
+        %sfilename_regex:  This optional argument restricts the set of files checked for
                          matching lines.  Eligible files must match this expression.
-                         Default value matches all files
+                         Default value matches all files%s
 
-    Options:
-
+    %sOptions:%s
+		%s
         -d | --debug
               Enable debug mode
         -f | --filename-only
@@ -50,30 +52,45 @@ const Usage = `
               Track basic statistics and print them on exit
         -v | --version
               Print current version and exit
-`
+%s
+`,
+		Red, versionString(false), Restore,
+		Brown, Restore,
+		Green, Restore,
+		Cyan, Restore,
+		Blue, Restore,
+		Purple, Restore,
+		Red, Restore,
+		Cyan, Restore,
+		Blue, Restore,
+		Purple, Restore,
+		Red, Restore,
+		Green, Restore,
+	)
+}
 
 const Version = "0.0.8"
 const Date = "2017-10-04"
 
 /* Colors */
 var (
-    Red string = "\033[0;31m"
-    Blue string = "\033[0;34m"
-    Cyan string = "\033[0;36m"
-    Green string = "\033[0;32m"
-    Black string = "\033[0;30m"
-    Brown string = "\033[0;33m"
-    White string = "\033[1;37m"
-    Yellow string = "\033[1;33m"
-    Purple string = "\033[0;35m"
-    Restore string = "\033[0m"
-    LightRed string = "\033[1;31m"
-    DarkGray string = "\033[1;30m"
-    LightGray string = "\033[0;37m"
-    LightBlue string = "\033[1;34m"
-    LightCyan string = "\033[1;36m"
-    LightGreen string = "\033[1;32m"
-    LightPurple string = "\033[1;35m"
+	Red         string = "\033[0;31m"
+	Blue        string = "\033[0;34m"
+	Cyan        string = "\033[0;36m"
+	Green       string = "\033[0;32m"
+	Black       string = "\033[0;30m"
+	Brown       string = "\033[0;33m"
+	White       string = "\033[1;37m"
+	Yellow      string = "\033[1;33m"
+	Purple      string = "\033[0;35m"
+	Restore     string = "\033[0m"
+	LightRed    string = "\033[1;31m"
+	DarkGray    string = "\033[1;30m"
+	LightGray   string = "\033[0;37m"
+	LightBlue   string = "\033[1;34m"
+	LightCyan   string = "\033[1;36m"
+	LightGreen  string = "\033[1;32m"
+	LightPurple string = "\033[1;35m"
 )
 
 var FILE_PROCESSING_COMPLETE error = nil
@@ -268,16 +285,16 @@ func getMatchRegex(ignoreCase bool, matchCase bool, usersRegex string) *regexp.R
 	}
 }
 
-func versionString() string {
-	return fmt.Sprintf("%s%s%s%s%s%s%s", Cyan, "findref (version ", Version, " released on ", Date, ")", Restore)
-}
-
-func usage() string {
-	return fmt.Sprintf(Usage, versionString())
+func versionString(color bool) string {
+	if color {
+		return fmt.Sprintf("%s%s%s%s%s%s%s", Cyan, "findref (version ", Version, " released on ", Date, ")", Restore)
+	} else {
+		return fmt.Sprintf("%s%s%s%s%s", "findref (version ", Version, " released on ", Date, ")")
+	}
 }
 
 func printVersion() {
-	fmt.Println(versionString())
+	fmt.Println(versionString(true))
 }
 
 func uniq(stringSlice []string) []string {
@@ -315,7 +332,7 @@ func main() {
 	filenameOnlyPtr := flag.Bool("filename-only", false, "Display only filenames with matches")
 
 	flag.Usage = func() {
-		fmt.Print(usage())
+		fmt.Print(Usage())
 	}
 	flag.Parse()
 
