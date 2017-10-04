@@ -52,6 +52,20 @@ def docker_run(os, arch)
   EOS
 end
 
+#
+# Consider moving to github releases instead of a separate bin repo.
+#   See: https://github.com/aktau/github-release/ for a useful tool to automate.
+#   Example usage:  https://github.com/zyedidia/micro/blob/master/tools/release.sh
+#
+# Also consider moving to a Makefile.  See:
+#   https://github.com/aktau/github-release/blob/master/Makefile and
+#   https://github.com/zyedidia/micro for examples.
+#
+# The Micro source also has a snapcraft config to look at, as well as a brew package:
+#   https://github.com/zyedidia/micro/blob/master/snapcraft.yaml
+#
+# Vendoring stuff should be moved from govendor to dep:  https://github.com/golang/dep
+#
 def main(release)
   die('Must pass release version as first arg') if release.nil? || release.empty?
   OSES_ARCHES.each do |os, arches|
