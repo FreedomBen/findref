@@ -68,6 +68,8 @@ end
 #
 # Use color for usage output
 #
+# Break into separate files
+#
 def main(release)
   die('Must pass release version as first arg') if release.nil? || release.empty?
   OSES_ARCHES.each do |os, arches|
