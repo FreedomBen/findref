@@ -190,11 +190,11 @@ main ()
     bin_name=''
 
     if runningLinux; then
-        cyan 'You are running linux!  Downloading findref v0.0.7 for linux...'
+        cyan 'You are running linux!  Downloading findref v0.0.8 for linux...'
         bin_name='findref'
         downlink_link "${dest_dir}" "$(linux_link)"
     elif runningOSX; then
-        cyan 'You are running macOS!  Downloading findref v0.0.7 for macOS...'
+        cyan 'You are running macOS!  Downloading findref v0.0.8 for macOS...'
         bin_name='findref'
         downlink_link "${dest_dir}" "$(mac_link)"
     else
@@ -207,13 +207,13 @@ main ()
     cyan 'Cleaning out any old versions'
     rm -f "${bin_name}" || red "Error removing old version of ${bin_name}"
 
-    cyan 'Unzipping v0.0.7'
+    cyan 'Unzipping v0.0.8'
     unzip 'findref.zip' || die 'Error unzipping findref.zip'
 
-    cyan 'Cleaning up the zip file for v0.0.7'
+    cyan 'Cleaning up the zip file for v0.0.8'
     rm -f 'findref.zip' || red "Error removing findref.zip"
 
-    cyan 'Making ${bin_name} v0.0.7 executable'
+    cyan 'Making ${bin_name} v0.0.8 executable'
     chmod +x "${bin_name}" || die "Unable to make $(pwd)/${bin_name}' executable!"
 
     cyan "All done!  If you can't run '${bin_name}' now, make sure that '${dest_dir}' is in your PATH"
