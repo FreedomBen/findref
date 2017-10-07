@@ -1,6 +1,5 @@
 package main
 
-//import "github.com/stretchr/powerwalk"
 import "flag"
 import "fmt"
 import "sort"
@@ -35,7 +34,7 @@ func Usage() string {
                          Default value matches all files%s
 
     %sOptions:%s
-		%s
+        %s
         -d | --debug
               Enable debug mode
         -f | --filename-only
@@ -54,18 +53,18 @@ func Usage() string {
               Print current version and exit
 %s
 `,
-		Red, versionString(false), Restore,
-		Brown, Restore,
-		Green, Restore,
-		Cyan, Restore,
-		Blue, Restore,
-		Purple, Restore,
-		Red, Restore,
-		Cyan, Restore,
-		Blue, Restore,
-		Purple, Restore,
-		Red, Restore,
-		Green, Restore,
+		colors.Red, versionString(false), colors.Restore,
+		colors.Brown, colors.Restore,
+		colors.Green, colors.Restore,
+		colors.Cyan, colors.Restore,
+		colors.Blue, colors.Restore,
+		colors.Purple, colors.Restore,
+		colors.Red, colors.Restore,
+		colors.Cyan, colors.Restore,
+		colors.Blue, colors.Restore,
+		colors.Purple, colors.Restore,
+		colors.Red, colors.Restore,
+		colors.Green, colors.Restore,
 	)
 }
 
@@ -73,70 +72,15 @@ const Version = "0.0.9"
 const Date = "2017-10-04"
 
 /* Colors */
-var (
-	Red         string = "\033[0;31m"
-	Blue        string = "\033[0;34m"
-	Cyan        string = "\033[0;36m"
-	Green       string = "\033[0;32m"
-	Black       string = "\033[0;30m"
-	Brown       string = "\033[0;33m"
-	White       string = "\033[1;37m"
-	Yellow      string = "\033[1;33m"
-	Purple      string = "\033[0;35m"
-	Restore     string = "\033[0m"
-	LightRed    string = "\033[1;31m"
-	DarkGray    string = "\033[1;30m"
-	LightGray   string = "\033[0;37m"
-	LightBlue   string = "\033[1;34m"
-	LightCyan   string = "\033[1;36m"
-	LightGreen  string = "\033[1;32m"
-	LightPurple string = "\033[1;35m"
-)
+var ()
 
 var FILE_PROCESSING_COMPLETE error = nil
 
-/* Shared flags */
-var Debug bool = false
-var TrackStats bool = false
-var FilenameOnly bool = false
-var IncludeHidden bool = false
-
-/* Shared regular expressions */
-var matchRegex *regexp.Regexp = nil
-var filenameRegex *regexp.Regexp = regexp.MustCompile(".*")
-var hiddenFileRegex *regexp.Regexp = regexp.MustCompile(`(^|\/)\.`)
-
-/* Statistics */
-var filesScanned int = 0
-var linesScanned int = 0
-var matchesFound int = 0
-var startTime time.Time
+var settings *Settings = NewSettings()
+var statistics *Statistics = NewStatistics()
+var colors *Colors = NewColors()
 
 var filenameOnlyFiles []string = make([]string, 0, 100)
-
-func zeroColors() {
-	Red = ""
-	Blue = ""
-	Cyan = ""
-	Green = ""
-	Black = ""
-	Brown = ""
-	White = ""
-	Yellow = ""
-	Purple = ""
-	Restore = ""
-	LightRed = ""
-	DarkGray = ""
-	LightGray = ""
-	LightBlue = ""
-	LightCyan = ""
-	LightGreen = ""
-	LightPurple = ""
-}
-
-func elapsedTime() time.Duration {
-	return time.Now().Sub(startTime)
-}
 
 func usageAndExit() {
 	flag.Usage()
@@ -144,35 +88,25 @@ func usageAndExit() {
 }
 
 func debug(a ...interface{}) {
-	if Debug {
+	if settings.Debug {
 		fmt.Println(a...)
 	}
 }
 
 func printMatch(path string, lineNumber int, line []byte, match []int) {
-	//fmt.Println(Purple + path + Restore + Green + ":" + strconv.Itoa(lineNumber) + ":" + Restore + string(line[:match[0]]) + LightRed + string(line[match[0]:match[1]]) + Restore + string(line[match[1]:]))
 	fmt.Printf("%s%s%s%s:%s:%s%s%s%s%s%s\n",
-		Purple,
+		colors.Purple,
 		path,
-		Restore,
-		Green,
+		colors.Restore,
+		colors.Green,
 		strconv.Itoa(lineNumber),
-		Restore,
+		colors.Restore,
 		string(line[:match[0]]),
-		LightRed,
+		colors.LightRed,
 		string(line[match[0]:match[1]]),
-		Restore,
+		colors.Restore,
 		string(line[match[1]:]),
 	)
-}
-
-func passesFileFilter(path string) bool {
-	return filenameRegex.MatchString(path)
-}
-
-func isHidden(path string) bool {
-	// Ignore hidden files unless the IncludeHidden flag is set
-	return path != "." && !IncludeHidden && hiddenFileRegex.MatchString(path)
 }
 
 func containsNullByte(line []byte) bool {
@@ -184,31 +118,12 @@ func containsNullByte(line []byte) bool {
 	return false
 }
 
-func incrLineCount() {
-	if TrackStats {
-		linesScanned++
-	}
-}
-
-func incrFileCount() {
-
-	if TrackStats {
-		filesScanned++
-	}
-}
-
-func incrMatchCount() {
-	if TrackStats {
-		matchesFound++
-	}
-}
-
 func checkForMatches(path string) error {
-	debug(Blue+"Checking file for matches:"+Restore, path)
+	debug(colors.Blue+"Checking file for matches:"+colors.Restore, path)
 
 	file, err := os.Open(path)
 	if err != nil {
-		debug(Red+"Error opening file at '"+path+"'.  It might be a directory.  Err: "+Restore, err)
+		debug(colors.Red+"Error opening file at '"+path+"'.  It might be a directory.  Err: "+colors.Restore, err)
 		return FILE_PROCESSING_COMPLETE
 	}
 	defer file.Close()
@@ -217,17 +132,16 @@ func checkForMatches(path string) error {
 	var lineNumber int = 0
 	for scanner.Scan() {
 		line := scanner.Bytes()
-		lineNumber++
-		incrLineCount()
+		statistics.IncrLineCount()
 		if containsNullByte(line) {
 			// This is a binary file.  Skip it!
-			debug(Blue+"Not processing binary file:"+Restore, path)
+			debug(colors.Blue+"Not processing binary file:"+colors.Restore, path)
 			return FILE_PROCESSING_COMPLETE
 		}
-		if matchIndex := matchRegex.FindIndex(line); matchIndex != nil {
+		if matchIndex := settings.MatchRegex.FindIndex(line); matchIndex != nil {
 			// we have a match! loc == nil means no match so just ignore that case
-			incrMatchCount()
-			if FilenameOnly {
+			statistics.IncrMatchCount()
+			if settings.FilenameOnly {
 				filenameOnlyFiles = append(filenameOnlyFiles, path)
 			} else {
 				printMatch(path, lineNumber, line, matchIndex)
@@ -236,14 +150,14 @@ func checkForMatches(path string) error {
 	}
 
 	if err := scanner.Err(); err != nil {
-		debug(Red+"Error scanning line from file '"+path+"'. File will be skipped.  Err: "+Restore, err)
+		debug(colors.Red+"Error scanning line from file '"+path+"'. File will be skipped.  Err: "+colors.Restore, err)
 		return FILE_PROCESSING_COMPLETE
 	}
 	return FILE_PROCESSING_COMPLETE
 }
 
 func processFile(path string, info os.FileInfo, err error) error {
-	incrFileCount()
+	statistics.IncrFileCount()
 
 	if err != nil {
 		debug("filepath.Walk encountered error with path '"+path+"'", err)
@@ -251,23 +165,23 @@ func processFile(path string, info os.FileInfo, err error) error {
 	}
 
 	if info.IsDir() {
-		if isHidden(path) {
-			debug(Blue, "Directory", path, "is hidden and will be pruned", Restore)
+		if settings.IsHidden(path) {
+			debug(colors.Blue, "Directory", path, "is hidden and will be pruned", colors.Restore)
 			return filepath.SkipDir // skip the whole sub-contents of this hidden directory
 		} else {
 			return FILE_PROCESSING_COMPLETE
 		}
 	}
 
-	if passesFileFilter(path) {
-		debug(Blue+"Passes file filter:", path)
-		if isHidden(path) {
-			debug(Blue + "Hidden file '" + Restore + path + Blue + "' not processed")
+	if settings.PassesFileFilter(path) {
+		debug(colors.Blue+"Passes file filter:", path)
+		if settings.IsHidden(path) {
+			debug(colors.Blue + "Hidden file '" + colors.Restore + path + colors.Blue + "' not processed")
 			return FILE_PROCESSING_COMPLETE
 		}
 		return checkForMatches(path)
 	} else {
-		debug(Blue + "Ignoring file cause it doesn't match filter: " + Restore + path)
+		debug(colors.Blue + "Ignoring file cause it doesn't match filter: " + colors.Restore + path)
 	}
 	return FILE_PROCESSING_COMPLETE
 }
@@ -277,17 +191,17 @@ func getMatchRegex(ignoreCase bool, matchCase bool, usersRegex string) *regexp.R
 	// if match-case is not set, use smart case which means if it's all lower case be case-insensitive,
 	// but if there's capitals then be case-sensitive
 	if ignoreCase || (!matchCase && !regexp.MustCompile("[A-Z]").MatchString(usersRegex)) {
-		debug(Blue, "Match regex will be case-insensitive", Restore)
+		debug(colors.Blue, "Match regex will be case-insensitive", colors.Restore)
 		return regexp.MustCompile("(?i)" + usersRegex)
 	} else {
-		debug(Blue, "Match regex will be exactly as user provided", Restore)
+		debug(colors.Blue, "Match regex will be exactly as user provided", colors.Restore)
 		return regexp.MustCompile(usersRegex)
 	}
 }
 
 func versionString(color bool) string {
 	if color {
-		return fmt.Sprintf("%s%s%s%s%s%s%s", Cyan, "findref (version ", Version, " released on ", Date, ")", Restore)
+		return fmt.Sprintf("%s%s%s%s%s%s%s", colors.Cyan, "findref (version ", Version, " released on ", Date, ")", colors.Restore)
 	} else {
 		return fmt.Sprintf("%s%s%s%s%s", "findref (version ", Version, " released on ", Date, ")")
 	}
@@ -347,27 +261,27 @@ func main() {
 
 	if *nPtr || *nocolorPtr {
 		debug("Color output is disabled")
-		zeroColors()
+		colors.ZeroColors()
 	}
 
-	Debug = *debugPtr || *dPtr
-	TrackStats = *statsPtr || *sPtr
-	FilenameOnly = *filenameOnlyPtr || *fPtr
-	IncludeHidden = *hiddenPtr || *hPtr
+	settings.Debug = *debugPtr || *dPtr
+	settings.TrackStats = *statsPtr || *sPtr
+	settings.FilenameOnly = *filenameOnlyPtr || *fPtr
+	settings.IncludeHidden = *hiddenPtr || *hPtr
 	*matchCasePtr = *matchCasePtr || *mPtr
 	*ignoreCasePtr = *ignoreCasePtr || *iPtr
 
-	if TrackStats {
-		startTime = time.Now()
-		debug(Blue, "Start time is:", Restore, startTime.String())
+	if settings.TrackStats {
+		statistics.startTime = time.Now()
+		debug(colors.Blue, "Start time is:", colors.Restore, statistics.startTime.String())
 	}
 
-	debug(Blue, "stats enabled: ", Restore, TrackStats)
-	debug(Blue, "match-case enabled: ", Restore, *matchCasePtr)
-	debug(Blue, "ignore-case enabled: ", Restore, *ignoreCasePtr)
-	debug(Blue, "include hidden files: ", Restore, IncludeHidden)
-	debug(Blue, "debug mode: ", Restore, Debug)
-	debug(Blue, "filename only: ", Restore, FilenameOnly)
+	debug(colors.Blue, "stats enabled: ", colors.Restore, settings.TrackStats)
+	debug(colors.Blue, "match-case enabled: ", colors.Restore, *matchCasePtr)
+	debug(colors.Blue, "ignore-case enabled: ", colors.Restore, *ignoreCasePtr)
+	debug(colors.Blue, "include hidden files: ", colors.Restore, settings.IncludeHidden)
+	debug(colors.Blue, "debug mode: ", colors.Restore, settings.Debug)
+	debug(colors.Blue, "filename only: ", colors.Restore, settings.FilenameOnly)
 
 	rootDir := "."
 
@@ -378,19 +292,19 @@ func main() {
 		fmt.Errorf("%s", "Too many args (expected 1 <= 3)")
 		usageAndExit()
 	} else {
-		matchRegex = getMatchRegex(*ignoreCasePtr, *matchCasePtr, flag.Args()[0])
+		settings.MatchRegex = getMatchRegex(*ignoreCasePtr, *matchCasePtr, flag.Args()[0])
 
 		if len(flag.Args()) >= 2 {
 			rootDir = flag.Args()[1]
 		}
 		if len(flag.Args()) == 3 {
-			filenameRegex = regexp.MustCompile(flag.Args()[2])
+			settings.FilenameRegex = regexp.MustCompile(flag.Args()[2])
 		}
 	}
 
-	debug(Blue, "matchRegex: ", Restore, matchRegex.String())
-	debug(Blue, "rootDir: ", Restore, rootDir)
-	debug(Blue, "fileRegex: ", Restore, filenameRegex.String())
+	debug(colors.Blue, "matchRegex: ", colors.Restore, settings.MatchRegex.String())
+	debug(colors.Blue, "rootDir: ", colors.Restore, rootDir)
+	debug(colors.Blue, "fileRegex: ", colors.Restore, settings.FilenameRegex.String())
 
 	filepath.Walk(rootDir, processFile)
 
@@ -398,18 +312,18 @@ func main() {
 	//runtime.GOMAXPROCS(runtime.NumCPU())
 	//powerwalk.Walk(rootDir, processFile)
 
-	if FilenameOnly {
+	if settings.FilenameOnly {
 		filenames := uniq(filenameOnlyFiles)
 		sort.Strings(filenames)
 		for _, filename := range filenames {
-			fmt.Printf("%s%s%s\n", Purple, filename, Restore)
+			fmt.Printf("%s%s%s\n", colors.Purple, filename, colors.Restore)
 		}
 	}
 
-	if TrackStats {
-		fmt.Printf("%sElapsed time:%s  %s\n", Cyan, Restore, elapsedTime().String())
-		fmt.Printf("%sLines scanned:%s %d\n", Cyan, Restore, linesScanned)
-		fmt.Printf("%sFiles scanned:%s %d\n", Cyan, Restore, filesScanned)
-		fmt.Printf("%sMatches found:%s %d\n", Cyan, Restore, matchesFound)
+	if settings.TrackStats {
+		fmt.Printf("%sElapsed time:%s  %s\n", colors.Cyan, colors.Restore, statistics.ElapsedTime().String())
+		fmt.Printf("%sLines scanned:%s %d\n", colors.Cyan, colors.Restore, statistics.LineCount())
+		fmt.Printf("%sFiles scanned:%s %d\n", colors.Cyan, colors.Restore, statistics.FileCount())
+		fmt.Printf("%sMatches found:%s %d\n", colors.Cyan, colors.Restore, statistics.MatchCount())
 	}
 }

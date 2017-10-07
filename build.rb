@@ -68,6 +68,10 @@ end
 #
 # Break into separate files
 #
+# Add config file (local in proj or global, just walk the tree up looking for it)
+#
+# Add option to honor git ignore file
+#
 def main(release)
   die('Must pass release version as first arg') if release.nil? || release.empty?
   OSES_ARCHES.each do |os, arches|
