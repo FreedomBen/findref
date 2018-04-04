@@ -133,6 +133,8 @@ func checkForMatches(path string) []Match {
 			if settings.FilenameOnly {
 				filenameOnlyFiles = append(filenameOnlyFiles, path)
 			} else {
+				m := Match{path, lineNumber, line, matchIndex}
+				m.printMatch()
 				retval = append(retval, Match{path, lineNumber, line, matchIndex})
 			}
 		}
@@ -329,7 +331,7 @@ func main() {
 	results := make(chan []Match, 100)
 
 	// two workers for each core
-	numWorkers := runtime.NumCPU() * 2
+	numWorkers := runtime.NumCPU() * 1
 	for w := 0; w < numWorkers; w++ {
 		go worker(w, jobs, results)
 	}
@@ -344,12 +346,10 @@ func main() {
 		result := <-results
 		for _, res := range result {
 			if res.hasMatch() {
-				res.printMatch()
+				//res.printMatch()
 			}
 		}
 	}
-
-	fmt.Println(colors.Blue, "All jobs finished.  Ready to exit", colors.Restore)
 
 	finishAndExit()
 }
