@@ -6,6 +6,7 @@ import (
 )
 
 type Statistics struct {
+	filesToScan  int
 	filesScanned int
 	linesScanned int
 	matchesFound int
@@ -20,6 +21,12 @@ func NewStatistics() *Statistics {
 		matchesFound: 0,
 		startTime:    time.Now(),
 	}
+}
+
+func (s *Statistics) IncrFilesToScan() {
+	s.mux.Lock()
+	s.filesToScan++
+	s.mux.Unlock()
 }
 
 func (s *Statistics) IncrLineCount() {
@@ -44,6 +51,12 @@ func (s *Statistics) LineCount() int {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 	return s.linesScanned
+}
+
+func (s *Statistics) FilesToScanCount() int {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+	return s.filesToScan
 }
 
 func (s *Statistics) FileCount() int {

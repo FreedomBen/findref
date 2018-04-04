@@ -8,9 +8,8 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strconv"
+	"runtime"
 	"time"
-	//"runtime"
 )
 
 func Usage() string {
@@ -71,9 +70,6 @@ func Usage() string {
 const Version = "0.0.9"
 const Date = "2017-10-04"
 
-/* Colors */
-var ()
-
 var FILE_PROCESSING_COMPLETE error = nil
 
 var settings *Settings = NewSettings()
@@ -81,6 +77,7 @@ var statistics *Statistics = NewStatistics()
 var colors *Colors = NewColors()
 
 var filenameOnlyFiles []string = make([]string, 0, 100)
+var filesToScan []FileToScan = make([]FileToScan, 0, 100)
 
 func usageAndExit() {
 	flag.Usage()
@@ -93,22 +90,6 @@ func debug(a ...interface{}) {
 	}
 }
 
-func printMatch(path string, lineNumber int, line []byte, match []int) {
-	fmt.Printf("%s%s%s%s:%s:%s%s%s%s%s%s\n",
-		colors.Purple,
-		path,
-		colors.Restore,
-		colors.Green,
-		strconv.Itoa(lineNumber),
-		colors.Restore,
-		string(line[:match[0]]),
-		colors.LightRed,
-		string(line[match[0]:match[1]]),
-		colors.Restore,
-		string(line[match[1]:]),
-	)
-}
-
 func containsNullByte(line []byte) bool {
 	for _, el := range line {
 		if el == 0 {
@@ -118,25 +99,33 @@ func containsNullByte(line []byte) bool {
 	return false
 }
 
-func checkForMatches(path string) error {
+func checkForMatches(path string) []Match {
 	debug(colors.Blue+"Checking file for matches:"+colors.Restore, path)
-
 	file, err := os.Open(path)
 	if err != nil {
+		fmt.Println(colors.Red+"Error opening file at '"+path+"'.  It might be a directory.  Err: "+colors.Restore, err)
 		debug(colors.Red+"Error opening file at '"+path+"'.  It might be a directory.  Err: "+colors.Restore, err)
-		return FILE_PROCESSING_COMPLETE
+		return []Match{Match{path, 0, []byte{}, []int{}}}
 	}
-	defer file.Close()
+	defer func() {
+		if path == "src/main/java/com/canopy/service/EFileService.java" {
+			fmt.Println("Closing the file: " + path)
+		}
+		file.Close()
+	}()
+
+	retval := make([]Match, 50)
 
 	scanner := bufio.NewScanner(file)
 	var lineNumber int = 0
 	for scanner.Scan() {
+		lineNumber += 1
 		line := scanner.Bytes()
 		statistics.IncrLineCount()
 		if containsNullByte(line) {
 			// This is a binary file.  Skip it!
 			debug(colors.Blue+"Not processing binary file:"+colors.Restore, path)
-			return FILE_PROCESSING_COMPLETE
+			return retval
 		}
 		if matchIndex := settings.MatchRegex.FindIndex(line); matchIndex != nil {
 			// we have a match! loc == nil means no match so just ignore that case
@@ -144,21 +133,18 @@ func checkForMatches(path string) error {
 			if settings.FilenameOnly {
 				filenameOnlyFiles = append(filenameOnlyFiles, path)
 			} else {
-				printMatch(path, lineNumber, line, matchIndex)
+				retval = append(retval, Match{path, lineNumber, line, matchIndex})
 			}
 		}
 	}
 
 	if err := scanner.Err(); err != nil {
 		debug(colors.Red+"Error scanning line from file '"+path+"'. File will be skipped.  Err: "+colors.Restore, err)
-		return FILE_PROCESSING_COMPLETE
 	}
-	return FILE_PROCESSING_COMPLETE
+	return retval
 }
 
 func processFile(path string, info os.FileInfo, err error) error {
-	statistics.IncrFileCount()
-
 	if err != nil {
 		debug("filepath.Walk encountered error with path '"+path+"'", err)
 		return FILE_PROCESSING_COMPLETE
@@ -179,7 +165,10 @@ func processFile(path string, info os.FileInfo, err error) error {
 			debug(colors.Blue + "Hidden file '" + colors.Restore + path + colors.Blue + "' not processed")
 			return FILE_PROCESSING_COMPLETE
 		}
-		return checkForMatches(path)
+		statistics.IncrFilesToScan()
+		defer statistics.IncrFileCount()
+
+		filesToScan = append(filesToScan, FileToScan{Path: path, Info: info, Err: err})
 	} else {
 		debug(colors.Blue + "Ignoring file cause it doesn't match filter: " + colors.Restore + path)
 	}
@@ -224,6 +213,31 @@ func uniq(stringSlice []string) []string {
 		i++
 	}
 	return retval
+}
+
+func finishAndExit() {
+	if settings.FilenameOnly {
+		filenames := uniq(filenameOnlyFiles)
+		sort.Strings(filenames)
+		for _, filename := range filenames {
+			fmt.Printf("%s%s%s\n", colors.Purple, filename, colors.Restore)
+		}
+	}
+
+	if settings.TrackStats {
+		fmt.Printf("%sElapsed time:%s  %s\n", colors.Cyan, colors.Restore, statistics.ElapsedTime().String())
+		fmt.Printf("%sLines scanned:%s %d\n", colors.Cyan, colors.Restore, statistics.LineCount())
+		fmt.Printf("%sFiles scanned:%s %d\n", colors.Cyan, colors.Restore, statistics.FileCount())
+		fmt.Printf("%sMatches found:%s %d\n", colors.Cyan, colors.Restore, statistics.MatchCount())
+	}
+}
+
+func worker(id int, jobs <-chan string, results chan<- []Match) {
+	for file := range jobs {
+		debug(colors.Blue, "Worker number", id, "started file", file, colors.Restore)
+		results <- checkForMatches(file)
+		debug(colors.Blue, "Worker number", id, "finished file", file, colors.Restore)
+	}
 }
 
 func main() {
@@ -306,24 +320,36 @@ func main() {
 	debug(colors.Blue, "rootDir: ", colors.Restore, rootDir)
 	debug(colors.Blue, "fileRegex: ", colors.Restore, settings.FilenameRegex.String())
 
+	runtime.GOMAXPROCS(runtime.NumCPU())
 	filepath.Walk(rootDir, processFile)
 
-	// TODO: Switch to powerwalk for performance:  https://github.com/stretchr/powerwalk
-	//runtime.GOMAXPROCS(runtime.NumCPU())
-	//powerwalk.Walk(rootDir, processFile)
+	// TODO: set niceness value to low
 
-	if settings.FilenameOnly {
-		filenames := uniq(filenameOnlyFiles)
-		sort.Strings(filenames)
-		for _, filename := range filenames {
-			fmt.Printf("%s%s%s\n", colors.Purple, filename, colors.Restore)
+	jobs := make(chan string, len(filesToScan))
+	results := make(chan []Match, 100)
+
+	// two workers for each core
+	numWorkers := runtime.NumCPU() * 2
+	for w := 0; w < numWorkers; w++ {
+		go worker(w, jobs, results)
+	}
+
+	// create a job for each file to scan
+	for _, val := range filesToScan {
+		jobs <- val.Path
+	}
+	close(jobs)
+
+	for r := 0; r < len(filesToScan); r++ {
+		result := <-results
+		for _, res := range result {
+			if res.hasMatch() {
+				res.printMatch()
+			}
 		}
 	}
 
-	if settings.TrackStats {
-		fmt.Printf("%sElapsed time:%s  %s\n", colors.Cyan, colors.Restore, statistics.ElapsedTime().String())
-		fmt.Printf("%sLines scanned:%s %d\n", colors.Cyan, colors.Restore, statistics.LineCount())
-		fmt.Printf("%sFiles scanned:%s %d\n", colors.Cyan, colors.Restore, statistics.FileCount())
-		fmt.Printf("%sMatches found:%s %d\n", colors.Cyan, colors.Restore, statistics.MatchCount())
-	}
+	fmt.Println(colors.Blue, "All jobs finished.  Ready to exit", colors.Restore)
+
+	finishAndExit()
 }

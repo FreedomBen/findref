@@ -66,7 +66,7 @@ end
 #
 # Vendoring stuff should be moved from govendor to dep:  https://github.com/golang/dep
 #
-# Break into separate files
+# Move build scripts and stuff to subdir
 #
 # Add config file (local in proj or global, just walk the tree up looking for it)
 #
