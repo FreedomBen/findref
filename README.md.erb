@@ -16,19 +16,21 @@ time linear in the size of the input](https://swtch.com/~rsc/regexp/regexp1.html
 ## How it compares to other tools (or why it is better in my opinion):
 
 **grep**:  `findref` adds much simpler recursive search that doesn't require a bunch of
-tedious flags to get pleasant output.  It also ignores files hidden files by default,
-which helps you avoid a lot of junk matches.  Speed is comparable, but `findref` will be
-faster than `grep` in the future (planned improvements).  The output of `findref` is
-identical to grep's line numbers and colors (but are on by default).
+tedious flags to get pleasant output.  It also ignores hidden files by default,
+which helps you avoid a lot of junk matches.  findref has a lot of handy command line
+switches that make it easier to find the needle in the haystack.  For example, the ability
+to restrict search to files whose name matches a specified regex.  The output of `findref` is
+identical to grep's line numbers and colors (but are on by default).  Speed-wise, grep
+is faster.  It's hard to beat this venerable tool in performance.
 
 **git grep**:  `findref` output looks very similar, but adds colorization, which makes
-reading it *much* easier.  `findref` also works on non-git repos, unlike git grep.
-`findref` is also faster
+reading it *much* easier.  `findref` also works on non-git repos, unlike git grep.  findref
+also supports a variety of switches that make narrowing results easier.
 
-**Ag (or the silver searcher)**:  `findref` is a little slower (tho not by much),
-but has much better formatting and coloring.  `findref` does not currently have a vim
+**Ag (or the silver searcher)**:  `findref` is slower (ag is amazingly fast), but has
+much better formatting and coloring.  `findref` does not currently have a vim
 plugin tho, so for searching within vim, [ag](https://github.com/vim-scripts/ag.vim)
-is the way to go.
+is the way to go.  Ag is also useful for very large codebases.
 
 
 ## Usage
