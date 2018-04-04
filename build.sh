@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+#
+# Deprecated.  Use the Rakefile `rake`
+#
+
 set -e
 
 declare -r color_restore='\033[0m'

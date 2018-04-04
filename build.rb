@@ -1,5 +1,9 @@
 #!/usr/bin/env ruby
 
+#
+# This is not meant to be an entrypoint.  Use `rake` with the rakefile
+#
+
 require 'fileutils'
 
 require_relative 'helpers'

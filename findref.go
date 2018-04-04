@@ -67,8 +67,8 @@ func Usage() string {
 	)
 }
 
-const Version = "0.0.9"
-const Date = "2017-10-04"
+const Version = "0.1.0"
+const Date = "2017-04-03"
 
 var FILE_PROCESSING_COMPLETE error = nil
 
