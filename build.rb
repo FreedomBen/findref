@@ -8,7 +8,7 @@ require 'fileutils'
 
 require_relative 'helpers'
 
-GO_VERSION = '1.9-alpine'.freeze
+GO_VERSION = '1.13-alpine'.freeze
 
 # See: https://stackoverflow.com/a/30068222/2062384 for list of valid targets
 OSES_ARCHES = {
@@ -44,9 +44,16 @@ def die(message)
   exit 1
 end
 
+def podman_or_docker
+  # If podman is installed, use that. Otherwise use docker
+  `command -v podman`.strip.empty? \
+    ? 'docker' \
+    : 'sudo podman'
+end
+
 def docker_run(os, arch)
   <<-EOS.gsub(/\s+/, ' ').gsub(/[\s\t]*\n/, ' ').strip
-    docker run
+    #{podman_or_docker} run
     --rm
     --volume "#{Dir.pwd}:/usr/src/findref"
     --workdir "/usr/src/findref"
