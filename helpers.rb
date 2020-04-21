@@ -75,6 +75,7 @@ module Helpers
     glob("#{findref_bin_repo}/*")
       .select{ |rel| File.directory?("#{findref_bin_repo}/#{rel}") }
       .select{ |rel| rel != latest_release_name }
+      .select{ |rel| rel != 'upload' }
       .map{ |rel| File.basename(rel) }
       .sort
       .reverse
