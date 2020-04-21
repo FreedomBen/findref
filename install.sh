@@ -153,7 +153,8 @@ runningAmd64 ()
 
 running386 ()
 {
-    local arch="$(uname -m)"
+    local arch
+    arch="$(uname -m)"
     [ "$arch" = 'i686' ] || [ "$arch" = 'i386' ]
 }
 
@@ -167,12 +168,12 @@ running386 ()
 
 mac_link ()
 {
-    echo 'https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/darwin/amd64/findref.zip'
+    echo 'https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/darwin/amd64/findref-latest-darwin-amd64.zip'
 }
 
 linux_link ()
 {
-    echo 'https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/amd64/findref.zip'
+    echo 'https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/amd64/findref-latest-linux-amd64.zip'
 }
 
 downlink_link ()
@@ -201,7 +202,7 @@ main ()
         die "Platform not supported by this install script.\n\n\t${color_yellow}Pre-built binaries may be available for manual download.\n\tSee:  https://github.com/FreedomBen/findref#pre-built-binaries\n"
     fi
 
-    cd "${dest_dir}"
+    cd "${dest_dir}" || die "Could not cd into ${dest_dir}"
 
     # If there's already a findref version, remove it
     cyan 'Cleaning out any old versions'
@@ -213,10 +214,10 @@ main ()
     cyan 'Cleaning up the zip file for v1.0.1'
     rm -f 'findref.zip' || red "Error removing findref.zip"
 
-    cyan 'Making ${bin_name} v1.0.1 executable'
+    cyan "Making ${bin_name} v1.0.1 executable"
     chmod +x "${bin_name}" || die "Unable to make $(pwd)/${bin_name}' executable!"
 
     cyan "All done!  If you can't run '${bin_name}' now, make sure that '${dest_dir}' is in your PATH"
 }
 
-main $@
+main "$@"

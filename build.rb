@@ -91,7 +91,7 @@ def main(release)
       cyan "Building findref v#{release} for #{os} #{arch}..."
       system(docker_run(os, arch))
       fr_bin = Helpers.bin_name(os)
-      fr_zip = Helpers.zip_name
+      fr_zip = Helpers.zip_name(release, os, arch)
       cyan "Zipping #{fr_bin} into #{fr_zip}"
       system("zip -9 #{fr_zip} #{fr_bin}")
       dest_dirs.each do |dest_dir|

@@ -75,21 +75,27 @@ module Helpers
     glob("#{findref_bin_repo}/*")
       .select{ |rel| File.directory?("#{findref_bin_repo}/#{rel}") }
       .select{ |rel| rel != latest_release_name }
+      .select{ |rel| rel != 'upload' }
       .map{ |rel| File.basename(rel) }
       .sort
       .reverse
   end
 
-  def self.zip_name
+  def self.bare_zip_name
     'findref.zip'
+  end
+
+  def self.zip_name(v, os, arch)
+    "findref-#{v}-#{os}-#{arch}.zip"
   end
 
   def self.bin_name(os)
     os == 'windows' ? 'findref.exe' : 'findref'
   end
 
-  def self.url(release, os, arch)
-    "https://raw.githubusercontent.com/FreedomBen/#{findref_bin_repo}/master/#{release}/#{os}/#{arch}/#{zip_name}"
+  # v == Version, os == GOOS, arch == GOARCH
+  def self.url(v, os, arch)
+    "https://raw.githubusercontent.com/FreedomBen/#{findref_bin_repo}/master/#{v}/#{os}/#{arch}/#{zip_name(v, os, arch)}"
   end
 
   def self.link(release, os, arch)
