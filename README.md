@@ -35,36 +35,9 @@ is the way to go.  Ag is also useful for very large codebases.
 
 ## Usage
 
-    findref [options] match_regex [start_dir] [filename_regex]
-
-    Arguments:
-
-        match_regex:  This is an RE2 regular expression that will be matched against lines
-                      in each file, with matches being displayed to the user.
-
-        start_dir:  This optional argument sets the starting directory to crawl looking
-                    for eligible files with lines matching match_regex.  Default value
-                    is the current working directory, AKA `pwd` or `.`
-
-        filename_regex:  This optional argument restricts the set of files checked for
-                         matching lines.  Eligible files must match this expression.
-                         Default value matches all files
-
-    Options:
-
-        -d | --debug
-              Enable debug mode
-        -h | --hidden
-              Include hidden files and files in hidden directories
-        -i | --ignore-case
-              Ignore case in regex (overrides smart-case)
-        -m | --match-case
-              Match regex case (if unset smart-case is used)
-        -s | --stats
-              Track basic statistics and print them on exit
-        -v | --version
-              Print current version and exit
-
+<p align="center">
+  <img src="images/findref-usage.png" alt="findref usage">
+</p>
 
 ### Examples:
 
