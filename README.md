@@ -47,6 +47,10 @@ Simple usage that starts looking recursively in the current directory, and check
 
     findref getMethodName
 
+<p align="center">
+  <img src="images/findref-simple.gif" alt="findref simple usage">
+</p>
+
 To go case insensitive, simply add -i or --ignore-case as the first arg:
 
     findref --ignore-case getMethodName
@@ -62,9 +66,17 @@ You don't have to search only for strings.  You can pass any valid golang regex:
     findref "str[i1]ng.*"
     findref "st.*ng"
 
+<p align="center">
+  <img src="images/findref-regex.gif" alt="findref regex usage">
+</p>
+
 You can add a starting directory (if none is specified, the default is the current working directory):
 
     findref "str[i1]ng.*" /home/ben/my-starting-directory
+
+<p align="center">
+  <img src="images/findref-starting-loc.gif" alt="findref starting location usage">
+</p>
 
 If you want to restrict which files are searched, you can also do this by passing a file
 matching regex.  For example, to only search cpp files:
@@ -74,6 +86,10 @@ matching regex.  For example, to only search cpp files:
 Or to restrict the search to C++ code files (.h and .cpp):
 
     findref "str[i1]ng.*" "~/my-starting-directory" ".*\.[hc](pp)?"
+
+<p align="center">
+  <img src="images/findref-file-regex.gif" alt="findref file regex usage">
+</p>
 
 ## Installation
 
