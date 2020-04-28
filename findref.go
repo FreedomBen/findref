@@ -238,9 +238,9 @@ func finishAndExit() {
 
 func worker(id int, jobs <-chan string, results chan<- []Match) {
 	for file := range jobs {
-		debug(colors.Blue, "Worker number", id, "started file", file, colors.Restore)
+		debug(colors.Blue, "Worker number", id, "started file", colors.Restore, file)
 		results <- checkForMatches(file)
-		debug(colors.Blue, "Worker number", id, "finished file", file, colors.Restore)
+		debug(colors.Blue, "Worker number", id, "finished file", colors.Restore, file)
 	}
 }
 
