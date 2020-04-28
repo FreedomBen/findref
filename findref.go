@@ -34,6 +34,8 @@ func Usage() string {
 
     %sOptions:%s
         %s
+        -a | --all
+							Aggressively search for matches (implies: -i -h)
         -d | --debug
               Enable debug mode
         -f | --filename-only
@@ -243,6 +245,7 @@ func worker(id int, jobs <-chan string, results chan<- []Match) {
 }
 
 func main() {
+	aPtr := flag.Bool("a", false, "Alias for --all")
 	sPtr := flag.Bool("s", false, "Alias for --stats")
 	dPtr := flag.Bool("d", false, "Alias for --debug")
 	hPtr := flag.Bool("h", false, "Alias for --hidden")
@@ -251,6 +254,7 @@ func main() {
 	mPtr := flag.Bool("m", false, "Alias for --match-case")
 	iPtr := flag.Bool("i", false, "Alias for --ignore-case")
 	fPtr := flag.Bool("f", false, "Alias for --filename-only")
+	allPtr := flag.Bool("all", false, "Include hidden files and ignore case (implies: -i -h)")
 	helpPtr := flag.Bool("help", false, "Show usage")
 	statsPtr := flag.Bool("stats", false, "Track and display statistics")
 	debugPtr := flag.Bool("debug", false, "Enable debug mode")
@@ -284,8 +288,10 @@ func main() {
 	settings.TrackStats = *statsPtr || *sPtr
 	settings.FilenameOnly = *filenameOnlyPtr || *fPtr
 	settings.IncludeHidden = *hiddenPtr || *hPtr
+	settings.IncludeHidden = *allPtr || *aPtr // -a implies -h
 	*matchCasePtr = *matchCasePtr || *mPtr
 	*ignoreCasePtr = *ignoreCasePtr || *iPtr
+	*ignoreCasePtr = *allPtr || *aPtr // -a implies -i
 
 	if settings.TrackStats {
 		statistics.startTime = time.Now()
