@@ -1,6 +1,7 @@
 # fr / findref
 
 
+![Version](https://img.shields.io/badge/Version-v1.1.1-green)
 
 `findref` (commonly aliased to `fr`) helps you find strings, or match regular expressions, in a directory of files.  It is inspired by `git grep` which is a good tool, but has limitations that made writing a replacement a worthy endeavor.
 
