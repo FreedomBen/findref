@@ -75,13 +75,11 @@ end
 # The Micro source also has a snapcraft config to look at, as well as a brew package:
 #   https://github.com/zyedidia/micro/blob/master/snapcraft.yaml
 #
-# Vendoring stuff should be moved from govendor to dep:  https://github.com/golang/dep
-#
 # Move build scripts and stuff to subdir
 #
 # Add config file (local in proj or global, just walk the tree up looking for it)
 #
-# Add option to honor git ignore file
+# Add option to honor git ignore file (currently excludes based on hidden files)
 #
 def main(release)
   die('Must pass release version as first arg') if release.nil? || release.empty?

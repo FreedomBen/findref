@@ -357,5 +357,17 @@ func main() {
 		}
 	}
 
+	// Repeat settings at the end
+	debug(colors.Cyan, "Search settings were:", colors.Restore)
+	debug(colors.Blue, "* stats enabled: ", colors.Restore, settings.TrackStats)
+	debug(colors.Blue, "* match-case enabled: ", colors.Restore, *matchCasePtr)
+	debug(colors.Blue, "* ignore-case enabled: ", colors.Restore, *ignoreCasePtr)
+	debug(colors.Blue, "* include hidden files: ", colors.Restore, settings.IncludeHidden)
+	debug(colors.Blue, "* debug mode: ", colors.Restore, settings.Debug)
+	debug(colors.Blue, "* filename only: ", colors.Restore, settings.FilenameOnly)
+	debug(colors.Blue, "* matchRegex: ", colors.Restore, settings.MatchRegex.String())
+	debug(colors.Blue, "* rootDir: ", colors.Restore, rootDir)
+	debug(colors.Blue, "* fileRegex: ", colors.Restore, settings.FilenameRegex.String())
+
 	finishAndExit()
 }
