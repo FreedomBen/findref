@@ -55,7 +55,7 @@ def docker_run(os, arch)
   <<-EOS.gsub(/\s+/, ' ').gsub(/[\s\t]*\n/, ' ').strip
     #{podman_or_docker} run
     --rm
-    --volume "#{Dir.pwd}:/usr/src/findref"
+    --volume "#{Dir.pwd}:/usr/src/findref:Z"
     --workdir "/usr/src/findref"
     --env GOOS=#{os}
     --env GOARCH=#{arch}
@@ -87,6 +87,7 @@ def main(release)
     arches.each do |arch|
       dest_dirs = [Helpers.latest_release_name, release].map{ |rel| "#{Helpers.findref_bin_repo}/#{rel}/#{os}/#{arch}" }
       cyan "Building findref v#{release} for #{os} #{arch}..."
+      cyan "Running: #{docker_run(os, arch)}"
       system(docker_run(os, arch))
       fr_bin = Helpers.bin_name(os)
       fr_zip = Helpers.zip_name
