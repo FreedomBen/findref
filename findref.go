@@ -35,7 +35,7 @@ func Usage() string {
     %sOptions:%s
         %s
         -a | --all
-							Aggressively search for matches (implies: -i -h)
+              Aggressively search for matches (implies: -i -h)
         -d | --debug
               Enable debug mode
         -f | --filename-only
