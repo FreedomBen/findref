@@ -8,13 +8,13 @@ require 'fileutils'
 
 require_relative 'helpers'
 
-GO_VERSION = '1.13-alpine'.freeze
+GO_VERSION = '1.17-alpine'.freeze
 
 # See: https://stackoverflow.com/a/30068222/2062384 for list of valid targets
 OSES_ARCHES = {
   'linux' => %w(amd64 386 arm arm64),
   'windows' => %w(amd64 386),
-  'darwin' => %w(amd64 386)
+  'darwin' => %w(amd64 arm64)
 }.freeze
 
 RED = "\033[0;31m".freeze

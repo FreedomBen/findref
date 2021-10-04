@@ -2,7 +2,7 @@ module Helpers
   OSES_ARCHES = {
     'linux' => %w(amd64 386 arm arm64),
     'windows' => %w(amd64 386),
-    'darwin' => %w(amd64 386)
+    'darwin' => %w(amd64 arm64)
   }.freeze
 
   def self.terminal_color_restore

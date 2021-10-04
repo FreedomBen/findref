@@ -1,7 +1,7 @@
 # fr / findref
 
 
-![Version](https://img.shields.io/badge/Version-v1.1.1-green)
+![Version](https://img.shields.io/badge/Version-v1.1.2-green)
 
 `findref` (commonly aliased to `fr`) helps you find strings, or match regular expressions, in a directory of files.  It is inspired by `git grep` which is a good tool, but has limitations that made writing a replacement a worthy endeavor.
 
@@ -122,7 +122,7 @@ put it somewhere in your [PATH](http://www.linfo.org/path_env_var.html).
 I recommend putting it in `~/bin` if you are the only user (`sudo` isn't required
 to install in that location), or `/usr/local/bin` if there are multiple users on the system:
 
-#### Current Release Version: 1.1.1
+#### Current Release Version: 1.1.2
 
 These links will always point to the latest released version, so they are includable in
 scripts to get the latest version without having to adjust the version number for new
@@ -131,14 +131,14 @@ on the [ARCHIVES.md](ARCHIVES.md) page.
 
 | Version | Linux | macOS | Windows |
 |:-------:|:-----:|:-----:|:-------:|
-| latest | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/amd64/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/arm64/findref.zip) - [arm](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/arm/findref.zip) | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/darwin/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/darwin/amd64/findref.zip) | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/windows/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/windows/amd64/findref.zip) |
+| latest | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/amd64/findref.zip) - [arm](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/arm/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/arm64/findref.zip) | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/darwin/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/darwin/amd64/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/darwin/arm64/findref.zip) | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/windows/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/windows/amd64/findref.zip) |
 
-These links are perma-links to the binaries for version 1.1.1, meaning even after
-a new version is released, these will still get you version 1.1.1.
+These links are perma-links to the binaries for version 1.1.2, meaning even after
+a new version is released, these will still get you version 1.1.2.
 
 | Version | Linux | macOS | Windows |
 |:-------:|:-----:|:-----:|:-------:|
-| 1.1.1 | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.1.1/linux/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.1.1/linux/amd64/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.1.1/linux/arm64/findref.zip) - [arm](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.1.1/linux/arm/findref.zip) | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.1.1/darwin/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.1.1/darwin/amd64/findref.zip) | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.1.1/windows/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.1.1/windows/amd64/findref.zip) |
+| 1.1.2 | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.1.2/linux/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.1.2/linux/amd64/findref.zip) - [arm](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.1.2/linux/arm/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.1.2/linux/arm64/findref.zip) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.1.2/darwin/amd64/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.1.2/darwin/arm64/findref.zip) | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.1.2/windows/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.1.2/windows/amd64/findref.zip) |
 
 ### Older releases
 
