@@ -9,6 +9,8 @@ type Settings struct {
 	TrackStats      bool
 	FilenameOnly    bool
 	IncludeHidden   bool
+	MaxLineLength   int
+	NoMaxLineLength bool
 	MatchRegex      *regexp.Regexp
 	FilenameRegex   *regexp.Regexp
 	HiddenFileRegex *regexp.Regexp
@@ -20,6 +22,8 @@ func NewSettings() *Settings {
 		TrackStats:      false,
 		FilenameOnly:    false,
 		IncludeHidden:   false,
+		MaxLineLength:   2000,
+		NoMaxLineLength: false,
 		MatchRegex:      nil,
 		FilenameRegex:   regexp.MustCompile(".*"),
 		HiddenFileRegex: regexp.MustCompile(`(^|\/)\.`),

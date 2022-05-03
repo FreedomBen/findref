@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"strconv"
 	"time"
 )
 
@@ -48,6 +49,10 @@ func Usage() string {
               Match regex case (if unset smart-case is used)
         -n | --no-color
               Disable colorized output
+        -l | --max-line-length
+              Set maximum line length in characters (default is 2,000)
+        -x |  --no-max-line-length
+              Remove maximum line length.  Match againt lines of any length
         -s | --stats
               Track basic statistics and print them on exit
         -v | --version
@@ -71,6 +76,8 @@ func Usage() string {
 
 const Version = "1.1.3"
 const Date = "2022-03-27"
+
+const MaxLineLengthDefault = 2000
 
 var FILE_PROCESSING_COMPLETE error = nil
 
@@ -129,7 +136,10 @@ func checkForMatches(path string) []Match {
 			debug(colors.Blue+"Not processing binary file:"+colors.Restore, path)
 			return retval
 		}
-		if matchIndex := settings.MatchRegex.FindIndex(line); matchIndex != nil {
+		if (len(line) > settings.MaxLineLength) && !settings.NoMaxLineLength {
+			// Line exceeds maximum length.  Skip it!
+			debug(colors.Blue + "Line is " + colors.Restore + strconv.Itoa(len(line)) + colors.Blue + " chars, which is longer than " + colors.Restore + strconv.Itoa(settings.MaxLineLength) + colors.Blue + " and unlimited line length is " + colors.Restore + strconv.FormatBool(settings.NoMaxLineLength))
+		} else if matchIndex := settings.MatchRegex.FindIndex(line); matchIndex != nil {
 			// we have a match! loc == nil means no match so just ignore that case
 			statistics.IncrMatchCount()
 			if settings.FilenameOnly {
@@ -254,6 +264,8 @@ func main() {
 	mPtr := flag.Bool("m", false, "Alias for --match-case")
 	iPtr := flag.Bool("i", false, "Alias for --ignore-case")
 	fPtr := flag.Bool("f", false, "Alias for --filename-only")
+	xPtr := flag.Bool("x", false, "Alias for --no-max-line-length")
+	lPtr := flag.Int("l", MaxLineLengthDefault, "Alias for --max-line-length")
 	allPtr := flag.Bool("all", false, "Include hidden files and ignore case (implies: -i -h)")
 	helpPtr := flag.Bool("help", false, "Show usage")
 	statsPtr := flag.Bool("stats", false, "Track and display statistics")
@@ -264,6 +276,8 @@ func main() {
 	matchCasePtr := flag.Bool("match-case", false, "Match regex case (if unset smart-case is used)")
 	ignoreCasePtr := flag.Bool("ignore-case", false, "Ignore case in regex (overrides smart-case)")
 	filenameOnlyPtr := flag.Bool("filename-only", false, "Display only filenames with matches")
+	maxLineLengthPtr := flag.Int("max-line-length", MaxLineLengthDefault, "Set maximum line length in characters (default is 2,000)")
+	noMaxLineLengthPtr := flag.Bool("no-max-line-length", false, "Remove maximum line length.  Match againt lines of any length")
 
 	flag.Usage = func() {
 		fmt.Print(Usage())
@@ -289,9 +303,17 @@ func main() {
 	settings.FilenameOnly = *filenameOnlyPtr || *fPtr
 	settings.IncludeHidden = *hiddenPtr || *hPtr
 	settings.IncludeHidden = *allPtr || *aPtr // -a implies -h
+	settings.NoMaxLineLength = *noMaxLineLengthPtr || *xPtr
 	*matchCasePtr = *matchCasePtr || *mPtr
 	*ignoreCasePtr = *ignoreCasePtr || *iPtr
 	*ignoreCasePtr = *allPtr || *aPtr // -a implies -i
+
+	if *lPtr != MaxLineLengthDefault {
+		settings.MaxLineLength = *lPtr
+	}
+	if *maxLineLengthPtr != MaxLineLengthDefault {
+		settings.MaxLineLength = *maxLineLengthPtr
+	}
 
 	if settings.TrackStats {
 		statistics.startTime = time.Now()
@@ -304,6 +326,8 @@ func main() {
 	debug(colors.Blue, "include hidden files: ", colors.Restore, settings.IncludeHidden)
 	debug(colors.Blue, "debug mode: ", colors.Restore, settings.Debug)
 	debug(colors.Blue, "filename only: ", colors.Restore, settings.FilenameOnly)
+	debug(colors.Blue, "max line length: ", colors.Restore, settings.MaxLineLength)
+	debug(colors.Blue, "no max line length enabled: ", colors.Restore, settings.NoMaxLineLength)
 
 	rootDir := "."
 
@@ -365,6 +389,8 @@ func main() {
 	debug(colors.Blue, "* include hidden files: ", colors.Restore, settings.IncludeHidden)
 	debug(colors.Blue, "* debug mode: ", colors.Restore, settings.Debug)
 	debug(colors.Blue, "* filename only: ", colors.Restore, settings.FilenameOnly)
+	debug(colors.Blue, "* max line length: ", colors.Restore, settings.MaxLineLength)
+	debug(colors.Blue, "* no max line length enabled: ", colors.Restore, settings.NoMaxLineLength)
 	debug(colors.Blue, "* matchRegex: ", colors.Restore, settings.MatchRegex.String())
 	debug(colors.Blue, "* rootDir: ", colors.Restore, rootDir)
 	debug(colors.Blue, "* fileRegex: ", colors.Restore, settings.FilenameRegex.String())
