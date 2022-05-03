@@ -110,9 +110,9 @@ func checkForMatches(path string) []Match {
 		return []Match{Match{path, 0, []byte{}, []int{}}}
 	}
 	defer func() {
-		if path == "src/main/java/com/canopy/service/EFileService.java" {
-			fmt.Println("Closing the file: " + path)
-		}
+		// if path == "src/main/java/com/canopy/service/EFileService.java" {
+		// 	fmt.Println("Closing the file: " + path)
+		// }
 		file.Close()
 	}()
 
