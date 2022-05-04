@@ -134,11 +134,13 @@ func checkForMatches(path string) []Match {
 		if containsNullByte(line) {
 			// This is a binary file.  Skip it!
 			debug(colors.Blue+"Not processing binary file:"+colors.Restore, path)
+			statistics.IncrSkippedNullCount()
 			return retval
 		}
-		if (len(line) > settings.MaxLineLength) && !settings.NoMaxLineLength {
+		if !settings.NoMaxLineLength && (len(line) > settings.MaxLineLength) {
 			// Line exceeds maximum length.  Skip it!
-			debug(colors.Blue + "Line is " + colors.Restore + strconv.Itoa(len(line)) + colors.Blue + " chars, which is longer than " + colors.Restore + strconv.Itoa(settings.MaxLineLength) + colors.Blue + " and unlimited line length is " + colors.Restore + strconv.FormatBool(settings.NoMaxLineLength))
+			debug(colors.Blue+"Line is "+colors.Restore+strconv.Itoa(len(line))+colors.Blue+" chars, which is longer than "+colors.Restore+strconv.Itoa(settings.MaxLineLength)+colors.Blue+" and unlimited line length is "+colors.Restore+strconv.FormatBool(settings.NoMaxLineLength))
+			statistics.IncrSkippedLongCount()
 		} else if matchIndex := settings.MatchRegex.FindIndex(line); matchIndex != nil {
 			// we have a match! loc == nil means no match so just ignore that case
 			statistics.IncrMatchCount()
@@ -243,6 +245,8 @@ func finishAndExit() {
 		fmt.Printf("%sLines scanned:%s %d\n", colors.Cyan, colors.Restore, statistics.LineCount())
 		fmt.Printf("%sFiles scanned:%s %d\n", colors.Cyan, colors.Restore, statistics.FileCount())
 		fmt.Printf("%sMatches found:%s %d\n", colors.Cyan, colors.Restore, statistics.MatchCount())
+		fmt.Printf("%sSkipped Long: %s %d\n", colors.Cyan, colors.Restore, statistics.SkippedLongCount())
+		fmt.Printf("%sSkipped Null: %s %d\n", colors.Cyan, colors.Restore, statistics.SkippedNullCount())
 	}
 }
 
