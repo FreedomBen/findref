@@ -130,12 +130,17 @@ func checkForMatches(path string) []Match {
 
 	retval := make([]Match, 50)
 
+	// Split function defaults to ScanLines
 	scanner := bufio.NewScanner(file)
 
 	const sixtyFourKB = 64 * 1024
 	const oneMB = 1024 * 1024
 	const tenMB = 10 * oneMB
 	const hundredMB = 100 * tenMB
+
+	// TODO: We should check the file size and size the buffer intelligently
+	// We open the file above on line 118 so maybe there's a method we can
+	// use on the file object, but if not we can use os.Stat()
 
 	// Fix for max token size:  https://stackoverflow.com/a/37455465/2062384
 	buf := make([]byte, 0, sixtyFourKB)
