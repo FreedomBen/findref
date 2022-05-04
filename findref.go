@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
-	"strconv"
 	"time"
 )
 
@@ -120,7 +119,7 @@ func checkForMatches(path string) []Match {
 	if err != nil {
 		fmt.Println(colors.Red+"Error opening file at '"+path+"'.  It might be a directory.  Err: "+colors.Restore, err)
 		debug(colors.Red+"Error opening file at '"+path+"'.  It might be a directory.  Err: "+colors.Restore, err)
-		return []Match{Match{path, 0, []byte{}, []int{}}}
+		return []Match{Match{path, 0, []byte{}, []int{}, 0}}
 	}
 	defer func() {
 		// if path == "src/main/java/com/canopy/service/EFileService.java" {
@@ -143,19 +142,21 @@ func checkForMatches(path string) []Match {
 			statistics.IncrSkippedNullCount()
 			return retval
 		}
-		if !settings.NoMaxLineLength && (len(line) > settings.MaxLineLength) {
-			// Line exceeds maximum length.  Skip it!
-			debug(colors.Blue+"Line is "+colors.Restore+strconv.Itoa(len(line))+colors.Blue+" chars, which is longer than "+colors.Restore+strconv.Itoa(settings.MaxLineLength)+colors.Blue+" and unlimited line length is "+colors.Restore+strconv.FormatBool(settings.NoMaxLineLength))
-			statistics.IncrSkippedLongCount()
-		} else if matchIndex := settings.MatchRegex.FindIndex(line); matchIndex != nil {
+		if matchIndex := settings.MatchRegex.FindIndex(line); matchIndex != nil {
 			// we have a match! loc == nil means no match so just ignore that case
 			statistics.IncrMatchCount()
 			if settings.FilenameOnly {
 				filenameOnlyFiles = append(filenameOnlyFiles, path)
 			} else {
-				m := Match{path, lineNumber, line, matchIndex}
-				m.printMatch()
-				retval = append(retval, Match{path, lineNumber, line, matchIndex})
+				m := Match{path, lineNumber, line, matchIndex, settings.MaxLineLength}
+				if !settings.NoMaxLineLength && (len(line) > settings.MaxLineLength) {
+					statistics.IncrSkippedLongCount()
+					m.printMatchClip()
+					// m.printMatchTooLong()
+				} else {
+					m.printMatch()
+				}
+				retval = append(retval, m)
 			}
 		}
 	}
