@@ -131,6 +131,15 @@ func checkForMatches(path string) []Match {
 	retval := make([]Match, 50)
 
 	scanner := bufio.NewScanner(file)
+
+	const sixtyFourKB = 64 * 1024
+	const oneMB = 1024 * 1024
+	const hundredMB = 100 * oneMB
+
+	// Fix for max token size:  https://stackoverflow.com/a/37455465/2062384
+	buf := make([]byte, 0, sixtyFourKB)
+	scanner.Buffer(buf, hundredMB) // Files up to 100 MB in size.  Lower if memory becomes a problem
+
 	var lineNumber int = 0
 	for scanner.Scan() {
 		lineNumber += 1
