@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-const SideBuffer = 30
+const SideBuffer = 40
 
 type Match struct {
 	Path       string
