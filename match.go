@@ -45,7 +45,7 @@ func (m *Match) printMatchClip() {
 		start = 0
 		startStr = ""
 	}
-	if end > len(m.Line) - 1 {
+	if end > len(m.Line)-1 {
 		end = len(m.Line) - 1
 		endStr = ""
 	}

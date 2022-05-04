@@ -134,7 +134,8 @@ func checkForMatches(path string) []Match {
 
 	const sixtyFourKB = 64 * 1024
 	const oneMB = 1024 * 1024
-	const hundredMB = 100 * oneMB
+	const tenMB = 10 * oneMB
+	const hundredMB = 100 * tenMB
 
 	// Fix for max token size:  https://stackoverflow.com/a/37455465/2062384
 	buf := make([]byte, 0, sixtyFourKB)
