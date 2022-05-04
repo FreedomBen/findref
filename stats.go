@@ -12,6 +12,7 @@ type Statistics struct {
 	matchesFound int
 	skippedLong  int
 	skippedNull  int
+	erroredFiles int
 	startTime    time.Time
 	mux          sync.Mutex
 }
@@ -23,6 +24,7 @@ func NewStatistics() *Statistics {
 		matchesFound: 0,
 		skippedLong:  0,
 		skippedNull:  0,
+		erroredFiles: 0,
 		startTime:    time.Now(),
 	}
 }
@@ -63,6 +65,12 @@ func (s *Statistics) IncrSkippedNullCount() {
 	s.mux.Unlock()
 }
 
+func (s *Statistics) IncrErroredFilesCount() {
+	s.mux.Lock()
+	s.erroredFiles++
+	s.mux.Unlock()
+}
+
 func (s *Statistics) LineCount() int {
 	s.mux.Lock()
 	defer s.mux.Unlock()
@@ -91,6 +99,12 @@ func (s *Statistics) SkippedNullCount() int {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 	return s.skippedNull
+}
+
+func (s *Statistics) ErroredFilesCount() int {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+	return s.erroredFiles
 }
 
 func (s *Statistics) SkippedLongCount() int {

@@ -93,6 +93,12 @@ func usageAndExit() {
 	os.Exit(1)
 }
 
+func usageAndExitErr(errMsg error) {
+	flag.Usage()
+	fmt.Println(colors.Red + "[error]: " + errMsg.Error() + colors.Restore)
+	os.Exit(1)
+}
+
 func debug(a ...interface{}) {
 	if settings.Debug {
 		fmt.Println(a...)
@@ -156,6 +162,7 @@ func checkForMatches(path string) []Match {
 
 	if err := scanner.Err(); err != nil {
 		debug(colors.Red+"Error scanning line from file '"+path+"'. File will be skipped.  Err: "+colors.Restore, err)
+		statistics.IncrErroredFilesCount()
 	}
 	return retval
 }
@@ -247,6 +254,7 @@ func finishAndExit() {
 		fmt.Printf("%sMatches found:%s %d\n", colors.Cyan, colors.Restore, statistics.MatchCount())
 		fmt.Printf("%sSkipped Long: %s %d\n", colors.Cyan, colors.Restore, statistics.SkippedLongCount())
 		fmt.Printf("%sSkipped Null: %s %d\n", colors.Cyan, colors.Restore, statistics.SkippedNullCount())
+		fmt.Printf("%sErrored Files:%s %d\n", colors.Cyan, colors.Restore, statistics.ErroredFilesCount())
 	}
 }
 
@@ -302,6 +310,10 @@ func main() {
 		colors.ZeroColors()
 	}
 
+	if *xPtr && (*lPtr != *maxLineLengthPtr || *lPtr != MaxLineLengthDefault) {
+		usageAndExitErr(fmt.Errorf("%s", "Explicit -l|--max-line-length contradicts -x|--no-max-line-length"))
+	}
+
 	settings.Debug = *debugPtr || *dPtr
 	settings.TrackStats = *statsPtr || *sPtr
 	settings.FilenameOnly = *filenameOnlyPtr || *fPtr
@@ -336,11 +348,9 @@ func main() {
 	rootDir := "."
 
 	if len(flag.Args()) < 1 {
-		fmt.Errorf("%s", "Must specify regex to match against files")
-		usageAndExit()
+		usageAndExitErr(fmt.Errorf("%s", "Must specify regex to match against files"))
 	} else if len(flag.Args()) > 3 {
-		fmt.Errorf("%s", "Too many args (expected 1 <= 3)")
-		usageAndExit()
+		usageAndExitErr(fmt.Errorf("%s", "Too many args (expected 1 <= 3)"))
 	} else {
 		settings.MatchRegex = getMatchRegex(*ignoreCasePtr, *matchCasePtr, flag.Args()[0])
 
