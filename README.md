@@ -97,8 +97,8 @@ Or to restrict the search to C++ code files (.h and .cpp):
 ### Use the install script
 
 If you are on an intel-based linux or mac, there is an install script located at
-`install.sh`.  If on ARM or Windows, you should probably download the
-[pre-built binary](#pre-built-binaries) below.
+`install.sh`.  If on ARM, Windows, or {Free,Open}BSD, you should download the
+appropriate [pre-built binary](#pre-built-binaries) below.
 
 To let the script do the work, run this command.  Make sure to add `sudo` if
 installing to a location that isn't writeable by your normal user:
@@ -129,16 +129,16 @@ scripts to get the latest version without having to adjust the version number fo
 releases.  Of course if you want to point to a specific release, find the permanent link
 on the [ARCHIVES.md](ARCHIVES.md) page.
 
-| Version | Linux | macOS | Windows |
-|:-------:|:-----:|:-----:|:-------:|
-| latest | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/amd64/findref.zip) - [arm](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/arm/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/arm64/findref.zip) | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/darwin/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/darwin/amd64/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/darwin/arm64/findref.zip) | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/windows/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/windows/amd64/findref.zip) |
+| Version | Linux | macOS | Windows | FreeBSD | OpenBSD |
+|:-------:|:-----:|:-----:|:-------:|:-------:|:--------|
+| latest | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/amd64/findref.zip) - [arm](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/arm/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/arm64/findref.zip) | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/darwin/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/darwin/amd64/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/darwin/arm64/findref.zip) | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/windows/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/windows/amd64/findref.zip) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/freebsd/amd64/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/freebsd/arm64/findref.zip) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/openbsd/amd64/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/openbsd/arm64/findref.zip) |
 
 These links are perma-links to the binaries for version 1.2.2, meaning even after
 a new version is released, these will still get you version 1.2.2.
 
-| Version | Linux | macOS | Windows |
-|:-------:|:-----:|:-----:|:-------:|
-| 1.2.2 | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.2.2/linux/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.2.2/linux/amd64/findref.zip) - [arm](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.2.2/linux/arm/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.2.2/linux/arm64/findref.zip) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.2.2/darwin/amd64/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.2.2/darwin/arm64/findref.zip) | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.2.2/windows/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.2.2/windows/amd64/findref.zip) |
+| Version | Linux | macOS | Windows | FreeBSD | OpenBSD |
+|:-------:|:-----:|:-----:|:-------:|:-------:|:--------|
+| 1.2.2 | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.2.2/linux/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.2.2/linux/amd64/findref.zip) - [arm](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.2.2/linux/arm/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.2.2/linux/arm64/findref.zip) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.2.2/darwin/amd64/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.2.2/darwin/arm64/findref.zip) | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.2.2/windows/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.2.2/windows/amd64/findref.zip) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.2.2/freebsd/amd64/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.2.2/freebsd/arm64/findref.zip) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.2.2/openbsd/amd64/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.2.2/openbsd/arm64/findref.zip) |
 
 ### Older releases
 
@@ -164,13 +164,14 @@ git clone https://github.com/FreedomBen/findref.git \
  && rake
 ```
 
-Pretty easy, tho that will build for every supported platform.  You can find the binary you
-care about by looking in the `findref-bin` subdirectory and following the directory structure
-until you find the correct binary for your system.
+Pretty easy, the only downside being that it will build findref for every supported
+platform rather than just the one you care about.  You can find the binary you
+care about by looking in the `findref-bin` subdirectory and following the directory
+structure until you find the correct binary for your system.
 
 You can also build for just
-your platform.  Specify your OS for the `GOOS` value, and your arch for `GOARCH`.  See [here
-for a list of valid targets](https://stackoverflow.com/a/30068222/2062384).
+your platform.  Specify your OS for the `GOOS` value, and your arch for `GOARCH`.
+See [here for a list of valid targets](https://stackoverflow.com/a/30068222/2062384).
 
 Clone the repo if you haven't already:
 

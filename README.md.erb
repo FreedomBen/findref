@@ -97,8 +97,8 @@ Or to restrict the search to C++ code files (.h and .cpp):
 ### Use the install script
 
 If you are on an intel-based linux or mac, there is an install script located at
-`install.sh`.  If on ARM or Windows, you should probably download the
-[pre-built binary](#pre-built-binaries) below.
+`install.sh`.  If on ARM, Windows, or {Free,Open}BSD, you should download the
+appropriate [pre-built binary](#pre-built-binaries) below.
 
 To let the script do the work, run this command.  Make sure to add `sudo` if
 installing to a location that isn't writeable by your normal user:
@@ -160,13 +160,14 @@ git clone https://github.com/FreedomBen/findref.git \
  && rake
 ```
 
-Pretty easy, tho that will build for every supported platform.  You can find the binary you
-care about by looking in the `findref-bin` subdirectory and following the directory structure
-until you find the correct binary for your system.
+Pretty easy, the only downside being that it will build findref for every supported
+platform rather than just the one you care about.  You can find the binary you
+care about by looking in the `findref-bin` subdirectory and following the directory
+structure until you find the correct binary for your system.
 
 You can also build for just
-your platform.  Specify your OS for the `GOOS` value, and your arch for `GOARCH`.  See [here
-for a list of valid targets](https://stackoverflow.com/a/30068222/2062384).
+your platform.  Specify your OS for the `GOOS` value, and your arch for `GOARCH`.
+See [here for a list of valid targets](https://stackoverflow.com/a/30068222/2062384).
 
 Clone the repo if you haven't already:
 

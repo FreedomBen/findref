@@ -14,7 +14,9 @@ GO_VERSION = '1.18'.freeze
 OSES_ARCHES = {
   'linux' => %w(amd64 386 arm arm64),
   'windows' => %w(amd64 386),
-  'darwin' => %w(amd64 arm64)
+  'darwin' => %w(amd64 arm64),
+  'freebsd' => %w(amd64 arm64),
+  'openbsd' => %w(amd64 arm64)
 }.freeze
 
 RED = "\033[0;31m".freeze

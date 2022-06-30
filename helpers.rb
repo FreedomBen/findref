@@ -2,7 +2,9 @@ module Helpers
   OSES_ARCHES = {
     'linux' => %w(amd64 386 arm arm64),
     'windows' => %w(amd64 386),
-    'darwin' => %w(amd64 arm64)
+    'darwin' => %w(amd64 arm64),
+    'freebsd' => %w(amd64 arm64),
+    'openbsd' => %w(amd64 arm64)
   }.freeze
 
   def self.terminal_color_restore
@@ -113,8 +115,16 @@ module Helpers
     links(release, 'windows').join(' - ')
   end
 
+  def self.freebsd_links(release)
+    links(release, 'freebsd').join(' - ')
+  end
+
+  def self.openbsd_links(release)
+    links(release, 'openbsd').join(' - ')
+  end
+
   def self.release_line(release)
-    "| #{release} | #{linux_links(release)} | #{mac_links(release)} | #{windows_links(release)} |"
+    "| #{release} | #{linux_links(release)} | #{mac_links(release)} | #{windows_links(release)} | #{freebsd_links(release)} | #{openbsd_links(release)} |"
   end
 
   def self.release_line_latest
@@ -123,8 +133,8 @@ module Helpers
 
   def self.release_table_header
     <<-EOS.split("\n").map(&:strip).join("\n").concat("\n")
-      | Version | Linux | macOS | Windows |
-      |:-------:|:-----:|:-----:|:-------:|
+      | Version | Linux | macOS | Windows | FreeBSD | OpenBSD |
+      |:-------:|:-----:|:-----:|:-------:|:-------:|:--------|
     EOS
   end
 
