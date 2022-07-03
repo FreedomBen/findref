@@ -34,6 +34,8 @@ func Usage() string {
 
     %sOptions:%s
         %s
+        -- | --
+							End of options.  Use when one of the args starts with a '-'
         -a | --all
               Aggressively search for matches (implies: -i -h)
         -d | --debug
