@@ -34,8 +34,6 @@ func Usage() string {
 
     %sOptions:%s
         %s
-        -- | --
-							End of options.  Use when one of the args starts with a '-'
         -a | --all
               Aggressively search for matches (implies: -i -h)
         -d | --debug
@@ -58,20 +56,71 @@ func Usage() string {
               Track basic statistics and print them on exit
         -v | --version
               Print current version and exit
-%s
+        -- | --
+              End of options.  Use when one of the args starts with a '-'
+        %s
+    %sExamples:%s
+
+        %s// Find all occurences in the current directory (and children) of "getMethodName"%s
+        %sfindref%s %sgetMethodName%s
+
+        %s// Find all exec() calls in the src/ directory%s
+        %sfindref%s %s--ignore-case%s %s'exec('%s %ssrc/%s
+
+        %s// Find all "hi1" or "hi2" in all C++ files (including hidden) in "~/starting-dir"%s
+        %sfindref%s %s--hidden%s %s"hi(1|2)"%s %s"~/starting-dir"%s %s".*\.[hc](pp)?"%s
+
+        %s// Find all "-str[i1]ng.*" in "~/starting-dir" checking C++ files, include stats%s
+        %sfindref%s %s-s --%s %s"-str[i1]ng.*"%s %s"~/starting-dir"%s %s".*\.[hc](pp)?"%s
+
 `,
-		colors.Red, versionString(false), colors.Restore,
-		colors.Brown, colors.Restore,
-		colors.Green, colors.Restore,
-		colors.Cyan, colors.Restore,
-		colors.Blue, colors.Restore,
-		colors.Purple, colors.Restore,
-		colors.Red, colors.Restore,
-		colors.Cyan, colors.Restore,
-		colors.Blue, colors.Restore,
-		colors.Purple, colors.Restore,
-		colors.Red, colors.Restore,
-		colors.Green, colors.Restore,
+		// Usage block
+		colors.Red, versionString(false), colors.Restore, // header
+		colors.Brown, colors.Restore, // findref
+		colors.Green, colors.Restore, // options
+		colors.Cyan, colors.Restore, // match_regex
+		colors.Blue, colors.Restore, // start_dir
+		colors.Purple, colors.Restore, // filename_regex
+
+		// Arguments block
+		colors.Red, colors.Restore, // header
+		colors.Cyan, colors.Restore, // match_regex
+		colors.Blue, colors.Restore, // start_dir
+		colors.Purple, colors.Restore, // filename_regex
+
+		// Options
+		colors.Red, colors.Restore, // Start of Options block
+		colors.Green, colors.Restore, // end of Options block
+
+		// Examples
+		// First Example
+		colors.Red, colors.Restore, // Examples: header
+		colors.LightGray, colors.Restore, // first example comment
+		colors.Brown, colors.Restore, // first example findref
+		colors.Cyan, colors.Restore, // first example match_regex
+
+		// Second Example
+		colors.LightGray, colors.Restore, // second example comment
+		colors.Brown, colors.Restore, // second example findref
+		colors.Green, colors.Restore, // second example option
+		colors.Cyan, colors.Restore, // second example match_regex
+		colors.Blue, colors.Restore, // second example start_dir
+
+		// Third Example
+		colors.LightGray, colors.Restore, // third example comment
+		colors.Brown, colors.Restore, // third example findref
+		colors.Green, colors.Restore, // third example option
+		colors.Cyan, colors.Restore, // third example match_regex
+		colors.Blue, colors.Restore, // fourth example start_dir
+		colors.Purple, colors.Restore, // fourth example filename_regex
+
+		// Fourth Example
+		colors.LightGray, colors.Restore, // fourth example comment
+		colors.Brown, colors.Restore, // fourth example findref
+		colors.Green, colors.Restore, // fourth example options
+		colors.Cyan, colors.Restore, // fourth example match_regex
+		colors.Blue, colors.Restore, // fourth example start_dir
+		colors.Purple, colors.Restore, // fourth example filename_regex
 	)
 }
 
