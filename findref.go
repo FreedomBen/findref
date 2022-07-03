@@ -124,8 +124,8 @@ func Usage() string {
 	)
 }
 
-const Version = "1.2.2"
-const Date = "2022-05-05"
+const Version = "1.2.3"
+const Date = "2022-07-03"
 
 const MaxLineLengthDefault = 2000
 
