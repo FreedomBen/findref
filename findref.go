@@ -124,8 +124,8 @@ func Usage() string {
 	)
 }
 
-const Version = "1.2.3"
-const Date = "2022-07-03"
+const Version = "1.2.4"
+const Date = "2022-08-26"
 
 const MaxLineLengthDefault = 2000
 
@@ -168,8 +168,8 @@ func checkForMatches(path string) []Match {
 	debug(colors.Blue+"Checking file for matches:"+colors.Restore, path)
 	file, err := os.Open(path)
 	if err != nil {
-		fmt.Println(colors.Red+"Error opening file at '"+path+"'.  It might be a directory.  Err: "+colors.Restore, err)
-		debug(colors.Red+"Error opening file at '"+path+"'.  It might be a directory.  Err: "+colors.Restore, err)
+		fmt.Println(colors.Red+"Error opening file at '"+path+"'.  Err: "+colors.Restore, err)
+		debug(colors.Red+"Error opening file at '"+path+"'.  It might be a bad symlink.  Err: "+colors.Restore, err)
 		return []Match{Match{path, 0, []byte{}, []int{}, 0}}
 	}
 	defer func() {
