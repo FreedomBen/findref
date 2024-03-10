@@ -8,7 +8,7 @@ require 'fileutils'
 
 require_relative 'helpers'
 
-GO_VERSION = '1.18'.freeze
+GO_VERSION = '1.22'.freeze
 
 # See: https://stackoverflow.com/a/30068222/2062384 for list of valid targets
 OSES_ARCHES = {
@@ -61,7 +61,7 @@ def docker_run(os, arch)
     --workdir "/usr/src/findref"
     --env GOOS=#{os}
     --env GOARCH=#{arch}
-    golang:#{GO_VERSION} go build
+    golang:#{GO_VERSION} go build -buildvcs=false
   EOS
 end
 
