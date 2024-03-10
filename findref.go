@@ -15,7 +15,16 @@ import (
 func Usage() string {
 	return fmt.Sprintf(
 		`
-    %sUsage of %s:%s
+    %s%s%s
+
+        %sfindref%s is a simple utility that lets you find strings based on regular expressions
+        in directories of text files.
+
+        A common example of why you would want to do this, is if you are searching for occurences
+        of a particular word in a source code repository.  Using %sfindref%s you can quickly
+        find any variable or function that includes a particular string, or any other pattern.%s
+
+    %sUsage of findref:%s
 
         %sfindref%s %s[options]%s %smatch_regex%s %s[start_dir]%s %s[filename_regex]%s
 
@@ -74,8 +83,12 @@ func Usage() string {
         %sfindref%s %s-s --%s %s"-str[i1]ng.*"%s %s"~/starting-dir"%s %s".*\.[hc](pp)?"%s
 
 `,
+		// Top block
+		colors.Red, versionString(false), colors.Restore, // Title
+		colors.Brown, colors.LightGray, colors.Brown, colors.LightGray, colors.Restore, // Description
+
 		// Usage block
-		colors.Red, versionString(false), colors.Restore, // header
+		colors.Red, colors.Restore, // header
 		colors.Brown, colors.Restore, // findref
 		colors.Green, colors.Restore, // options
 		colors.Cyan, colors.Restore, // match_regex
