@@ -8,7 +8,7 @@ require 'fileutils'
 
 require_relative 'helpers'
 
-GO_VERSION = '1.22'.freeze
+GO_VERSION = '1.23'.freeze
 
 # See: https://stackoverflow.com/a/30068222/2062384 for list of valid targets
 OSES_ARCHES = {
