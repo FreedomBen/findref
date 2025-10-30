@@ -42,7 +42,7 @@ for os in ${OSES[@]}; do
           --workdir /usr/src/findref \
           --env GOOS=${os} \
           --env GOARCH=${arch} \
-          golang:1.9-alpine go build
+          golang:1.25-alpine go build
         mkdir -p ${root_dir}/${os}/${arch}
         filename='findref'
         [ "$os" = "windows" ] && filename='findref.exe'
