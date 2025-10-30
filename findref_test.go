@@ -15,43 +15,72 @@ func TestContainsNullByte(t *testing.T) {
 }
 
 func TestPassesFileFilter(t *testing.T) {
-	filenameRegex = regexp.MustCompile("abcd")
-	if !passesFileFilter("abcd.txt") {
+	s := NewSettings()
+	s.FilenameRegex = regexp.MustCompile("abcd")
+	if !s.PassesFileFilter("abcd.txt") {
 		t.Fail()
 	}
-	if passesFileFilter("abc.txt") {
+	if s.PassesFileFilter("abc.txt") {
 		t.Fail()
 	}
-	if !passesFileFilter("abcd") {
+	if !s.PassesFileFilter("abcd") {
 		t.Fail()
 	}
-	filenameRegex = regexp.MustCompile(`.*\.txt`)
-	if !passesFileFilter("abcd.txt") {
+	s.FilenameRegex = regexp.MustCompile(`.*\.txt`)
+	if !s.PassesFileFilter("abcd.txt") {
 		t.Fail()
 	}
-	if passesFileFilter("abc.tx") {
+	if s.PassesFileFilter("abc.tx") {
 		t.Fail()
 	}
-	if passesFileFilter("abcd") {
+	if s.PassesFileFilter("abcd") {
 		t.Fail()
 	}
 }
 
 func TestIsHidden(t *testing.T) {
-	if isHidden("/home/ben") {
+	s := NewSettings()
+	if s.IsHidden("/home/ben") {
 		t.Fail()
 	}
-	if isHidden("/home/ben/nothing.txt") {
+	if s.IsHidden("/home/ben/nothing.txt") {
 		t.Fail()
 	}
-	if !isHidden("/home/.ben/nothing.txt") {
+	if !s.IsHidden("/home/.ben/nothing.txt") {
 		t.Fail()
 	}
-	if !isHidden("/home/ben/.nothing.txt") {
+	if !s.IsHidden("/home/ben/.nothing.txt") {
 		t.Fail()
 	}
-	if !isHidden("/home/.ben/.nothing.txt") {
+	if !s.IsHidden("/home/.ben/.nothing.txt") {
 		t.Fail()
+	}
+}
+
+func TestShouldExcludeDirDefaults(t *testing.T) {
+	s := NewSettings()
+	if !s.ShouldExcludeDir("./.git") {
+		t.Fatalf("expected .git to be excluded by default")
+	}
+	if !s.ShouldExcludeDir("/tmp/project/.svn") {
+		t.Fatalf("expected .svn to be excluded by default")
+	}
+	if s.ShouldExcludeDir("./vendor") {
+		t.Fatalf("did not expect vendor to be excluded by default")
+	}
+}
+
+func TestShouldExcludeDirUserProvided(t *testing.T) {
+	s := NewSettings()
+	s.AddExcludeDirs("vendor", "./build/")
+	if !s.ShouldExcludeDir("/tmp/project/vendor") {
+		t.Fatalf("expected vendor directory to be excluded when provided")
+	}
+	if !s.ShouldExcludeDir("./build") {
+		t.Fatalf("expected build directory to be excluded when provided")
+	}
+	if s.ShouldExcludeDir("/tmp/project/src") {
+		t.Fatalf("did not expect src directory to be excluded")
 	}
 }
 
