@@ -191,6 +191,62 @@ var colors *Colors = NewColors()
 var filenameOnlyFiles []string = make([]string, 0, 100)
 var filesToScan []FileToScan = make([]FileToScan, 0, 100)
 
+const (
+	scannerDefaultInitialCap = 64 * 1024
+	scannerMinimumInitialCap = 4 * 1024
+	scannerMaxTokenCap       = 256 * 1024 * 1024
+	scannerMaxLineSlack      = 1024
+)
+
+func scannerBufferLimits(info os.FileInfo) (int, int) {
+	initialCap := scannerDefaultInitialCap
+	maxToken := scannerDefaultInitialCap
+
+	if info != nil {
+		if size := info.Size(); size > 0 {
+			if size > int64(scannerMaxTokenCap) {
+				maxToken = scannerMaxTokenCap
+			} else {
+				maxToken = int(size)
+			}
+			if int64(initialCap) > size {
+				initialCap = int(size)
+			}
+		}
+	}
+
+	if !settings.NoMaxLineLength {
+		desired := settings.MaxLineLength + scannerMaxLineSlack
+		if desired < scannerMinimumInitialCap {
+			desired = scannerMinimumInitialCap
+		}
+		if desired > scannerMaxTokenCap {
+			desired = scannerMaxTokenCap
+		}
+		if desired > maxToken {
+			maxToken = desired
+		}
+	} else if maxToken == scannerDefaultInitialCap {
+		maxToken = scannerMaxTokenCap
+	}
+
+	if maxToken < scannerMinimumInitialCap {
+		maxToken = scannerMinimumInitialCap
+	}
+	if maxToken > scannerMaxTokenCap {
+		maxToken = scannerMaxTokenCap
+	}
+
+	if initialCap < scannerMinimumInitialCap {
+		initialCap = scannerMinimumInitialCap
+	}
+	if initialCap > maxToken {
+		initialCap = maxToken
+	}
+
+	return initialCap, maxToken
+}
+
 func usageAndExit() {
 	flag.Usage()
 	os.Exit(1)
@@ -237,18 +293,16 @@ func checkForMatches(path string) []Match {
 	// Split function defaults to ScanLines
 	scanner := bufio.NewScanner(file)
 
-	const sixtyFourKB = 64 * 1024
-	const oneMB = 1024 * 1024
-	const tenMB = 10 * oneMB
-	const hundredMB = 100 * tenMB
+	fileInfo, statErr := file.Stat()
+	if statErr != nil {
+		debug(colors.Red+"Unable to stat file '"+path+"' while sizing scanner buffer. Falling back to defaults. Err: "+colors.Restore, statErr)
+	}
 
-	// TODO: We should check the file size and size the buffer intelligently
-	// We open the file above on line 118 so maybe there's a method we can
-	// use on the file object, but if not we can use os.Stat()
+	initialCap, maxToken := scannerBufferLimits(fileInfo)
 
 	// Fix for max token size:  https://stackoverflow.com/a/37455465/2062384
-	buf := make([]byte, 0, sixtyFourKB)
-	scanner.Buffer(buf, hundredMB) // Files up to 100 MB in size.  Lower if memory becomes a problem
+	buf := make([]byte, 0, initialCap)
+	scanner.Buffer(buf, maxToken)
 
 	var lineNumber int = 0
 	for scanner.Scan() {

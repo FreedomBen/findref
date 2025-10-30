@@ -1,6 +1,5 @@
 Things To DO:
 
-- Estimate scanner buffer size on file size
 - Add bash auto completion
   - Basic implementation done, need to add to install script
 - Add a way to exclude or blacklist certain directories/paths.

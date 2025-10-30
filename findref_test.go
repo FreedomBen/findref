@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strings"
 	"testing"
+	"time"
 )
 
 func resetTestState(t *testing.T) {
@@ -223,6 +224,82 @@ func TestProcessFile(t *testing.T) {
 	}
 	if statistics.FileCount() != 1 {
 		t.Fatalf("expected statistics to record 1 processed file, got %d", statistics.FileCount())
+	}
+}
+
+type stubFileInfo struct {
+	size int64
+	mode os.FileMode
+}
+
+func (s stubFileInfo) Name() string       { return "stub" }
+func (s stubFileInfo) Size() int64        { return s.size }
+func (s stubFileInfo) Mode() os.FileMode  { return s.mode }
+func (s stubFileInfo) ModTime() time.Time { return time.Time{} }
+func (s stubFileInfo) IsDir() bool        { return s.mode.IsDir() }
+func (s stubFileInfo) Sys() interface{}   { return nil }
+
+func TestScannerBufferLimits(t *testing.T) {
+	cases := []struct {
+		name        string
+		info        os.FileInfo
+		setup       func(t *testing.T)
+		wantInitial int
+		wantMax     int
+	}{
+		{
+			name: "small file respects minimum cap",
+			info: stubFileInfo{size: 1024},
+			setup: func(t *testing.T) {
+				resetTestState(t)
+			},
+			wantInitial: scannerMinimumInitialCap,
+			wantMax:     scannerMinimumInitialCap,
+		},
+		{
+			name: "large file uses file size",
+			info: stubFileInfo{size: 10 * 1024 * 1024},
+			setup: func(t *testing.T) {
+				resetTestState(t)
+			},
+			wantInitial: scannerDefaultInitialCap,
+			wantMax:     10 * 1024 * 1024,
+		},
+		{
+			name: "huge file clamps to max token cap",
+			info: stubFileInfo{size: int64(scannerMaxTokenCap) + (32 * 1024 * 1024)},
+			setup: func(t *testing.T) {
+				resetTestState(t)
+			},
+			wantInitial: scannerDefaultInitialCap,
+			wantMax:     scannerMaxTokenCap,
+		},
+		{
+			name: "no stat info with no max line length uses max token cap",
+			info: nil,
+			setup: func(t *testing.T) {
+				resetTestState(t)
+				settings.NoMaxLineLength = true
+			},
+			wantInitial: scannerDefaultInitialCap,
+			wantMax:     scannerMaxTokenCap,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup(t)
+			t.Cleanup(func() {
+				resetTestState(t)
+			})
+			initial, max := scannerBufferLimits(tc.info)
+			if initial != tc.wantInitial {
+				t.Fatalf("initial cap = %d, want %d", initial, tc.wantInitial)
+			}
+			if max != tc.wantMax {
+				t.Fatalf("max token = %d, want %d", max, tc.wantMax)
+			}
+		})
 	}
 }
 
