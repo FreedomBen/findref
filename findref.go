@@ -85,6 +85,12 @@ func Usage() string {
         %s// Find all "-str[i1]ng.*" in "~/starting-dir" checking C++ files, include stats%s
         %sfindref%s %s-s --%s %s"-str[i1]ng.*"%s %s"~/starting-dir"%s %s".*\.[hc](pp)?"%s
 
+        %s// Skip node_modules while searching for TODO comments%s
+        %sfindref%s %s--exclude%s %snode_modules%s %s"TODO"%s %s"./src"%s
+
+        %s// Use multiple excludes when scanning Go sources%s
+        %sfindref%s %s--exclude%s %svendor%s %s--exclude%s %sbuild%s %s"^func init"%s
+
 `,
 		// Top block
 		colors.Red, versionString(false), colors.Restore, // Title
@@ -137,6 +143,23 @@ func Usage() string {
 		colors.Cyan, colors.Restore, // fourth example match_regex
 		colors.Blue, colors.Restore, // fourth example start_dir
 		colors.Purple, colors.Restore, // fourth example filename_regex
+
+		// Fifth Example
+		colors.LightGray, colors.Restore, // fifth example comment
+		colors.Brown, colors.Restore, // fifth example findref
+		colors.Green, colors.Restore, // fifth example option
+		colors.Yellow, colors.Restore, // fifth example exclude value
+		colors.Cyan, colors.Restore, // fifth example match_regex
+		colors.Blue, colors.Restore, // fifth example start_dir
+
+		// Sixth Example
+		colors.LightGray, colors.Restore, // sixth example comment
+		colors.Brown, colors.Restore, // sixth example findref
+		colors.Green, colors.Restore, // sixth example first exclude option
+		colors.Yellow, colors.Restore, // sixth example first exclude value
+		colors.Green, colors.Restore, // sixth example second exclude option
+		colors.Yellow, colors.Restore, // sixth example second exclude value
+		colors.Cyan, colors.Restore, // sixth example match_regex
 	)
 }
 
