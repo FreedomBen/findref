@@ -45,6 +45,7 @@ main() {
 
     output="$(run_completion findref --exclude "")"
     assert_contains "exclude suggestions" ".git" "${output}"
+    assert_contains "exclude suggestions" "findref.go" "${output}"
 
     output="$(run_completion findref foo "")"
     assert_contains "start directory suggestions" "." "${output}"

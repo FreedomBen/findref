@@ -124,7 +124,7 @@ curl -s https://raw.githubusercontent.com/FreedomBen/findref/master/install.sh |
    ```
 2. To load the completion automatically, either copy or symlink the script into a directory that Bash Completion reads (for example `/etc/bash_completion.d/findref`), or add the `source` command above to your `~/.bashrc`.
 
-The script understands `--exclude`/`-e` values, offers directory completions for start points and excludes, and provides presets for `--max-line-length`, so you can explore the CLI without memorizing every switch.
+The script understands `--exclude`/`-e` values, offers path completions for start points and excludes, and provides presets for `--max-line-length`, so you can explore the CLI without memorizing every switch.
 
 ### Pre-built binaries
 

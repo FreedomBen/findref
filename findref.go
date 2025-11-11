@@ -49,7 +49,7 @@ func Usage() string {
         -d | --debug
               Enable debug mode
         -e | --exclude
-              Exclude directories whose names match the provided value (repeat for multiple; defaults skip VCS metadata)
+              Exclude directories or files whose names match the provided value (repeat for multiple; defaults skip VCS metadata)
         -f | --filename-only
               Display only filenames with matches, not the matches themselves
         -h | --hidden
@@ -360,6 +360,11 @@ func processFile(path string, info os.FileInfo, err error) error {
 		}
 	}
 
+	if settings.ShouldExcludeFile(path) {
+		debug(colors.Blue, "File", path, "is excluded and will be skipped", colors.Restore)
+		return FILE_PROCESSING_COMPLETE
+	}
+
 	if settings.PassesFileFilter(path) {
 		debug(colors.Blue+"Passes file filter:", path)
 		if settings.IsHidden(path) {
@@ -469,7 +474,7 @@ func main() {
 	maxLineLengthPtr := flag.Int("max-line-length", MaxLineLengthDefault, "Set maximum line length in characters (default is 2,000)")
 	noMaxLineLengthPtr := flag.Bool("no-max-line-length", false, "Remove maximum line length.  Match againt lines of any length")
 	excludeValues := multiValueFlag{}
-	flag.Var(&excludeValues, "exclude", "Exclude directories whose names match the provided value (repeatable)")
+	flag.Var(&excludeValues, "exclude", "Exclude directories or files whose names match the provided value (repeatable)")
 	flag.Var(&excludeValues, "e", "Alias for --exclude")
 
 	flag.Usage = func() {
@@ -512,7 +517,7 @@ func main() {
 		settings.MaxLineLength = *maxLineLengthPtr
 	}
 	if len(excludeValues) > 0 {
-		settings.AddExcludeDirs([]string(excludeValues)...)
+		settings.AddExcludes([]string(excludeValues)...)
 	}
 
 	if settings.TrackStats {
@@ -528,7 +533,7 @@ func main() {
 	debug(colors.Blue, "filename only: ", colors.Restore, settings.FilenameOnly)
 	debug(colors.Blue, "max line length: ", colors.Restore, settings.MaxLineLength)
 	debug(colors.Blue, "no max line length enabled: ", colors.Restore, settings.NoMaxLineLength)
-	debug(colors.Blue, "excluded directories: ", colors.Restore, settings.ExcludeDirs())
+	debug(colors.Blue, "excluded paths: ", colors.Restore, settings.Excludes())
 
 	rootDir := "."
 
@@ -590,7 +595,7 @@ func main() {
 	debug(colors.Blue, "* filename only: ", colors.Restore, settings.FilenameOnly)
 	debug(colors.Blue, "* max line length: ", colors.Restore, settings.MaxLineLength)
 	debug(colors.Blue, "* no max line length enabled: ", colors.Restore, settings.NoMaxLineLength)
-	debug(colors.Blue, "* excluded directories: ", colors.Restore, settings.ExcludeDirs())
+	debug(colors.Blue, "* excluded paths: ", colors.Restore, settings.Excludes())
 	debug(colors.Blue, "* matchRegex: ", colors.Restore, settings.MatchRegex.String())
 	debug(colors.Blue, "* rootDir: ", colors.Restore, rootDir)
 	debug(colors.Blue, "* fileRegex: ", colors.Restore, settings.FilenameRegex.String())

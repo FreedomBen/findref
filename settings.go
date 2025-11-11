@@ -6,6 +6,11 @@ import (
 	"strings"
 )
 
+type excludeEntry struct {
+	value     string
+	matchBase bool
+}
+
 type Settings struct {
 	Debug           bool
 	TrackStats      bool
@@ -16,7 +21,7 @@ type Settings struct {
 	MatchRegex      *regexp.Regexp
 	FilenameRegex   *regexp.Regexp
 	HiddenFileRegex *regexp.Regexp
-	excludeDirs     []string
+	excludes        []excludeEntry
 }
 
 func NewSettings() *Settings {
@@ -30,7 +35,7 @@ func NewSettings() *Settings {
 		MatchRegex:      nil,
 		FilenameRegex:   regexp.MustCompile(".*"),
 		HiddenFileRegex: regexp.MustCompile(`(^|\/)\.`),
-		excludeDirs:     []string{},
+		excludes:        []excludeEntry{},
 	}
 	s.AddExcludeDirs(".git", ".svn", ".hg", ".bzr", "CVS")
 	return s
@@ -46,8 +51,12 @@ func (s *Settings) IsHidden(path string) bool {
 }
 
 func (s *Settings) AddExcludeDirs(dirs ...string) {
-	for _, dir := range dirs {
-		trimmed := strings.TrimSpace(dir)
+	s.AddExcludes(dirs...)
+}
+
+func (s *Settings) AddExcludes(paths ...string) {
+	for _, path := range paths {
+		trimmed := strings.TrimSpace(path)
 		if trimmed == "" {
 			continue
 		}
@@ -55,28 +64,51 @@ func (s *Settings) AddExcludeDirs(dirs ...string) {
 		if cleaned == "." {
 			continue
 		}
-		s.excludeDirs = append(s.excludeDirs, cleaned)
+		entry := excludeEntry{
+			value:     cleaned,
+			matchBase: filepath.Base(cleaned) == cleaned,
+		}
+		s.excludes = append(s.excludes, entry)
 	}
 }
 
 func (s *Settings) ExcludeDirs() []string {
-	retval := make([]string, len(s.excludeDirs))
-	copy(retval, s.excludeDirs)
+	return s.Excludes()
+}
+
+func (s *Settings) Excludes() []string {
+	retval := make([]string, len(s.excludes))
+	for idx, entry := range s.excludes {
+		retval[idx] = entry.value
+	}
 	return retval
 }
 
 func (s *Settings) ShouldExcludeDir(path string) bool {
-	if len(s.excludeDirs) == 0 {
+	return s.shouldExclude(path)
+}
+
+func (s *Settings) ShouldExcludeFile(path string) bool {
+	return s.shouldExclude(path)
+}
+
+func (s *Settings) shouldExclude(path string) bool {
+	if len(s.excludes) == 0 {
 		return false
 	}
 	cleanedPath := filepath.Clean(path)
 	pathBase := filepath.Base(cleanedPath)
-	for _, dir := range s.excludeDirs {
-		if cleanedPath == dir {
+	for _, entry := range s.excludes {
+		if cleanedPath == entry.value {
 			return true
 		}
-		if pathBase == filepath.Base(dir) {
+		if entry.matchBase && pathBase == entry.value {
 			return true
+		}
+		if !entry.matchBase && !filepath.IsAbs(entry.value) {
+			if strings.HasSuffix(cleanedPath, string(filepath.Separator)+entry.value) {
+				return true
+			}
 		}
 	}
 	return false

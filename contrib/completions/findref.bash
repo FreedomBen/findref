@@ -96,6 +96,9 @@ _findref_completion() {
                 while IFS= read -r line; do
                     suggestions+=("$line")
                 done < <(compgen -d -- "$value")
+                while IFS= read -r line; do
+                    suggestions+=("$line")
+                done < <(compgen -f -- "$value")
                 if [[ -n $prefix ]]; then
                     local -a prefixed=()
                     local unique

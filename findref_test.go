@@ -100,6 +100,20 @@ func TestShouldExcludeDirUserProvided(t *testing.T) {
 	}
 }
 
+func TestShouldExcludeFileUserProvided(t *testing.T) {
+	s := NewSettings()
+	s.AddExcludes("README.md", "src/generated.go")
+	if !s.ShouldExcludeFile("/tmp/project/docs/README.md") {
+		t.Fatalf("expected README.md files to be excluded when provided")
+	}
+	if !s.ShouldExcludeFile("/tmp/project/src/generated.go") {
+		t.Fatalf("expected generated.go to be excluded when provided with relative path")
+	}
+	if s.ShouldExcludeFile("/tmp/project/src/generated_test.go") {
+		t.Fatalf("did not expect generated_test.go to be excluded")
+	}
+}
+
 func TestGetMatchRegex(t *testing.T) {
 	r1 := getMatchRegex(false, false, "HEllo")
 	if !r1.MatchString("HEllo") {
