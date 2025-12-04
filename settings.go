@@ -18,7 +18,22 @@ var defaultExcludeDirs = []string{
 	"dist",
 	"out",
 	"coverage",
+	"package-lock.json",
+	"yarn.lock",
+	"pnpm-lock.yaml",
+	"bun.lockb",
+	"composer.lock",
+	"Gemfile.lock",
+	"mix.lock",
+	"Cargo.lock",
+	"Pipfile.lock",
+	"poetry.lock",
+	"Podfile.lock",
+	"go.sum",
+	"gradle.lockfile",
 }
+
+var defaultExcludeEntries = buildExcludeEntries(defaultExcludeDirs...)
 
 type excludeEntry struct {
 	value     string
@@ -26,32 +41,33 @@ type excludeEntry struct {
 }
 
 type Settings struct {
-	Debug           bool
-	TrackStats      bool
-	FilenameOnly    bool
-	IncludeHidden   bool
-	MaxLineLength   int
-	NoMaxLineLength bool
-	MatchRegex      *regexp.Regexp
-	FilenameRegex   *regexp.Regexp
-	HiddenFileRegex *regexp.Regexp
-	excludes        []excludeEntry
+	Debug              bool
+	TrackStats         bool
+	FilenameOnly       bool
+	IncludeHidden      bool
+	MaxLineLength      int
+	NoMaxLineLength    bool
+	MatchRegex         *regexp.Regexp
+	FilenameRegex      *regexp.Regexp
+	HiddenFileRegex    *regexp.Regexp
+	UseDefaultExcludes bool
+	excludes           []excludeEntry
 }
 
 func NewSettings() *Settings {
 	s := &Settings{
-		Debug:           false,
-		TrackStats:      false,
-		FilenameOnly:    false,
-		IncludeHidden:   false,
-		MaxLineLength:   2000,
-		NoMaxLineLength: false,
-		MatchRegex:      nil,
-		FilenameRegex:   regexp.MustCompile(".*"),
-		HiddenFileRegex: regexp.MustCompile(`(^|\/)\.`),
-		excludes:        []excludeEntry{},
+		Debug:              false,
+		TrackStats:         false,
+		FilenameOnly:       false,
+		IncludeHidden:      false,
+		MaxLineLength:      2000,
+		NoMaxLineLength:    false,
+		MatchRegex:         nil,
+		FilenameRegex:      regexp.MustCompile(".*"),
+		HiddenFileRegex:    regexp.MustCompile(`(^|\/)\.`),
+		excludes:           []excludeEntry{},
+		UseDefaultExcludes: true,
 	}
-	s.AddExcludeDirs(defaultExcludeDirs...)
 	return s
 }
 
@@ -69,21 +85,7 @@ func (s *Settings) AddExcludeDirs(dirs ...string) {
 }
 
 func (s *Settings) AddExcludes(paths ...string) {
-	for _, path := range paths {
-		trimmed := strings.TrimSpace(path)
-		if trimmed == "" {
-			continue
-		}
-		cleaned := filepath.Clean(trimmed)
-		if cleaned == "." {
-			continue
-		}
-		entry := excludeEntry{
-			value:     cleaned,
-			matchBase: filepath.Base(cleaned) == cleaned,
-		}
-		s.excludes = append(s.excludes, entry)
-	}
+	s.excludes = append(s.excludes, buildExcludeEntries(paths...)...)
 }
 
 func (s *Settings) ExcludeDirs() []string {
@@ -91,9 +93,16 @@ func (s *Settings) ExcludeDirs() []string {
 }
 
 func (s *Settings) Excludes() []string {
-	retval := make([]string, len(s.excludes))
-	for idx, entry := range s.excludes {
-		retval[idx] = entry.value
+	total := len(s.excludes)
+	if s.UseDefaultExcludes {
+		total += len(defaultExcludeDirs)
+	}
+	retval := make([]string, 0, total)
+	for _, entry := range s.excludes {
+		retval = append(retval, entry.value)
+	}
+	if s.UseDefaultExcludes {
+		retval = append(retval, defaultExcludeDirs...)
 	}
 	return retval
 }
@@ -107,12 +116,19 @@ func (s *Settings) ShouldExcludeFile(path string) bool {
 }
 
 func (s *Settings) shouldExclude(path string) bool {
-	if len(s.excludes) == 0 {
-		return false
-	}
 	cleanedPath := filepath.Clean(path)
 	pathBase := filepath.Base(cleanedPath)
-	for _, entry := range s.excludes {
+	if s.matchesExclude(cleanedPath, pathBase, s.excludes) {
+		return true
+	}
+	if s.UseDefaultExcludes && s.matchesExclude(cleanedPath, pathBase, defaultExcludeEntries) {
+		return true
+	}
+	return false
+}
+
+func (s *Settings) matchesExclude(cleanedPath string, pathBase string, entries []excludeEntry) bool {
+	for _, entry := range entries {
 		if cleanedPath == entry.value {
 			return true
 		}
@@ -126,4 +142,24 @@ func (s *Settings) shouldExclude(path string) bool {
 		}
 	}
 	return false
+}
+
+func buildExcludeEntries(paths ...string) []excludeEntry {
+	entries := make([]excludeEntry, 0, len(paths))
+	for _, path := range paths {
+		trimmed := strings.TrimSpace(path)
+		if trimmed == "" {
+			continue
+		}
+		cleaned := filepath.Clean(trimmed)
+		if cleaned == "." {
+			continue
+		}
+		entry := excludeEntry{
+			value:     cleaned,
+			matchBase: filepath.Base(cleaned) == cleaned,
+		}
+		entries = append(entries, entry)
+	}
+	return entries
 }

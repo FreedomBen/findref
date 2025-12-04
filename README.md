@@ -42,7 +42,7 @@ is the way to go.  Ag is also useful for very large codebases.
 
 ### Default exclusions
 
-Even without passing any `--exclude` flags, `findref` prunes directories that usually contain generated artifacts or vendored dependencies: `.git`, `.svn`, `.hg`, `.bzr`, `CVS`, `vendor`, `node_modules`, `build`, `dist`, `out`, and `coverage`. Use additional `--exclude` values to extend this list. Hidden files and directories remain ignored unless you supply `--hidden` or `--all`, but the directories above stay excluded to keep searches fast.
+Even without passing any `--exclude` flags, `findref` prunes directories and lockfiles that usually contain generated artifacts or vendored dependencies: `.git`, `.svn`, `.hg`, `.bzr`, `CVS`, `vendor`, `node_modules`, `build`, `dist`, `out`, `coverage`, `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `bun.lockb`, `composer.lock`, `Gemfile.lock`, `mix.lock`, `Cargo.lock`, `Pipfile.lock`, `poetry.lock`, `Podfile.lock`, `go.sum`, and `gradle.lockfile`. Use additional `--exclude` values—these can be directories or single files—to extend this list. Hidden files and directories remain ignored unless you supply `--hidden` or `--all`, but the entries above stay excluded to keep searches fast. Need to crawl everything? Pass `--all` (which already implies hidden files and ignore-case) to disable the defaults, then layer on whichever `--exclude` values still make sense for that search.
 
 ### Examples:
 

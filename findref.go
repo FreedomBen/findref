@@ -45,7 +45,7 @@ func Usage() string {
     %sOptions:%s
         %s
         -a | --all
-              Aggressively search for matches (implies: -i -h)
+             Aggressively search for matches (implies: -i -h) and disables default excludes
         -d | --debug
               Enable debug mode
         -e | --exclude
@@ -503,12 +503,12 @@ func main() {
 	settings.Debug = *debugPtr || *dPtr
 	settings.TrackStats = *statsPtr || *sPtr
 	settings.FilenameOnly = *filenameOnlyPtr || *fPtr
-	settings.IncludeHidden = *hiddenPtr || *hPtr
-	settings.IncludeHidden = *allPtr || *aPtr // -a implies -h
+	allEnabled := *allPtr || *aPtr
+	settings.IncludeHidden = (*hiddenPtr || *hPtr) || allEnabled
 	settings.NoMaxLineLength = *noMaxLineLengthPtr || *xPtr
 	*matchCasePtr = *matchCasePtr || *mPtr
-	*ignoreCasePtr = *ignoreCasePtr || *iPtr
-	*ignoreCasePtr = *allPtr || *aPtr // -a implies -i
+	*ignoreCasePtr = (*ignoreCasePtr || *iPtr) || allEnabled
+	settings.UseDefaultExcludes = !allEnabled
 
 	if *lPtr != MaxLineLengthDefault {
 		settings.MaxLineLength = *lPtr

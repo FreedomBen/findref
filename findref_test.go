@@ -73,16 +73,37 @@ func TestIsHidden(t *testing.T) {
 	}
 }
 
-func TestShouldExcludeDirDefaults(t *testing.T) {
+func TestDefaultExcludePaths(t *testing.T) {
 	s := NewSettings()
-	for _, dir := range defaultExcludeDirs {
-		path := filepath.Join("/tmp/project", dir)
+	for _, entry := range defaultExcludeDirs {
+		path := filepath.Join("/tmp/project", entry)
 		if !s.ShouldExcludeDir(path) {
-			t.Fatalf("expected %s to be excluded by default", dir)
+			t.Fatalf("expected %s to be excluded by default as directory", entry)
+		}
+		if !s.ShouldExcludeFile(path) {
+			t.Fatalf("expected %s to be excluded by default as file", entry)
 		}
 	}
 	if s.ShouldExcludeDir("./src") {
 		t.Fatalf("did not expect src to be excluded by default")
+	}
+	if s.ShouldExcludeFile("./src/file.go") {
+		t.Fatalf("did not expect src/file.go to be excluded by default")
+	}
+}
+
+func TestDisableDefaultExcludes(t *testing.T) {
+	s := NewSettings()
+	s.UseDefaultExcludes = false
+	for _, dir := range defaultExcludeDirs {
+		path := filepath.Join("/tmp/project", dir)
+		if s.ShouldExcludeDir(path) {
+			t.Fatalf("did not expect %s to be excluded when defaults disabled", dir)
+		}
+	}
+	s.AddExcludeDirs("vendor")
+	if !s.ShouldExcludeDir(filepath.Join("/tmp/project", "vendor")) {
+		t.Fatalf("expected vendor to be excluded when user provided")
 	}
 }
 
@@ -340,6 +361,16 @@ func TestIntegrationExcludeFlag(t *testing.T) {
 	expectContains(t, lines, thirdPartyFile)
 	expectNotContains(t, lines, gitFile)
 
+	stdout, stderr = runFindrefMain(t, []string{"--no-color", "--filename-only", "--all", "TODO", tmpDir})
+	if stderr != "" {
+		t.Fatalf("expected empty stderr, got %q", stderr)
+	}
+	lines = splitLines(stdout)
+	expectContains(t, lines, rootFile)
+	expectContains(t, lines, vendorFile)
+	expectContains(t, lines, thirdPartyFile)
+	expectContains(t, lines, gitFile)
+
 	stdout, stderr = runFindrefMain(t, []string{"--no-color", "--filename-only", "--exclude", "vendor", "--exclude", "third_party", "TODO", tmpDir})
 	if stderr != "" {
 		t.Fatalf("expected empty stderr, got %q", stderr)
@@ -349,6 +380,16 @@ func TestIntegrationExcludeFlag(t *testing.T) {
 	expectNotContains(t, lines, vendorFile)
 	expectNotContains(t, lines, thirdPartyFile)
 	expectNotContains(t, lines, gitFile)
+
+	stdout, stderr = runFindrefMain(t, []string{"--no-color", "--filename-only", "--all", "--exclude", "vendor", "TODO", tmpDir})
+	if stderr != "" {
+		t.Fatalf("expected empty stderr, got %q", stderr)
+	}
+	lines = splitLines(stdout)
+	expectContains(t, lines, rootFile)
+	expectNotContains(t, lines, vendorFile)
+	expectContains(t, lines, thirdPartyFile)
+	expectContains(t, lines, gitFile)
 }
 
 func runFindrefMain(t *testing.T, args []string) (string, string) {

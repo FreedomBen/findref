@@ -48,8 +48,12 @@ _findref_completion() {
         -l --max-line-length
         -e --exclude
     )
-	# Keep in sync with defaultExcludeDirs in settings.go
-	local -a exclude_defaults=(.git .svn .hg .bzr CVS vendor node_modules build dist out coverage)
+    # Keep in sync with defaultExcludeDirs in settings.go
+    local -a exclude_defaults=(
+        .git .svn .hg .bzr CVS vendor node_modules build dist out coverage
+        package-lock.json yarn.lock pnpm-lock.yaml bun.lockb composer.lock Gemfile.lock
+        mix.lock Cargo.lock Pipfile.lock poetry.lock Podfile.lock go.sum gradle.lockfile
+    )
     local -a regex_suggestions=('".*\\.go$"' '".*\\.py$"' '".*\\.(js|ts)$"' '".*\\.(c|h)$"')
     local -a match_examples=('"TODO"' '"TODO|FIXME"' '"(?i)http"')
 
