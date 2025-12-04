@@ -7,6 +7,23 @@ __findref_safe_compopt() {
     fi
 }
 
+__findref_should_print_hint() {
+    if [[ -z ${COMP_TYPE+x} ]]; then
+        return 1
+    fi
+    [[ $COMP_TYPE -eq 63 ]]
+}
+
+__findref_maybe_print_hint() {
+    local hint="$1"
+    if [[ -z $hint ]]; then
+        return
+    fi
+    if __findref_should_print_hint; then
+        printf '\n%s\n' "$hint"
+    fi
+}
+
 _findref_completion() {
     local cur prev words cword
     if declare -F _init_completion >/dev/null 2>&1; then
@@ -55,7 +72,7 @@ _findref_completion() {
         mix.lock Cargo.lock Pipfile.lock poetry.lock Podfile.lock go.sum gradle.lockfile
     )
     local -a regex_suggestions=('".*\\.go$"' '".*\\.py$"' '".*\\.(js|ts)$"' '".*\\.(c|h)$"')
-    local -a match_examples=('"TODO"' '"TODO|FIXME"' '"(?i)http"')
+    local -a match_examples=('"panic"' '"(?i)password"' '"http.NewRequest"')
 
     local expecting_value=""
     case "$prev" in
@@ -207,6 +224,14 @@ _findref_completion() {
 
     case "$positional_index" in
         0)
+            if [[ -z $cur ]]; then
+                local -a all_opts=("${opts_no_value[@]}" "${opts_with_value[@]}")
+                COMPREPLY=($(compgen -W "${all_opts[*]}" -- "$cur"))
+                __findref_maybe_print_hint '[match regex] search file contents'
+                COMPREPLY+=("${match_examples[@]}")
+                return 0
+            fi
+            __findref_maybe_print_hint '[match regex] search file contents'
             COMPREPLY=($(compgen -W "${match_examples[*]}" -- "$cur"))
             return 0
             ;;
@@ -223,6 +248,7 @@ _findref_completion() {
             return 0
             ;;
         2)
+            __findref_maybe_print_hint '[filename regex] filter files to scan'
             COMPREPLY=($(compgen -W "${regex_suggestions[*]}" -- "$cur"))
             return 0
             ;;

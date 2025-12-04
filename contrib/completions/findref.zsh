@@ -29,9 +29,9 @@ typeset -ga _findref_exclude_defaults=(
 )
 
 typeset -ga _findref_match_examples=(
-  '"TODO"'
-  '"TODO|FIXME"'
-  '"(?i)http"'
+  '"panic"'
+  '"(?i)password"'
+  '"http.NewRequest"'
 )
 
 typeset -ga _findref_filename_regexes=(
@@ -60,12 +60,15 @@ _findref_complete_lengths() {
 
 _findref_complete_match_examples() {
   emulate -L zsh
-  compadd -Q -- "${_findref_match_examples[@]}"
+  if [[ $PREFIX == -* ]]; then
+    return 1
+  fi
+  compadd -Q -X '[match regex] search file contents' -- "${_findref_match_examples[@]}"
 }
 
 _findref_complete_filename_regexes() {
   emulate -L zsh
-  compadd -Q -- "${_findref_filename_regexes[@]}"
+  compadd -Q -X '[filename regex] filter files to scan' -- "${_findref_filename_regexes[@]}"
 }
 
 _findref_complete_start_dir() {

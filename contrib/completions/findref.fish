@@ -9,7 +9,7 @@ if not set -q __fish_findref_exclude_defaults
 end
 
 if not set -q __fish_findref_match_examples
-    set -g __fish_findref_match_examples '"TODO"' '"TODO|FIXME"' '"(?i)http"'
+    set -g __fish_findref_match_examples '"panic"' '"(?i)password"' '"http.NewRequest"'
 end
 
 if not set -q __fish_findref_filename_regexes
@@ -60,7 +60,14 @@ function __fish_findref_positional_count
 end
 
 function __fish_findref_needs_match_regex
-    test (__fish_findref_positional_count) -eq 0
+    if not test (__fish_findref_positional_count) -eq 0
+        return 1
+    end
+    set -l token (commandline -ct)
+    if string match -q -- '-*' "$token"
+        return 1
+    end
+    return 0
 end
 
 function __fish_findref_needs_start_dir
@@ -72,11 +79,17 @@ function __fish_findref_needs_filename_regex
 end
 
 function __fish_findref_match_examples
-    printf '%s\n' $__fish_findref_match_examples
+    set -l label '[match regex] search file contents'
+    for example in $__fish_findref_match_examples
+        printf '%s\t%s\n' "$example" "$label"
+    end
 end
 
 function __fish_findref_filename_regexes
-    printf '%s\n' $__fish_findref_filename_regexes
+    set -l label '[filename regex] filter files to scan'
+    for regex in $__fish_findref_filename_regexes
+        printf '%s\t%s\n' "$regex" "$label"
+    end
 end
 
 function __fish_findref_max_line_lengths
