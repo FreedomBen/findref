@@ -118,9 +118,11 @@ curl -s https://raw.githubusercontent.com/FreedomBen/findref/master/install.sh |
 curl -s https://raw.githubusercontent.com/FreedomBen/findref/master/install.sh | sudo bash -s /usr/local/bin
 ```
 
-### Bash autocomplete
+### Shell autocomplete
 
-`findref` ships with a Bash completion helper that suggests flags, helps fill in exclude directories, and offers quick-start regex snippets for the positional arguments.
+`findref` ships with completion helpers for Bash, Zsh, and Fish. They suggest flags, help fill in exclude directories, and offer quick-start regex snippets for the positional arguments, so you can explore the CLI without memorizing every switch.
+
+#### Bash
 
 1. Source it for your current shell (replace the path with wherever you cloned the repo):
    ```bash
@@ -128,7 +130,21 @@ curl -s https://raw.githubusercontent.com/FreedomBen/findref/master/install.sh |
    ```
 2. To load the completion automatically, either copy or symlink the script into a directory that Bash Completion reads (for example `/etc/bash_completion.d/findref`), or add the `source` command above to your `~/.bashrc`.
 
-The script understands `--exclude`/`-e` values, offers path completions for start points and excludes, and provides presets for `--max-line-length`, so you can explore the CLI without memorizing every switch.
+#### Zsh
+
+1. Load completions for the current session:
+   ```zsh
+   source /path/to/findref/contrib/completions/findref.zsh
+   ```
+2. For automatic loading, copy or symlink the script into a directory that appears in your `$fpath` (for example `/usr/local/share/zsh/site-functions/_findref`) or `source` it from your `~/.zshrc` after `compinit`.
+
+#### Fish
+
+1. Test it in the current shell:
+   ```fish
+   source /path/to/findref/contrib/completions/findref.fish
+   ```
+2. For permanent availability, copy or symlink the file to `~/.config/fish/completions/findref.fish` (or another directory listed in `fish_complete_path`).
 
 ### Pre-built binaries
 
