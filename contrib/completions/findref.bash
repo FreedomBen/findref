@@ -48,7 +48,8 @@ _findref_completion() {
         -l --max-line-length
         -e --exclude
     )
-    local -a exclude_defaults=(.git .svn .hg .bzr CVS vendor node_modules build dist out coverage)
+	# Keep in sync with defaultExcludeDirs in settings.go
+	local -a exclude_defaults=(.git .svn .hg .bzr CVS vendor node_modules build dist out coverage)
     local -a regex_suggestions=('".*\\.go$"' '".*\\.py$"' '".*\\.(js|ts)$"' '".*\\.(c|h)$"')
     local -a match_examples=('"TODO"' '"TODO|FIXME"' '"(?i)http"')
 

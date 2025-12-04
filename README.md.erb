@@ -40,6 +40,10 @@ is the way to go.  Ag is also useful for very large codebases.
   <img src="images/findref-usage.png" alt="findref usage">
 </p>
 
+### Default exclusions
+
+Even without passing any `--exclude` flags, `findref` prunes directories that usually contain generated artifacts or vendored dependencies: `.git`, `.svn`, `.hg`, `.bzr`, `CVS`, `vendor`, `node_modules`, `build`, `dist`, `out`, and `coverage`. Use additional `--exclude` values to extend this list. Hidden files and directories remain ignored unless you supply `--hidden` or `--all`, but the directories above stay excluded to keep searches fast.
+
 ### Examples:
 
 Let's say we are looking for the string "getMethodName":

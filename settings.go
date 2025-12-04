@@ -6,6 +6,20 @@ import (
 	"strings"
 )
 
+var defaultExcludeDirs = []string{
+	".git",
+	".svn",
+	".hg",
+	".bzr",
+	"CVS",
+	"vendor",
+	"node_modules",
+	"build",
+	"dist",
+	"out",
+	"coverage",
+}
+
 type excludeEntry struct {
 	value     string
 	matchBase bool
@@ -37,7 +51,7 @@ func NewSettings() *Settings {
 		HiddenFileRegex: regexp.MustCompile(`(^|\/)\.`),
 		excludes:        []excludeEntry{},
 	}
-	s.AddExcludeDirs(".git", ".svn", ".hg", ".bzr", "CVS")
+	s.AddExcludeDirs(defaultExcludeDirs...)
 	return s
 }
 

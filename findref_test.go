@@ -75,14 +75,14 @@ func TestIsHidden(t *testing.T) {
 
 func TestShouldExcludeDirDefaults(t *testing.T) {
 	s := NewSettings()
-	if !s.ShouldExcludeDir("./.git") {
-		t.Fatalf("expected .git to be excluded by default")
+	for _, dir := range defaultExcludeDirs {
+		path := filepath.Join("/tmp/project", dir)
+		if !s.ShouldExcludeDir(path) {
+			t.Fatalf("expected %s to be excluded by default", dir)
+		}
 	}
-	if !s.ShouldExcludeDir("/tmp/project/.svn") {
-		t.Fatalf("expected .svn to be excluded by default")
-	}
-	if s.ShouldExcludeDir("./vendor") {
-		t.Fatalf("did not expect vendor to be excluded by default")
+	if s.ShouldExcludeDir("./src") {
+		t.Fatalf("did not expect src to be excluded by default")
 	}
 }
 
@@ -336,7 +336,7 @@ func TestIntegrationExcludeFlag(t *testing.T) {
 
 	lines := splitLines(stdout)
 	expectContains(t, lines, rootFile)
-	expectContains(t, lines, vendorFile)
+	expectNotContains(t, lines, vendorFile)
 	expectContains(t, lines, thirdPartyFile)
 	expectNotContains(t, lines, gitFile)
 
