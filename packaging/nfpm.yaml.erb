@@ -1,6 +1,6 @@
 name: findref
 arch: "<%= arch %>"
-platform: linux
+platform: "<%= platform %>"
 version: "<%= version %>"
 section: utils
 priority: optional
@@ -14,6 +14,7 @@ license: MIT
 provides:
   - findref
 contents:
+<% if platform == 'linux' %>
   - src: dist/pkgroot/usr/bin/findref
     dst: /usr/bin/findref
     file_info:
@@ -42,3 +43,33 @@ contents:
     dst: /usr/share/doc/findref/README.md
     file_info:
       mode: 0644
+<% elsif platform == 'darwin' %>
+  - src: dist/pkgroot/usr/local/bin/findref
+    dst: /usr/local/bin/findref
+    file_info:
+      mode: 0755
+  - src: dist/pkgroot/usr/local/share/man/man1/findref.1
+    dst: /usr/local/share/man/man1/findref.1
+    file_info:
+      mode: 0644
+  - src: dist/pkgroot/usr/local/share/bash-completion/completions/findref
+    dst: /usr/local/share/bash-completion/completions/findref
+    file_info:
+      mode: 0644
+  - src: dist/pkgroot/usr/local/share/zsh/site-functions/_findref
+    dst: /usr/local/share/zsh/site-functions/_findref
+    file_info:
+      mode: 0644
+  - src: dist/pkgroot/usr/local/share/fish/vendor_completions.d/findref.fish
+    dst: /usr/local/share/fish/vendor_completions.d/findref.fish
+    file_info:
+      mode: 0644
+  - src: LICENSE
+    dst: /usr/local/share/licenses/findref/LICENSE
+    file_info:
+      mode: 0644
+  - src: README.md
+    dst: /usr/local/share/doc/findref/README.md
+    file_info:
+      mode: 0644
+<% end %>

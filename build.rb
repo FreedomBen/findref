@@ -18,25 +18,27 @@ MANPAGE_SOURCE = 'contrib/man/findref.1'.freeze
 COMPLETION_SCRIPTS = [
   {
     source: 'contrib/completions/findref.bash',
-    dest: File.join('usr', 'share', 'bash-completion', 'completions', 'findref'),
+    dest: %w(share bash-completion completions findref),
     mode: 0o644
   },
   {
     source: 'contrib/completions/findref.zsh',
-    dest: File.join('usr', 'share', 'zsh', 'site-functions', '_findref'),
+    dest: %w(share zsh site-functions _findref),
     mode: 0o644
   },
   {
     source: 'contrib/completions/findref.fish',
-    dest: File.join('usr', 'share', 'fish', 'vendor_completions.d', 'findref.fish'),
+    dest: %w(share fish vendor_completions.d findref.fish),
     mode: 0o644
   }
 ].freeze
-LINUX_PACKAGE_FORMATS = {
-  'deb' => { extension: 'deb' },
-  'rpm' => { extension: 'rpm' },
-  'apk' => { extension: 'apk' },
-  'archlinux' => { extension: 'pkg.tar.zst', arches: %w(amd64) }
+PACKAGE_FORMATS = {
+  'linux' => {
+    'deb' => { extension: 'deb' },
+    'rpm' => { extension: 'rpm' },
+    'apk' => { extension: 'apk' },
+    'archlinux' => { extension: 'pkg.tar.zst', arches: %w(amd64) }
+  }
 }.freeze
 NFPM_ARCH_MAP = {
   'deb' => {
@@ -129,8 +131,9 @@ def container_path(relative_path)
   "#{WORKDIR_IN_CONTAINER}/#{relative_path}"
 end
 
-def package_formats_for_arch(arch)
-  LINUX_PACKAGE_FORMATS.select do |_, spec|
+def package_formats_for(os, arch)
+  specs = PACKAGE_FORMATS.fetch(os, {})
+  specs.select do |_, spec|
     spec[:arches].nil? || spec[:arches].include?(arch)
   end
 end
@@ -155,10 +158,10 @@ def ensure_nfpm_template!
   die("nfpm config template '#{NFPM_CONFIG_TEMPLATE}' not found") unless File.exist?(NFPM_CONFIG_TEMPLATE)
 end
 
-def render_nfpm_config(release, package_arch)
+def render_nfpm_config(release, package_arch, platform)
   ensure_nfpm_template!
   template = ERB.new(File.read(NFPM_CONFIG_TEMPLATE))
-  rendered = template.result_with_hash(version: release, arch: package_arch)
+  rendered = template.result_with_hash(version: release, arch: package_arch, platform: platform)
   FileUtils.mkdir_p(File.dirname(NFPM_GENERATED_CONFIG))
   File.write(NFPM_GENERATED_CONFIG, rendered)
   NFPM_GENERATED_CONFIG
@@ -188,12 +191,13 @@ def nfpm_command(packager, target_rel, release, package_arch, config_rel)
   EOS
 end
 
-def stage_linux_binary(fr_bin, arch)
-  stage_rel = stage_dir_rel('linux', arch)
+def stage_unix_binary(fr_bin, arch, prefix_segments)
+  stage_rel = stage_dir_rel('unix', arch)
   stage_abs = File.join(Dir.pwd, stage_rel)
   FileUtils.rm_rf(stage_abs)
-  FileUtils.mkdir_p(File.join(stage_abs, 'usr', 'bin'))
-  staged_bin = File.join(stage_abs, 'usr', 'bin', 'findref')
+  prefix_path = File.join(stage_abs, *prefix_segments)
+  FileUtils.mkdir_p(File.join(prefix_path, 'bin'))
+  staged_bin = File.join(prefix_path, 'bin', 'findref')
   fr_bin_path = File.join(Dir.pwd, fr_bin)
   FileUtils.cp(fr_bin_path, staged_bin)
   FileUtils.chmod(0o755, staged_bin)
@@ -201,14 +205,14 @@ def stage_linux_binary(fr_bin, arch)
   unless File.exist?(man_src)
     die("man page '#{MANPAGE_SOURCE}' not found.  Run `rake erb` to generate it.")
   end
-  man_dst = File.join(stage_abs, 'usr', 'share', 'man', 'man1', 'findref.1')
+  man_dst = File.join(prefix_path, 'share', 'man', 'man1', 'findref.1')
   FileUtils.mkdir_p(File.dirname(man_dst))
   FileUtils.cp(man_src, man_dst)
   FileUtils.chmod(0o644, man_dst)
   COMPLETION_SCRIPTS.each do |script|
     src = File.join(Dir.pwd, script[:source])
     die("Completion script '#{script[:source]}' not found") unless File.exist?(src)
-    dst = File.join(stage_abs, script[:dest])
+    dst = File.join(prefix_path, *script[:dest])
     FileUtils.mkdir_p(File.dirname(dst))
     FileUtils.cp(src, dst)
     FileUtils.chmod(script[:mode], dst)
@@ -216,18 +220,56 @@ def stage_linux_binary(fr_bin, arch)
   stage_rel
 end
 
-def build_linux_packages(fr_bin, release, arch)
-  stage_rel = stage_linux_binary(fr_bin, arch)
+def stage_linux_binary(fr_bin, arch)
+  stage_unix_binary(fr_bin, arch, %w(usr))
+end
+
+def stage_darwin_binary(fr_bin, arch)
+  stage_unix_binary(fr_bin, arch, %w(usr local))
+end
+
+def stage_windows_binary(fr_bin, _arch)
+  stage_rel = stage_dir_rel('windows')
+  stage_abs = File.join(Dir.pwd, stage_rel)
+  FileUtils.rm_rf(stage_abs)
+  program_files = File.join(stage_abs, 'ProgramFiles', 'findref')
+  FileUtils.mkdir_p(program_files)
+  staged_bin = File.join(program_files, 'findref.exe')
+  fr_bin_path = File.join(Dir.pwd, fr_bin)
+  FileUtils.cp(fr_bin_path, staged_bin)
+  FileUtils.chmod(0o755, staged_bin)
+  stage_rel
+end
+
+def stage_binary_for(os, fr_bin, arch)
+  case os
+  when 'linux'
+    stage_linux_binary(fr_bin, arch)
+  when 'darwin'
+    stage_darwin_binary(fr_bin, arch)
+  when 'windows'
+    stage_windows_binary(fr_bin, arch)
+  else
+    nil
+  end
+end
+
+def build_packages(os, fr_bin, release, arch)
+  formats = package_formats_for(os, arch)
+  return [] if formats.empty?
+
+  stage_rel = stage_binary_for(os, fr_bin, arch)
+  die("No staging routine for #{os}") if stage_rel.nil?
   artifacts = []
-  package_formats_for_arch(arch).each do |packager, spec|
+  formats.each do |packager, spec|
     package_arch = nfpm_arch_for(packager, arch)
-    target_rel = File.join(packages_dir_rel('linux', arch), package_filename(packager, spec[:extension], release, arch, package_arch))
+    target_rel = File.join(packages_dir_rel(os, arch), package_filename(packager, spec[:extension], release, arch, package_arch))
     target_abs = File.join(Dir.pwd, target_rel)
     FileUtils.mkdir_p(File.dirname(target_abs))
-    cyan "Packaging #{packager} for linux #{arch}..."
-    config_rel = render_nfpm_config(release, package_arch)
+    cyan "Packaging #{packager} for #{os} #{arch}..."
+    config_rel = render_nfpm_config(release, package_arch, os)
     command = nfpm_command(packager, target_rel, release, package_arch, config_rel)
-    system(command) || die("nfpm packager '#{packager}' failed for linux #{arch}")
+    system(command) || die("nfpm packager '#{packager}' failed for #{os} #{arch}")
     artifacts << target_abs
   end
   FileUtils.rm_rf(File.join(Dir.pwd, stage_rel))
@@ -263,10 +305,7 @@ def main(release)
       system(docker_run(os, arch))
       fr_bin = Helpers.bin_name(os)
       fr_zip = Helpers.zip_name
-      package_files = []
-      if os == 'linux'
-        package_files = build_linux_packages(fr_bin, release, arch)
-      end
+      package_files = build_packages(os, fr_bin, release, arch)
       cyan "Zipping #{fr_bin} into #{fr_zip}"
       system("zip -9 #{fr_zip} #{fr_bin}")
       dest_dirs.each do |dest_dir|
