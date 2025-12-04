@@ -9,6 +9,7 @@ task :erb do
   sh "erb fr_version=#{findref_version} README.md.erb > README.md"
   sh "erb fr_version=#{findref_version} ARCHIVES.md.erb > ARCHIVES.md"
   sh "erb install.sh.erb > install.sh"
+  sh "erb fr_version=#{findref_version} contrib/man/findref.1.erb > contrib/man/findref.1"
   #File.write('README.md', ERB.new(File.open('README.md.erb').read).result)
 end
 

@@ -14,6 +14,7 @@ WORKDIR_IN_CONTAINER = '/usr/src/findref'.freeze
 NFPM_IMAGE = 'goreleaser/nfpm:v2.37.0'.freeze
 NFPM_CONFIG_TEMPLATE = 'packaging/nfpm.yaml.erb'.freeze
 NFPM_GENERATED_CONFIG = 'dist/nfpm.generated.yaml'.freeze
+MANPAGE_SOURCE = 'contrib/man/findref.1'.freeze
 LINUX_PACKAGE_FORMATS = {
   'deb' => { extension: 'deb' },
   'rpm' => { extension: 'rpm' },
@@ -179,6 +180,14 @@ def stage_linux_binary(fr_bin, arch)
   fr_bin_path = File.join(Dir.pwd, fr_bin)
   FileUtils.cp(fr_bin_path, staged_bin)
   FileUtils.chmod(0o755, staged_bin)
+  man_src = File.join(Dir.pwd, MANPAGE_SOURCE)
+  unless File.exist?(man_src)
+    die("man page '#{MANPAGE_SOURCE}' not found.  Run `rake erb` to generate it.")
+  end
+  man_dst = File.join(stage_abs, 'usr', 'share', 'man', 'man1', 'findref.1')
+  FileUtils.mkdir_p(File.dirname(man_dst))
+  FileUtils.cp(man_src, man_dst)
+  FileUtils.chmod(0o644, man_dst)
   stage_rel
 end
 
