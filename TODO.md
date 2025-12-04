@@ -8,10 +8,6 @@ Things To DO:
 
 - Create a Brew package for Mac.  It should also be compatible with Brew for Linux.
 
-- Write a man page for findref and include it in the packages
-
 - Update README.md.erb and ARCHIVES.md.erb to include the new linux packages (rpm, deb, apk, arch linux)
-
-- Are the shell completion files getting packages into the rpm, deb, apk, etc?
 
 - Add packages for all platform targets supported by nfpm

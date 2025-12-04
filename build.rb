@@ -15,6 +15,23 @@ NFPM_IMAGE = 'goreleaser/nfpm:v2.37.0'.freeze
 NFPM_CONFIG_TEMPLATE = 'packaging/nfpm.yaml.erb'.freeze
 NFPM_GENERATED_CONFIG = 'dist/nfpm.generated.yaml'.freeze
 MANPAGE_SOURCE = 'contrib/man/findref.1'.freeze
+COMPLETION_SCRIPTS = [
+  {
+    source: 'contrib/completions/findref.bash',
+    dest: File.join('usr', 'share', 'bash-completion', 'completions', 'findref'),
+    mode: 0o644
+  },
+  {
+    source: 'contrib/completions/findref.zsh',
+    dest: File.join('usr', 'share', 'zsh', 'site-functions', '_findref'),
+    mode: 0o644
+  },
+  {
+    source: 'contrib/completions/findref.fish',
+    dest: File.join('usr', 'share', 'fish', 'vendor_completions.d', 'findref.fish'),
+    mode: 0o644
+  }
+].freeze
 LINUX_PACKAGE_FORMATS = {
   'deb' => { extension: 'deb' },
   'rpm' => { extension: 'rpm' },
@@ -188,6 +205,14 @@ def stage_linux_binary(fr_bin, arch)
   FileUtils.mkdir_p(File.dirname(man_dst))
   FileUtils.cp(man_src, man_dst)
   FileUtils.chmod(0o644, man_dst)
+  COMPLETION_SCRIPTS.each do |script|
+    src = File.join(Dir.pwd, script[:source])
+    die("Completion script '#{script[:source]}' not found") unless File.exist?(src)
+    dst = File.join(stage_abs, script[:dest])
+    FileUtils.mkdir_p(File.dirname(dst))
+    FileUtils.cp(src, dst)
+    FileUtils.chmod(script[:mode], dst)
+  end
   stage_rel
 end
 
