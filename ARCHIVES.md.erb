@@ -8,3 +8,15 @@ Current Release Version: <%= fr_version %>
 
 <%= Helpers.release_table %>
 
+## Linux packages
+
+Each `linux/<arch>` directory listed above also contains ready-to-install packages for the major distributions. Build a download URL with `https://raw.githubusercontent.com/FreedomBen/findref-bin/master/<release>/linux/<arch>/<filename>` where `<release>` is one of the versions in the table and `<arch>` is `amd64`, `386`, `arm`, or `arm64` (the Arch package lives under `amd64`).
+
+| Format | File name pattern | Package architectures |
+|:-------|:------------------|:----------------------|
+| Debian / Ubuntu (`.deb`) | `findref_<release>_<deb-arch>.deb` | `amd64`, `arm64`, `armhf`, `i386` |
+| RPM distros (`.rpm`) | `findref-<release>-1.<rpm-arch>.rpm` | `x86_64`, `aarch64`, `armv7hl`, `i386` |
+| Alpine (`.apk`) | `findref-<release>.<apk-arch>.apk` | `x86_64`, `aarch64`, `armhf`, `x86` |
+| Arch Linux (`.pkg.tar.zst`) | `findref-<release>-1-x86_64.pkg.tar.zst` | `x86_64` |
+
+Use the `latest` alias in place of `<release>` if you simply want the most recent version without updating scripts, or pick a specific release to pin an environment.

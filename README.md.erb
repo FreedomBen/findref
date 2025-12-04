@@ -168,6 +168,19 @@ a new version is released, these will still get you version <%= fr_version %>.
 
 <%= Helpers.release_table(Helpers.release_line(Helpers.latest_release)) %>
 
+### Linux packages
+
+If you prefer native packages over the raw zip archives, every Linux build now ships Debian (`.deb`), RPM (`.rpm`), Alpine (`.apk`), and Arch Linux (`.pkg.tar.zst`, amd64 only) artifacts inside the same `findref-bin/<release>/linux/<arch>/` directories referenced above.
+
+**Current release downloads (amd64)**
+
+- [Debian / Ubuntu (.deb)](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/amd64/findref_<%= fr_version %>_amd64.deb)
+- [Fedora / RHEL / openSUSE (.rpm)](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/amd64/findref-<%= fr_version %>-1.x86_64.rpm)
+- [Alpine (.apk)](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/amd64/findref-<%= fr_version %>.x86_64.apk)
+- [Arch Linux (.pkg.tar.zst)](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/amd64/findref-<%= fr_version %>-1-x86_64.pkg.tar.zst)
+
+Swap `amd64` in the URL for `386`, `arm`, or `arm64` to grab the other architectures (the Arch package is amd64-only). The Debian packages use `amd64`, `arm64`, `armhf`, `i386` suffixes; RPM uses `x86_64`, `aarch64`, `armv7hl`, `i386`; APK uses `x86_64`, `aarch64`, `armhf`, `x86`. Replace `latest` with a concrete version (see [ARCHIVES.md](ARCHIVES.md)) if you need to pin to a specific release.
+
 ### Older releases
 
 The full catalog of releases is available to download.  See [ARCHIVES.md](ARCHIVES.md)
