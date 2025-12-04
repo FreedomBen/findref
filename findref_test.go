@@ -21,6 +21,15 @@ func resetTestState(t *testing.T) {
 	filesToScan = make([]FileToScan, 0, 100)
 }
 
+func mustGetMatchRegex(t *testing.T, ignoreCase bool, matchCase bool, usersRegex string) *regexp.Regexp {
+	t.Helper()
+	r, err := getMatchRegex(ignoreCase, matchCase, usersRegex)
+	if err != nil {
+		t.Fatalf("unexpected error compiling regex %q: %v", usersRegex, err)
+	}
+	return r
+}
+
 func TestContainsNullByte(t *testing.T) {
 	if containsNullByte([]byte("Here is a string....")) {
 		t.Fail()
@@ -136,14 +145,14 @@ func TestShouldExcludeFileUserProvided(t *testing.T) {
 }
 
 func TestGetMatchRegex(t *testing.T) {
-	r1 := getMatchRegex(false, false, "HEllo")
+	r1 := mustGetMatchRegex(t, false, false, "HEllo")
 	if !r1.MatchString("HEllo") {
 		t.Fail()
 	}
 	if r1.MatchString("hello") {
 		t.Fail()
 	}
-	r2 := getMatchRegex(false, false, "hello")
+	r2 := mustGetMatchRegex(t, false, false, "hello")
 	//  verify smart case works
 	if !r2.MatchString("abcHEllo") {
 		t.Fail()
@@ -157,7 +166,7 @@ func TestGetMatchRegex(t *testing.T) {
 	if r2.MatchString("abc") {
 		t.Fail()
 	}
-	r3 := getMatchRegex(true, false, "hello")
+	r3 := mustGetMatchRegex(t, true, false, "hello")
 	if !r3.MatchString("HEllo") {
 		t.Fail()
 	}
@@ -170,7 +179,7 @@ func TestGetMatchRegex(t *testing.T) {
 	if r3.MatchString("abc") {
 		t.Fail()
 	}
-	r4 := getMatchRegex(false, true, "hello")
+	r4 := mustGetMatchRegex(t, false, true, "hello")
 	if r4.MatchString("HEllo") {
 		t.Fail()
 	}
@@ -182,6 +191,16 @@ func TestGetMatchRegex(t *testing.T) {
 	}
 	if r4.MatchString("abc") {
 		t.Fail()
+	}
+}
+
+func TestGetMatchRegexInvalid(t *testing.T) {
+	_, err := getMatchRegex(false, false, "(")
+	if err == nil {
+		t.Fatalf("expected invalid regex to return an error")
+	}
+	if !strings.Contains(err.Error(), "invalid match regex") {
+		t.Fatalf("expected error to mention invalid match regex, got %q", err.Error())
 	}
 }
 

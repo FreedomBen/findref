@@ -258,6 +258,11 @@ func usageAndExitErr(errMsg error) {
 	os.Exit(1)
 }
 
+func exitWithErr(errMsg error) {
+	fmt.Println(colors.Red + "[error]: " + errMsg.Error() + colors.Restore)
+	os.Exit(1)
+}
+
 func debug(a ...interface{}) {
 	if settings.Debug {
 		fmt.Println(a...)
@@ -381,17 +386,24 @@ func processFile(path string, info os.FileInfo, err error) error {
 	return FILE_PROCESSING_COMPLETE
 }
 
-func getMatchRegex(ignoreCase bool, matchCase bool, usersRegex string) *regexp.Regexp {
+func getMatchRegex(ignoreCase bool, matchCase bool, usersRegex string) (*regexp.Regexp, error) {
 	// If ignore case is set, ignore the case of the regex.
 	// if match-case is not set, use smart case which means if it's all lower case be case-insensitive,
 	// but if there's capitals then be case-sensitive
+	regexToCompile := usersRegex
 	if ignoreCase || (!matchCase && !regexp.MustCompile("[A-Z]").MatchString(usersRegex)) {
 		debug(colors.Blue, "Match regex will be case-insensitive", colors.Restore)
-		return regexp.MustCompile("(?i)" + usersRegex)
+		regexToCompile = "(?i)" + usersRegex
 	} else {
 		debug(colors.Blue, "Match regex will be exactly as user provided", colors.Restore)
-		return regexp.MustCompile(usersRegex)
 	}
+
+	compiled, err := regexp.Compile(regexToCompile)
+	if err != nil {
+		return nil, fmt.Errorf("invalid match regex %q: %w", usersRegex, err)
+	}
+
+	return compiled, nil
 }
 
 func versionString(color bool) string {
@@ -542,13 +554,21 @@ func main() {
 	} else if len(flag.Args()) > 3 {
 		usageAndExitErr(fmt.Errorf("%s", "Too many args (expected 1 <= 3)"))
 	} else {
-		settings.MatchRegex = getMatchRegex(*ignoreCasePtr, *matchCasePtr, flag.Args()[0])
+		matchRegex, err := getMatchRegex(*ignoreCasePtr, *matchCasePtr, flag.Args()[0])
+		if err != nil {
+			exitWithErr(err)
+		}
+		settings.MatchRegex = matchRegex
 
 		if len(flag.Args()) >= 2 {
 			rootDir = flag.Args()[1]
 		}
 		if len(flag.Args()) == 3 {
-			settings.FilenameRegex = regexp.MustCompile(flag.Args()[2])
+			filenameRegex, err := regexp.Compile(flag.Args()[2])
+			if err != nil {
+				exitWithErr(fmt.Errorf("invalid filename regex %q: %w", flag.Args()[2], err))
+			}
+			settings.FilenameRegex = filenameRegex
 		}
 	}
 
