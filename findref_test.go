@@ -484,6 +484,24 @@ func captureOutput(fn func()) (string, string) {
 	return stdout, stderr
 }
 
+func runFindrefMainInDir(t *testing.T, args []string, dir string) (string, string) {
+	t.Helper()
+	oldWD, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("getwd: %v", err)
+	}
+	if err := os.Chdir(dir); err != nil {
+		t.Fatalf("chdir to %q: %v", dir, err)
+	}
+	t.Cleanup(func() {
+		if err := os.Chdir(oldWD); err != nil {
+			t.Fatalf("restore working dir: %v", err)
+		}
+	})
+
+	return runFindrefMain(t, args)
+}
+
 func mustWriteFile(t *testing.T, path string, content string) {
 	t.Helper()
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
@@ -517,6 +535,160 @@ func expectNotContains(t *testing.T, lines []string, target string) {
 	for _, line := range lines {
 		if line == target {
 			t.Fatalf("expected output not to contain %q; got %+v", target, lines)
+		}
+	}
+}
+
+func TestFindConfigFilePrefersCwd(t *testing.T) {
+	base := t.TempDir()
+	workDir := filepath.Join(base, "work")
+	homeDir := filepath.Join(base, "home")
+
+	if err := os.MkdirAll(workDir, 0o755); err != nil {
+		t.Fatalf("mkdir work dir: %v", err)
+	}
+	if err := os.MkdirAll(filepath.Join(homeDir, ".config", "findref"), 0o755); err != nil {
+		t.Fatalf("mkdir xdg dir: %v", err)
+	}
+
+	mustWriteFile(t, filepath.Join(workDir, ".findref.yaml"), "debug: true\n")
+	mustWriteFile(t, filepath.Join(homeDir, ".config", "findref", "config.yaml"), "stats: true\n")
+
+	t.Setenv("HOME", homeDir)
+	t.Setenv("XDG_CONFIG_HOME", filepath.Join(homeDir, ".config"))
+
+	restore := chdirHelper(t, workDir)
+	defer restore()
+
+	path, err := findConfigFile()
+	if err != nil {
+		t.Fatalf("findConfigFile returned error: %v", err)
+	}
+
+	expected := filepath.Join(workDir, ".findref.yaml")
+	if path != expected {
+		t.Fatalf("expected cwd config %q, got %q", expected, path)
+	}
+}
+
+func TestFindConfigFileXDGHome(t *testing.T) {
+	base := t.TempDir()
+	workDir := filepath.Join(base, "work")
+	homeDir := filepath.Join(base, "home")
+
+	if err := os.MkdirAll(workDir, 0o755); err != nil {
+		t.Fatalf("mkdir work dir: %v", err)
+	}
+	if err := os.MkdirAll(filepath.Join(homeDir, ".config", "findref"), 0o755); err != nil {
+		t.Fatalf("mkdir xdg dir: %v", err)
+	}
+
+	configPath := filepath.Join(homeDir, ".config", "findref", "config.yaml")
+	mustWriteFile(t, configPath, "stats: true\n")
+
+	t.Setenv("HOME", homeDir)
+	t.Setenv("XDG_CONFIG_HOME", filepath.Join(homeDir, ".config"))
+
+	restore := chdirHelper(t, workDir)
+	defer restore()
+
+	path, err := findConfigFile()
+	if err != nil {
+		t.Fatalf("findConfigFile returned error: %v", err)
+	}
+
+	if path != configPath {
+		t.Fatalf("expected XDG config %q, got %q", configPath, path)
+	}
+}
+
+func TestFindConfigFileHomeFallback(t *testing.T) {
+	base := t.TempDir()
+	workDir := filepath.Join(base, "work")
+	homeDir := filepath.Join(base, "home")
+
+	if err := os.MkdirAll(workDir, 0o755); err != nil {
+		t.Fatalf("mkdir work dir: %v", err)
+	}
+
+	configPath := filepath.Join(homeDir, ".findref.yaml")
+	mustWriteFile(t, configPath, "debug: true\n")
+
+	t.Setenv("HOME", homeDir)
+	// leave XDG unset so default resolves inside home/.config which is empty
+
+	restore := chdirHelper(t, workDir)
+	defer restore()
+
+	path, err := findConfigFile()
+	if err != nil {
+		t.Fatalf("findConfigFile returned error: %v", err)
+	}
+
+	if path != configPath {
+		t.Fatalf("expected home fallback config %q, got %q", configPath, path)
+	}
+}
+
+func TestConfigFileAppliedToRun(t *testing.T) {
+	base := t.TempDir()
+	workDir := filepath.Join(base, "work")
+	homeDir := filepath.Join(base, "home")
+
+	mustWriteFile(t, filepath.Join(workDir, ".findref.yaml"), "match_regex: todo\nignore_case: true\nfilename_only: true\nexclude:\n  - skipme\n")
+	mustWriteFile(t, filepath.Join(workDir, "main.go"), "package main\n// TODO: main\n")
+	mustWriteFile(t, filepath.Join(workDir, "skipme", "note.txt"), "todo: hidden\n")
+
+	t.Setenv("HOME", homeDir)
+	t.Setenv("XDG_CONFIG_HOME", filepath.Join(homeDir, ".config"))
+
+	stdout, stderr := runFindrefMainInDir(t, []string{"--no-color"}, workDir)
+	if stderr != "" {
+		t.Fatalf("expected empty stderr, got %q", stderr)
+	}
+
+	lines := splitLines(stdout)
+	expectContains(t, lines, "main.go")
+	expectNotContains(t, lines, filepath.Join("skipme", "note.txt"))
+}
+
+func TestConfigFileCliOverrides(t *testing.T) {
+	base := t.TempDir()
+	workDir := filepath.Join(base, "work")
+	homeDir := filepath.Join(base, "home")
+
+	mustWriteFile(t, filepath.Join(workDir, ".findref.yaml"), "match_regex: TODO\nstart_dir: .\nmax_line_length: 5\n")
+	mustWriteFile(t, filepath.Join(workDir, "main.go"), "package main\n// TODO: adjust\n")
+
+	t.Setenv("HOME", homeDir)
+	t.Setenv("XDG_CONFIG_HOME", filepath.Join(homeDir, ".config"))
+
+	stdout, stderr := runFindrefMainInDir(t, []string{"--no-color", "--max-line-length", "50"}, workDir)
+	if stderr != "" {
+		t.Fatalf("expected empty stderr, got %q", stderr)
+	}
+	if stdout == "" {
+		t.Fatalf("expected some output due to match")
+	}
+	if settings.MaxLineLength != 50 {
+		t.Fatalf("expected CLI max line length 50 to override config, got %d", settings.MaxLineLength)
+	}
+	resetTestState(t)
+}
+
+func chdirHelper(t *testing.T, target string) func() {
+	t.Helper()
+	oldWD, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("getwd: %v", err)
+	}
+	if err := os.Chdir(target); err != nil {
+		t.Fatalf("chdir to %q: %v", target, err)
+	}
+
+	return func() {
+		if err := os.Chdir(oldWD); err != nil {
+			t.Fatalf("restore working dir: %v", err)
 		}
 	}
 }

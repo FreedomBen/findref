@@ -44,6 +44,28 @@ is the way to go.  Ag is also useful for very large codebases.
 
 Even without passing any `--exclude` flags, `findref` prunes directories and lockfiles that usually contain generated artifacts or vendored dependencies: `.git`, `.svn`, `.hg`, `.bzr`, `CVS`, `vendor`, `node_modules`, `build`, `dist`, `out`, `coverage`, `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `bun.lockb`, `composer.lock`, `Gemfile.lock`, `mix.lock`, `Cargo.lock`, `Pipfile.lock`, `poetry.lock`, `Podfile.lock`, `go.sum`, and `gradle.lockfile`. Use additional `--exclude` values—these can be directories or single files—to extend this list. Hidden files and directories remain ignored unless you supply `--hidden` or `--all`, but the entries above stay excluded to keep searches fast. Need to crawl everything? Pass `--all` (which already implies hidden files and ignore-case) to disable the defaults, then layer on whichever `--exclude` values still make sense for that search.
 
+### Configuration file
+
+`findref` can read defaults from a YAML config file. It checks for one in this order and stops at the first match:
+
+1. `./.findref.yaml`
+2. `$XDG_CONFIG_HOME/findref/config.yaml` (falls back to `~/.config/findref/config.yaml`)
+3. `~/.findref.yaml`
+
+If no file is present, behavior stays the same. When a file is found, the values are applied as if they were flags; anything you put on the command line still wins. The YAML keys mirror the long flag names: `all`, `debug`, `stats`, `hidden`, `version`, `no_color`, `match_case`, `ignore_case`, `filename_only`, `max_line_length`, `no_max_line_length`, `exclude` (list), and the positional arguments `match_regex`, `start_dir`, `filename_regex`.
+
+Example:
+
+```yaml
+match_regex: todo
+start_dir: .
+ignore_case: true
+filename_only: true
+exclude:
+  - vendor
+  - .git
+```
+
 ### Examples:
 
 Let's say we are looking for the string "getMethodName":

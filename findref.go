@@ -462,6 +462,12 @@ func worker(id int, jobs <-chan string, results chan<- []Match) {
 }
 
 func main() {
+	fileConfig, configPath, configErr := loadConfigFile()
+	if configErr != nil {
+		exitWithErr(configErr)
+	}
+	mergeArgsWithConfig(configArgs(fileConfig))
+
 	aPtr := flag.Bool("a", false, "Alias for --all")
 	sPtr := flag.Bool("s", false, "Alias for --stats")
 	dPtr := flag.Bool("d", false, "Alias for --debug")
@@ -532,6 +538,10 @@ func main() {
 		settings.AddExcludes([]string(excludeValues)...)
 	}
 
+	if configPath != "" && settings.Debug {
+		fmt.Println(colors.Blue+"Using config file:"+colors.Restore, configPath)
+	}
+
 	if settings.TrackStats {
 		statistics.startTime = time.Now()
 		debug(colors.Blue, "Start time is:", colors.Restore, statistics.startTime.String())
@@ -549,27 +559,46 @@ func main() {
 
 	rootDir := "."
 
-	if len(flag.Args()) < 1 {
-		usageAndExitErr(fmt.Errorf("%s", "Must specify regex to match against files"))
-	} else if len(flag.Args()) > 3 {
+	if len(flag.Args()) > 3 {
 		usageAndExitErr(fmt.Errorf("%s", "Too many args (expected 1 <= 3)"))
-	} else {
-		matchRegex, err := getMatchRegex(*ignoreCasePtr, *matchCasePtr, flag.Args()[0])
-		if err != nil {
-			exitWithErr(err)
-		}
-		settings.MatchRegex = matchRegex
+	}
 
-		if len(flag.Args()) >= 2 {
-			rootDir = flag.Args()[1]
+	matchArg := ""
+	if len(flag.Args()) >= 1 {
+		matchArg = flag.Args()[0]
+	} else if fileConfig != nil && strings.TrimSpace(fileConfig.MatchRegex) != "" {
+		matchArg = strings.TrimSpace(fileConfig.MatchRegex)
+	}
+
+	if matchArg == "" {
+		usageAndExitErr(fmt.Errorf("%s", "Must specify regex to match against files"))
+	}
+
+	matchRegex, err := getMatchRegex(*ignoreCasePtr, *matchCasePtr, matchArg)
+	if err != nil {
+		exitWithErr(err)
+	}
+	settings.MatchRegex = matchRegex
+
+	if len(flag.Args()) >= 2 {
+		rootDir = flag.Args()[1]
+	} else if fileConfig != nil && strings.TrimSpace(fileConfig.StartDir) != "" {
+		rootDir = strings.TrimSpace(fileConfig.StartDir)
+	}
+
+	filenameRegexValue := ""
+	if len(flag.Args()) == 3 {
+		filenameRegexValue = flag.Args()[2]
+	} else if fileConfig != nil && strings.TrimSpace(fileConfig.FilenameRegex) != "" {
+		filenameRegexValue = strings.TrimSpace(fileConfig.FilenameRegex)
+	}
+
+	if filenameRegexValue != "" {
+		filenameRegex, err := regexp.Compile(filenameRegexValue)
+		if err != nil {
+			exitWithErr(fmt.Errorf("invalid filename regex %q: %w", filenameRegexValue, err))
 		}
-		if len(flag.Args()) == 3 {
-			filenameRegex, err := regexp.Compile(flag.Args()[2])
-			if err != nil {
-				exitWithErr(fmt.Errorf("invalid filename regex %q: %w", flag.Args()[2], err))
-			}
-			settings.FilenameRegex = filenameRegex
-		}
+		settings.FilenameRegex = filenameRegex
 	}
 
 	debug(colors.Blue, "matchRegex: ", colors.Restore, settings.MatchRegex.String())
