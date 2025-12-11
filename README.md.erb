@@ -66,6 +66,8 @@ exclude:
   - .git
 ```
 
+Generate a starter config with comments using `findref --write-config` (defaults to `local`, writing `./.findref.yaml`) or pass `global` to write to `$XDG_CONFIG_HOME/findref/config.yaml` (fallback `~/.findref.yaml`). Existing files are left untouched to avoid accidental overwrites.
+
 ### Examples:
 
 Let's say we are looking for the string "getMethodName":

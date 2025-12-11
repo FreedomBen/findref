@@ -21,6 +21,10 @@ if not set -q __fish_findref_max_line_lengths
     set -g __fish_findref_max_line_lengths 120 200 500 1000 2000
 end
 
+if not set -q __fish_findref_write_config_targets
+    set -g __fish_findref_write_config_targets local global
+end
+
 function __fish_findref_positional_count
     set -l tokens (commandline -opc)
     if test (count $tokens) -eq 0
@@ -45,10 +49,10 @@ function __fish_findref_positional_count
             case '--'
                 set after_dd 1
                 continue
-            case '-e' '--exclude' '-l' '--max-line-length'
+            case '-e' '--exclude' '-l' '--max-line-length' '--write-config'
                 set expect_value 1
                 continue
-            case '--exclude=*' '-e=*' '--max-line-length=*' '-l=*'
+            case '--exclude=*' '-e=*' '--max-line-length=*' '-l=*' '--write-config=*'
                 continue
             case '-*'
                 continue
@@ -119,6 +123,7 @@ complete -c findref -s m -l match-case -f -d 'Match regex case explicitly'
 complete -c findref -s i -l ignore-case -f -d 'Ignore regex case (override smart-case)'
 complete -c findref -s f -l filename-only -f -d 'Print only filenames that contain matches'
 complete -c findref -s x -l no-max-line-length -f -d 'Remove the maximum line length limit'
+complete -c findref -l write-config -fr -d 'Generate a default config file and exit' -a '$__fish_findref_write_config_targets'
 complete -c findref -l help -f -d 'Show usage information'
 
 complete -c findref -s l -l max-line-length -fr -d 'Set maximum line length' -a '(__fish_findref_max_line_lengths)'

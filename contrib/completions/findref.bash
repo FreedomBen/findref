@@ -64,6 +64,7 @@ _findref_completion() {
     local -a opts_with_value=(
         -l --max-line-length
         -e --exclude
+        --write-config
     )
     # Keep in sync with defaultExcludeDirs in settings.go
     local -a exclude_defaults=(
@@ -82,6 +83,9 @@ _findref_completion() {
         --max-line-length|-l)
             expecting_value="max-length"
             ;;
+        --write-config)
+            expecting_value="write-config"
+            ;;
     esac
 
     if [[ $cur == --exclude=* ]]; then
@@ -93,6 +97,9 @@ _findref_completion() {
     elif [[ $cur == -l=* ]]; then
         expecting_value="max-length"
         prev="-l"
+    elif [[ $cur == --write-config=* ]]; then
+        expecting_value="write-config"
+        prev="--write-config"
     fi
 
     if [[ -n $expecting_value ]]; then
@@ -150,6 +157,31 @@ _findref_completion() {
                 for n in "${numbers[@]}"; do
                     if [[ -z $value || $n == "$value"* ]]; then
                         matches+=("$n")
+                    fi
+                done
+                if [[ -n $prefix ]]; then
+                    local -a prefixed=()
+                    for m in "${matches[@]}"; do
+                        prefixed+=("$prefix$m")
+                    done
+                    COMPREPLY=("${prefixed[@]}")
+                else
+                    COMPREPLY=("${matches[@]}")
+                fi
+                return 0
+                ;;
+            write-config)
+                local prefix=""
+                local value="$cur"
+                if [[ $cur == --write-config=* ]]; then
+                    prefix="--write-config="
+                    value="${cur#*=}"
+                fi
+                local -a choices=(local global)
+                local -a matches=()
+                for choice in "${choices[@]}"; do
+                    if [[ -z $value || $choice == "$value"* ]]; then
+                        matches+=("$choice")
                     fi
                 done
                 if [[ -n $prefix ]]; then

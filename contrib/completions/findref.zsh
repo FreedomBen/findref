@@ -42,6 +42,7 @@ typeset -ga _findref_filename_regexes=(
 )
 
 typeset -ga _findref_max_line_lengths=(120 200 500 1000 2000)
+typeset -ga _findref_write_config_targets=(local global)
 
 _findref_complete_excludes() {
   emulate -L zsh
@@ -82,6 +83,11 @@ _findref_complete_start_dir() {
   return ret
 }
 
+_findref_complete_write_config() {
+  emulate -L zsh
+  compadd -Q -- "${_findref_write_config_targets[@]}"
+}
+
 _findref() {
   emulate -L zsh
   local state ret=1
@@ -98,6 +104,7 @@ _findref() {
     '(-x --no-max-line-length)'{-x,--no-max-line-length}'[Remove the maximum line length limit]' \
     '(-l --max-line-length)'{-l+,--max-line-length=-}'[Set maximum line length in characters]:max line length:_findref_complete_lengths' \
     '(-e --exclude)'{-e+,--exclude=-}'[Exclude matching directories or files (repeatable)]:exclude entry:_findref_complete_excludes' \
+    '--write-config[Generate a default config file and exit]:target:_findref_complete_write_config' \
     '--help[Show usage information]' \
     '1:match regex:_findref_complete_match_examples' \
     '2:start directory:_findref_complete_start_dir' \

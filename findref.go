@@ -68,8 +68,10 @@ func Usage() string {
               Track basic statistics and print them on exit
         -v | --version
               Print current version and exit
-        -- | --
+        --
               End of options.  Use when one of the args starts with a '-'
+        --write-config
+              Generate a default YAML config file (pass: local|global) and exit
         %s
     %sExamples:%s
 
@@ -467,6 +469,7 @@ func main() {
 		exitWithErr(configErr)
 	}
 	mergeArgsWithConfig(configArgs(fileConfig))
+	normalizeWriteConfigArg()
 
 	aPtr := flag.Bool("a", false, "Alias for --all")
 	sPtr := flag.Bool("s", false, "Alias for --stats")
@@ -491,6 +494,7 @@ func main() {
 	filenameOnlyPtr := flag.Bool("filename-only", false, "Display only filenames with matches")
 	maxLineLengthPtr := flag.Int("max-line-length", MaxLineLengthDefault, "Set maximum line length in characters (default is 2,000)")
 	noMaxLineLengthPtr := flag.Bool("no-max-line-length", false, "Remove maximum line length.  Match againt lines of any length")
+	writeConfigPtr := flag.String("write-config", "", "Write a default config file to 'local' or 'global' (default: local) and exit")
 	excludeValues := multiValueFlag{}
 	flag.Var(&excludeValues, "exclude", "Exclude directories or files whose names match the provided value (repeatable)")
 	flag.Var(&excludeValues, "e", "Alias for --exclude")
@@ -499,6 +503,15 @@ func main() {
 		fmt.Print(Usage())
 	}
 	flag.Parse()
+
+	if *writeConfigPtr != "" {
+		path, err := writeDefaultConfig(*writeConfigPtr)
+		if err != nil {
+			exitWithErr(err)
+		}
+		fmt.Printf("Default config written to %s\n", path)
+		os.Exit(0)
+	}
 
 	if *vPtr || *versionPtr {
 		printVersion()

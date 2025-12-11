@@ -92,6 +92,116 @@ func loadConfigFile() (*FileConfig, string, error) {
 	return &cfg, configPath, nil
 }
 
+func normalizeWriteConfigArg() {
+	args := os.Args
+	for i := 1; i < len(args); i++ {
+		switch {
+		case args[i] == "--write-config" || args[i] == "-write-config":
+			if i+1 >= len(args) || strings.HasPrefix(args[i+1], "-") {
+				args[i] = "--write-config=local"
+			}
+		case strings.HasPrefix(args[i], "--write-config="):
+			if trimmed := strings.TrimPrefix(args[i], "--write-config="); trimmed == "" {
+				args[i] = "--write-config=local"
+			}
+		}
+	}
+	os.Args = args
+}
+
+func defaultConfigTemplate() string {
+	var b strings.Builder
+	b.WriteString(`# Base findref configuration
+# Each key mirrors its long-form CLI flag. Command-line arguments still take precedence.
+
+# Required match expression if not provided via CLI.
+match_regex: ""
+
+# Starting directory. Set to "." to search the current working directory.
+start_dir: "."
+
+# Optional filename filter (regex). Leave blank to search all files.
+filename_regex: ""
+
+# Search behavior flags
+all: false                # implies --ignore-case and --hidden, disables default excludes
+debug: false              # print verbose debug output
+stats: false              # track and print basic statistics on exit
+hidden: false             # include hidden files and directories
+version: false            # print version and exit
+no_color: false           # disable colorized output
+match_case: false         # force case-sensitive matching (otherwise smart-case)
+ignore_case: false        # force case-insensitive matching
+filename_only: false      # print only filenames with matches
+max_line_length: 2000     # maximum line length before clipping
+no_max_line_length: false # disable line length limit entirely
+
+# Additional paths or files to exclude. Defaults mirror the built-in list; remove or add as needed.
+exclude:
+`)
+	for _, entry := range defaultExcludeDirs {
+		fmt.Fprintf(&b, "  - %s\n", entry)
+	}
+	return b.String()
+}
+
+func writeDefaultConfig(target string) (string, error) {
+	trimmed := strings.ToLower(strings.TrimSpace(target))
+	if trimmed == "" {
+		trimmed = "local"
+	}
+	switch trimmed {
+	case "local":
+		return writeConfigFile(localConfigPath())
+	case "global":
+		return writeConfigFile(globalConfigPath())
+	default:
+		return "", fmt.Errorf("invalid --write-config target %q (use 'local' or 'global')", target)
+	}
+}
+
+func localConfigPath() string {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return filepath.Join(".", ".findref.yaml")
+	}
+	return filepath.Join(cwd, ".findref.yaml")
+}
+
+func globalConfigPath() string {
+	homeDir, _ := os.UserHomeDir()
+	xdgConfigHome := os.Getenv("XDG_CONFIG_HOME")
+	if xdgConfigHome == "" && homeDir != "" {
+		xdgConfigHome = filepath.Join(homeDir, ".config")
+	}
+	if xdgConfigHome != "" {
+		return filepath.Join(xdgConfigHome, "findref", "config.yaml")
+	}
+	// Final fallback
+	return filepath.Join(homeDir, ".findref.yaml")
+}
+
+func writeConfigFile(path string) (string, error) {
+	if path == "" {
+		return "", fmt.Errorf("unable to determine config path")
+	}
+
+	if info, err := os.Stat(path); err == nil && !info.IsDir() {
+		return "", fmt.Errorf("config file already exists at %s; refusing to overwrite", path)
+	}
+
+	dir := filepath.Dir(path)
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return "", fmt.Errorf("creating config directory %q: %w", dir, err)
+	}
+
+	if err := os.WriteFile(path, []byte(defaultConfigTemplate()), 0o644); err != nil {
+		return "", fmt.Errorf("writing config file %q: %w", path, err)
+	}
+
+	return path, nil
+}
+
 func configArgs(cfg *FileConfig) []string {
 	if cfg == nil {
 		return []string{}

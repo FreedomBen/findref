@@ -676,6 +676,80 @@ func TestConfigFileCliOverrides(t *testing.T) {
 	resetTestState(t)
 }
 
+func TestWriteDefaultConfigLocal(t *testing.T) {
+	base := t.TempDir()
+	restore := chdirHelper(t, base)
+	defer restore()
+
+	path, err := writeDefaultConfig("local")
+	if err != nil {
+		t.Fatalf("writeDefaultConfig local error: %v", err)
+	}
+	if path != filepath.Join(base, ".findref.yaml") {
+		t.Fatalf("unexpected path %q", path)
+	}
+	content, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("read config: %v", err)
+	}
+	if !strings.Contains(string(content), "match_regex") {
+		t.Fatalf("config content missing expected keys")
+	}
+
+	if _, err := writeDefaultConfig("local"); err == nil {
+		t.Fatalf("expected error when config already exists")
+	}
+
+	if !strings.Contains(string(content), "- .git") {
+		t.Fatalf("expected default excludes to be populated")
+	}
+}
+
+func TestWriteDefaultConfigGlobal(t *testing.T) {
+	base := t.TempDir()
+	configHome := filepath.Join(base, "cfg")
+	t.Setenv("XDG_CONFIG_HOME", configHome)
+	homeDir := filepath.Join(base, "home")
+	t.Setenv("HOME", homeDir)
+
+	path, err := writeDefaultConfig("global")
+	if err != nil {
+		t.Fatalf("writeDefaultConfig global error: %v", err)
+	}
+	expected := filepath.Join(configHome, "findref", "config.yaml")
+	if path != expected {
+		t.Fatalf("expected %q, got %q", expected, path)
+	}
+
+	if _, err := os.Stat(path); err != nil {
+		t.Fatalf("config file not created: %v", err)
+	}
+}
+
+func TestWriteDefaultConfigInvalid(t *testing.T) {
+	if _, err := writeDefaultConfig("badtarget"); err == nil {
+		t.Fatalf("expected error for invalid target")
+	}
+}
+
+func TestWriteConfigDefaultsToLocal(t *testing.T) {
+	base := t.TempDir()
+	restore := chdirHelper(t, base)
+	defer restore()
+
+	path, err := writeDefaultConfig("")
+	if err != nil {
+		t.Fatalf("writeDefaultConfig empty target: %v", err)
+	}
+	expected := filepath.Join(base, ".findref.yaml")
+	if path != expected {
+		t.Fatalf("expected %q, got %q", expected, path)
+	}
+	if _, err := os.Stat(expected); err != nil {
+		t.Fatalf("expected local config to be created: %v", err)
+	}
+}
+
 func chdirHelper(t *testing.T, target string) func() {
 	t.Helper()
 	oldWD, err := os.Getwd()
