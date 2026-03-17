@@ -60,6 +60,7 @@ _findref_completion() {
         -f --filename-only
         -x --no-max-line-length
         --help
+        --mcp
     )
     local -a opts_with_value=(
         -l --max-line-length

@@ -72,6 +72,8 @@ func Usage() string {
               Print current version and exit
         --
               End of options.  Use when one of the args starts with a '-'
+        --mcp
+              Run as an MCP (Model Context Protocol) server over stdio for AI agent integration
         --write-config
               Generate a default YAML config file (pass: local|global) and exit (pass --force to overwrite existing file)
         %s
@@ -178,7 +180,7 @@ func Usage() string {
 	)
 }
 
-const Version = "1.5.0"
+const Version = "1.6.0"
 const Date = "2025-03-17"
 
 const MaxLineLengthDefault = 2000
@@ -507,6 +509,7 @@ func main() {
 	filenameOnlyPtr := flag.Bool("filename-only", false, "Display only filenames with matches")
 	maxLineLengthPtr := flag.Int("max-line-length", MaxLineLengthDefault, "Set maximum line length in characters (default is 2,000)")
 	noMaxLineLengthPtr := flag.Bool("no-max-line-length", false, "Remove maximum line length.  Match againt lines of any length")
+	mcpPtr := flag.Bool("mcp", false, "Run as an MCP (Model Context Protocol) server over stdio")
 	writeConfigPtr := flag.String("write-config", "", "Write a default config file to 'local' or 'global' (default: local) and exit")
 	forcePtr := flag.Bool("force", false, "Force overwrite without prompting (used with --write-config)")
 	excludeValues := multiValueFlag{}
@@ -537,6 +540,11 @@ func main() {
 
 	if *helpPtr {
 		usageAndExit()
+	}
+
+	if *mcpPtr {
+		mcpServe()
+		return
 	}
 
 	if *nPtr || *nocolorPtr {

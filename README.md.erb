@@ -68,6 +68,42 @@ exclude:
 
 Generate a starter config with comments using `findref --write-config` (defaults to `local`, writing `./.findref.yaml`) or pass `global` to write to `$XDG_CONFIG_HOME/findref/config.yaml` (fallback `~/.findref.yaml`). Existing files are left untouched to avoid accidental overwrites.
 
+### MCP server (AI agent integration)
+
+`findref` can run as an [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) server, letting AI coding assistants such as Claude Code, Cursor, and Windsurf use it as a tool. No daemon or background process is required — the AI tool launches `findref --mcp` as a subprocess and communicates over stdin/stdout using JSON-RPC.
+
+To register findref as an MCP server, add it to your AI tool's MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "findref": {
+      "command": "findref",
+      "args": ["--mcp"]
+    }
+  }
+}
+```
+
+The server exposes two tools:
+
+| Tool | Description |
+|------|-------------|
+| `search` | Search for text patterns using all of findref's features (pattern, directory, file filter, excludes, case control, filename-only mode, etc.). Returns structured JSON with file path, line number, matched text, and match offsets. |
+| `list_default_excludes` | Returns the list of directories and files excluded by default, so the agent can understand what is being filtered. |
+
+Example interaction (the AI tool handles this automatically):
+
+```json
+{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"search","arguments":{"pattern":"^func.*Handler","file_pattern":"\\.go$","exclude":["vendor"]}}}
+```
+
+Response:
+
+```json
+{"matches":[{"file":"server.go","line":42,"text":"func NewHandler(cfg Config) http.Handler {","match_start":0,"match_end":18}],"total_files_scanned":15,"total_lines_scanned":1200,"total_matches":1}
+```
+
 ### Examples:
 
 Let's say we are looking for the string "getMethodName":

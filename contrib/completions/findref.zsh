@@ -106,6 +106,7 @@ _findref() {
     '(-e --exclude)'{-e+,--exclude=-}'[Exclude matching directories or files (repeatable)]:exclude entry:_findref_complete_excludes' \
     '*'{-E+,--exclude-pattern=-}'[Exclude paths matching RE2 regex (repeatable)]:exclude pattern: ' \
     '--write-config[Generate a default config file and exit]:target:_findref_complete_write_config' \
+    '--mcp[Run as an MCP server over stdio for AI agent integration]' \
     '--help[Show usage information]' \
     '1:match regex:_findref_complete_match_examples' \
     '2:start directory:_findref_complete_start_dir' \
