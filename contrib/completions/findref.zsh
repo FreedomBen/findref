@@ -117,6 +117,12 @@ _findref() {
       _default && ret=0
       ;;
   esac
+
+  # Only offer --force when --write-config is already on the command line
+  if (( ${words[(I)--write-config(=*|)]} )); then
+    compadd -Q -- --force
+  fi
+
   return ret
 }
 

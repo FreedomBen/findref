@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -10,6 +12,9 @@ import (
 
 	"gopkg.in/yaml.v3"
 )
+
+// stdinReader is the source for interactive prompts. Tests may override it.
+var stdinReader io.Reader = os.Stdin
 
 // FileConfig represents configuration values loaded from a YAML file.
 // All fields are pointers so we can distinguish between "unset" and
@@ -150,16 +155,16 @@ exclude:
 	return b.String()
 }
 
-func writeDefaultConfig(target string) (string, error) {
+func writeDefaultConfig(target string, force bool) (string, error) {
 	trimmed := strings.ToLower(strings.TrimSpace(target))
 	if trimmed == "" {
 		trimmed = "local"
 	}
 	switch trimmed {
 	case "local":
-		return writeConfigFile(localConfigPath())
+		return writeConfigFile(localConfigPath(), force)
 	case "global":
-		return writeConfigFile(globalConfigPath())
+		return writeConfigFile(globalConfigPath(), force)
 	default:
 		return "", fmt.Errorf("invalid --write-config target %q (use 'local' or 'global')", target)
 	}
@@ -186,13 +191,21 @@ func globalConfigPath() string {
 	return filepath.Join(homeDir, ".findref.yaml")
 }
 
-func writeConfigFile(path string) (string, error) {
+func writeConfigFile(path string, force bool) (string, error) {
 	if path == "" {
 		return "", fmt.Errorf("unable to determine config path")
 	}
 
 	if info, err := os.Stat(path); err == nil && !info.IsDir() {
-		return "", fmt.Errorf("config file already exists at %s; refusing to overwrite", path)
+		if !force {
+			fmt.Fprintf(os.Stderr, "%sConfig file already exists at %s. Overwrite? [y/N]%s ", colors.Yellow, path, colors.Restore)
+			reader := bufio.NewReader(stdinReader)
+			answer, _ := reader.ReadString('\n')
+			answer = strings.TrimSpace(strings.ToLower(answer))
+			if answer != "y" && answer != "yes" {
+				return "", fmt.Errorf("aborted; existing config file at %s was not overwritten", path)
+			}
+		}
 	}
 
 	dir := filepath.Dir(path)

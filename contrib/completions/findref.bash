@@ -209,13 +209,25 @@ _findref_completion() {
         esac
     fi
 
+    # Only offer --force when --write-config is already on the command line
+    local has_write_config=0
+    for word in "${words[@]}"; do
+        case "$word" in
+            --write-config|--write-config=*) has_write_config=1; break ;;
+        esac
+    done
+    local force_opt=""
+    if [[ $has_write_config -eq 1 ]]; then
+        force_opt="--force"
+    fi
+
     if [[ $cur == --* ]]; then
-        COMPREPLY=($(compgen -W "${opts_no_value[*]} ${opts_with_value[*]} -- --version" -- "$cur"))
+        COMPREPLY=($(compgen -W "${opts_no_value[*]} ${opts_with_value[*]} $force_opt -- --version" -- "$cur"))
         return 0
     fi
 
     if [[ $cur == -* ]]; then
-        COMPREPLY=($(compgen -W "${opts_no_value[*]} ${opts_with_value[*]}" -- "$cur"))
+        COMPREPLY=($(compgen -W "${opts_no_value[*]} ${opts_with_value[*]} $force_opt" -- "$cur"))
         return 0
     fi
 

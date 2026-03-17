@@ -859,7 +859,7 @@ func TestWriteDefaultConfigLocal(t *testing.T) {
 	restore := chdirHelper(t, base)
 	defer restore()
 
-	path, err := writeDefaultConfig("local")
+	path, err := writeDefaultConfig("local", false)
 	if err != nil {
 		t.Fatalf("writeDefaultConfig local error: %v", err)
 	}
@@ -874,8 +874,24 @@ func TestWriteDefaultConfigLocal(t *testing.T) {
 		t.Fatalf("config content missing expected keys")
 	}
 
-	if _, err := writeDefaultConfig("local"); err == nil {
-		t.Fatalf("expected error when config already exists")
+	// Declining the overwrite prompt should return an error
+	oldStdin := stdinReader
+	stdinReader = strings.NewReader("n\n")
+	if _, err := writeDefaultConfig("local", false); err == nil {
+		t.Fatalf("expected error when user declines overwrite")
+	}
+	stdinReader = oldStdin
+
+	// Accepting the overwrite prompt should succeed
+	stdinReader = strings.NewReader("y\n")
+	if _, err := writeDefaultConfig("local", false); err != nil {
+		t.Fatalf("expected overwrite to succeed when user accepts: %v", err)
+	}
+	stdinReader = oldStdin
+
+	// --force should overwrite without prompting
+	if _, err := writeDefaultConfig("local", true); err != nil {
+		t.Fatalf("expected force overwrite to succeed: %v", err)
 	}
 
 	if !strings.Contains(string(content), "- .git") {
@@ -890,7 +906,7 @@ func TestWriteDefaultConfigGlobal(t *testing.T) {
 	homeDir := filepath.Join(base, "home")
 	t.Setenv("HOME", homeDir)
 
-	path, err := writeDefaultConfig("global")
+	path, err := writeDefaultConfig("global", false)
 	if err != nil {
 		t.Fatalf("writeDefaultConfig global error: %v", err)
 	}
@@ -905,7 +921,7 @@ func TestWriteDefaultConfigGlobal(t *testing.T) {
 }
 
 func TestWriteDefaultConfigInvalid(t *testing.T) {
-	if _, err := writeDefaultConfig("badtarget"); err == nil {
+	if _, err := writeDefaultConfig("badtarget", false); err == nil {
 		t.Fatalf("expected error for invalid target")
 	}
 }
@@ -915,7 +931,7 @@ func TestWriteConfigDefaultsToLocal(t *testing.T) {
 	restore := chdirHelper(t, base)
 	defer restore()
 
-	path, err := writeDefaultConfig("")
+	path, err := writeDefaultConfig("", false)
 	if err != nil {
 		t.Fatalf("writeDefaultConfig empty target: %v", err)
 	}

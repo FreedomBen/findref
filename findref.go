@@ -73,7 +73,7 @@ func Usage() string {
         --
               End of options.  Use when one of the args starts with a '-'
         --write-config
-              Generate a default YAML config file (pass: local|global) and exit
+              Generate a default YAML config file (pass: local|global) and exit (pass --force to overwrite existing file)
         %s
     %sExamples:%s
 
@@ -508,6 +508,7 @@ func main() {
 	maxLineLengthPtr := flag.Int("max-line-length", MaxLineLengthDefault, "Set maximum line length in characters (default is 2,000)")
 	noMaxLineLengthPtr := flag.Bool("no-max-line-length", false, "Remove maximum line length.  Match againt lines of any length")
 	writeConfigPtr := flag.String("write-config", "", "Write a default config file to 'local' or 'global' (default: local) and exit")
+	forcePtr := flag.Bool("force", false, "Force overwrite without prompting (used with --write-config)")
 	excludeValues := multiValueFlag{}
 	flag.Var(&excludeValues, "exclude", "Exclude directories or files whose names match the provided value (repeatable)")
 	flag.Var(&excludeValues, "e", "Alias for --exclude")
@@ -521,7 +522,7 @@ func main() {
 	flag.Parse()
 
 	if *writeConfigPtr != "" {
-		path, err := writeDefaultConfig(*writeConfigPtr)
+		path, err := writeDefaultConfig(*writeConfigPtr, *forcePtr)
 		if err != nil {
 			exitWithErr(err)
 		}
