@@ -20,6 +20,12 @@ end
 
 task build: [:release, :erb]
 
+desc 'Run the test suite'
+task :test do
+  sh "go test ./..."
+  sh "bash scripts/test_findref_completion.sh"
+end
+
 def alias_task(*tasks)
   tasks.each do |new_name, old_name|
     desc "Alias of #{old_name}"
@@ -28,5 +34,6 @@ def alias_task(*tasks)
 end
 
 alias_task(
-  [:b, :build]
+  [:b, :build],
+  [:t, :test]
 )
