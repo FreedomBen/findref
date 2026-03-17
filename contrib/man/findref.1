@@ -1,5 +1,5 @@
 .\" This file is generated from contrib/man/findref.1.erb. Run `rake erb` to refresh.
-.TH FINDREF 1 "March 2026" "findref 1.5.0" "User Commands"
+.TH FINDREF 1 "March 2026" "findref 1.6.0" "User Commands"
 .SH NAME
 findref \- recursively search directories with RE2 regular expressions
 .SH SYNOPSIS
@@ -146,6 +146,13 @@ Alias of
 Alias of
 .BR -i .
 .TP
+.BR --mcp
+Run as an MCP (Model Context Protocol) server over stdio. In this mode
+.B findref
+reads JSON-RPC 2.0 messages from standard input and writes responses to standard output,
+exposing its search functionality as MCP tools for AI coding assistants. No daemon or
+background process is required; the AI tool manages the subprocess lifecycle.
+.TP
 .BR --help
 Print the usage banner and exit.
 .TP
@@ -224,6 +231,47 @@ Skip all Go test files while searching for function declarations beneath
 .TP
 .B findref --filename-only --no-color "^func init" .
 List only the files that declare a Go initializer while keeping the output parseable for scripts.
+.SH MCP SERVER
+.PP
+When started with
+.BR --mcp ,
+.B findref
+acts as a stdio-based MCP server that AI coding assistants (Claude Code, Cursor, Windsurf,
+etc.) can launch as a subprocess. Register it in your tool's MCP configuration:
+.PP
+.RS
+.nf
+{
+  "mcpServers": {
+    "findref": {
+      "command": "findref",
+      "args": ["--mcp"]
+    }
+  }
+}
+.fi
+.RE
+.PP
+The server exposes two tools:
+.TP
+.B search
+Search for text patterns using all of findref's features. Accepts named parameters:
+.IR pattern ,
+.IR directory ,
+.IR file_pattern ,
+.IR exclude ,
+.IR exclude_pattern ,
+.IR ignore_case ,
+.IR match_case ,
+.IR include_hidden ,
+.IR all ,
+.IR filename_only ,
+and
+.IR max_line_length .
+Returns structured JSON with file path, line number, matched text, and match offsets.
+.TP
+.B list_default_excludes
+Returns the list of directories and files excluded from search by default.
 .SH EXIT STATUS
 .PP
 The exit status is 0 on success and non-zero on invalid input or other fatal errors discovered before
