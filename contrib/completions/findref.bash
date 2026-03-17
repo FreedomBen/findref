@@ -64,6 +64,7 @@ _findref_completion() {
     local -a opts_with_value=(
         -l --max-line-length
         -e --exclude
+        -E --exclude-pattern
         --write-config
     )
     # Keep in sync with defaultExcludeDirs in settings.go
@@ -80,6 +81,9 @@ _findref_completion() {
         --exclude|-e)
             expecting_value="exclude"
             ;;
+        --exclude-pattern|-E)
+            expecting_value="exclude-pattern"
+            ;;
         --max-line-length|-l)
             expecting_value="max-length"
             ;;
@@ -91,6 +95,9 @@ _findref_completion() {
     if [[ $cur == --exclude=* ]]; then
         expecting_value="exclude"
         prev="--exclude"
+    elif [[ $cur == --exclude-pattern=* ]]; then
+        expecting_value="exclude-pattern"
+        prev="--exclude-pattern"
     elif [[ $cur == --max-line-length=* ]]; then
         expecting_value="max-length"
         prev="--max-line-length"
@@ -140,6 +147,10 @@ _findref_completion() {
                     COMPREPLY=($(printf '%s\n' "${suggestions[@]}" | awk 'NF' | LC_ALL=C sort -u))
                     __findref_safe_compopt -o filenames -o nospace
                 fi
+                return 0
+                ;;
+            exclude-pattern)
+                # Regex pattern — no meaningful completions, just let the user type
                 return 0
                 ;;
             max-length)
@@ -231,11 +242,11 @@ _findref_completion() {
             continue
         fi
         case "$token" in
-            --exclude|--max-line-length|-e|-l)
+            --exclude|--exclude-pattern|--max-line-length|-e|-E|-l)
                 pending_option="$token"
                 continue
                 ;;
-            --exclude=*|--max-line-length=*|-l=*)
+            --exclude=*|--exclude-pattern=*|--max-line-length=*|-l=*)
                 continue
                 ;;
             -*)

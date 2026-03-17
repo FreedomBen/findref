@@ -27,6 +27,7 @@ type FileConfig struct {
 	MaxLineLength   *int     `yaml:"max_line_length"`
 	NoMaxLineLength *bool    `yaml:"no_max_line_length"`
 	Exclude         []string `yaml:"exclude"`
+	ExcludePattern  []string `yaml:"exclude_pattern"`
 	MatchRegex      string   `yaml:"match_regex"`
 	StartDir        string   `yaml:"start_dir"`
 	FilenameRegex   string   `yaml:"filename_regex"`
@@ -142,6 +143,10 @@ exclude:
 	for _, entry := range defaultExcludeDirs {
 		fmt.Fprintf(&b, "  - %s\n", entry)
 	}
+	b.WriteString("\n# RE2 regex patterns to exclude. Paths matching any pattern are skipped.\n")
+	b.WriteString("# exclude_pattern:\n")
+	b.WriteString("#   - '_test\\.go$'\n")
+	b.WriteString("#   - '(^|/)generated($|/)'\n")
 	return b.String()
 }
 
@@ -234,6 +239,13 @@ func configArgs(cfg *FileConfig) []string {
 		trimmed := strings.TrimSpace(ex)
 		if trimmed != "" {
 			args = append(args, "--exclude", trimmed)
+		}
+	}
+
+	for _, ep := range cfg.ExcludePattern {
+		trimmed := strings.TrimSpace(ep)
+		if trimmed != "" {
+			args = append(args, "--exclude-pattern", trimmed)
 		}
 	}
 

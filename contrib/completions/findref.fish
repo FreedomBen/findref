@@ -49,10 +49,10 @@ function __fish_findref_positional_count
             case '--'
                 set after_dd 1
                 continue
-            case '-e' '--exclude' '-l' '--max-line-length' '--write-config'
+            case '-e' '--exclude' '-E' '--exclude-pattern' '-l' '--max-line-length' '--write-config'
                 set expect_value 1
                 continue
-            case '--exclude=*' '-e=*' '--max-line-length=*' '-l=*' '--write-config=*'
+            case '--exclude=*' '-e=*' '--exclude-pattern=*' '-E=*' '--max-line-length=*' '-l=*' '--write-config=*'
                 continue
             case '-*'
                 continue
@@ -128,6 +128,7 @@ complete -c findref -l help -f -d 'Show usage information'
 
 complete -c findref -s l -l max-line-length -fr -d 'Set maximum line length' -a '(__fish_findref_max_line_lengths)'
 complete -c findref -s e -l exclude -fr -d 'Exclude matching directories or files' -a '(__fish_findref_exclude_suggestions)'
+complete -c findref -s E -l exclude-pattern -fr -d 'Exclude paths matching RE2 regex (repeatable)'
 
 complete -c findref -n '__fish_findref_needs_match_regex' -f -d 'Regular expression to search for' -a '(__fish_findref_match_examples)'
 complete -c findref -n '__fish_findref_needs_start_dir' -f -d 'Directory to start searching from' -a '(__fish_findref_start_dirs)'

@@ -65,6 +65,16 @@ Provide the flag multiple times to stack rules. Default excludes remain active u
 .BR --all
 is set.
 .TP
+.BR -E ", " --exclude-pattern " " \fIregex\fR
+Skip files or directories whose cleaned path matches the RE2 regular expression
+.IR regex .
+The pattern is tested against the full relative path (after
+.BR filepath.Clean ),
+so it can target basenames, directory components, or entire subtrees.
+Provide the flag multiple times to stack rules.
+Combinable with
+.BR --exclude .
+.TP
 .BR -f ", " --filename-only
 Suppress individual matches and emit a sorted, deduplicated list of filenames that contained at least
 one hit.
@@ -207,6 +217,10 @@ Skip
 .I node_modules
 while reporting aggregate statistics for TODO comments beneath
 .IR ./app .
+.TP
+.B findref --exclude-pattern '_test\\.go$' "func " ./src
+Skip all Go test files while searching for function declarations beneath
+.IR ./src .
 .TP
 .B findref --filename-only --no-color "^func init" .
 List only the files that declare a Go initializer while keeping the output parseable for scripts.

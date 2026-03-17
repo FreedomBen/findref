@@ -104,6 +104,7 @@ _findref() {
     '(-x --no-max-line-length)'{-x,--no-max-line-length}'[Remove the maximum line length limit]' \
     '(-l --max-line-length)'{-l+,--max-line-length=-}'[Set maximum line length in characters]:max line length:_findref_complete_lengths' \
     '(-e --exclude)'{-e+,--exclude=-}'[Exclude matching directories or files (repeatable)]:exclude entry:_findref_complete_excludes' \
+    '*'{-E+,--exclude-pattern=-}'[Exclude paths matching RE2 regex (repeatable)]:exclude pattern: ' \
     '--write-config[Generate a default config file and exit]:target:_findref_complete_write_config' \
     '--help[Show usage information]' \
     '1:match regex:_findref_complete_match_examples' \

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -52,6 +53,7 @@ type Settings struct {
 	HiddenFileRegex    *regexp.Regexp
 	UseDefaultExcludes bool
 	excludes           []excludeEntry
+	excludePatterns    []*regexp.Regexp
 }
 
 func NewSettings() *Settings {
@@ -66,6 +68,7 @@ func NewSettings() *Settings {
 		FilenameRegex:      regexp.MustCompile(".*"),
 		HiddenFileRegex:    regexp.MustCompile(`(^|\/)\.`),
 		excludes:           []excludeEntry{},
+		excludePatterns:    []*regexp.Regexp{},
 		UseDefaultExcludes: true,
 	}
 	return s
@@ -86,6 +89,29 @@ func (s *Settings) AddExcludeDirs(dirs ...string) {
 
 func (s *Settings) AddExcludes(paths ...string) {
 	s.excludes = append(s.excludes, buildExcludeEntries(paths...)...)
+}
+
+func (s *Settings) AddExcludePatterns(patterns ...string) error {
+	for _, p := range patterns {
+		trimmed := strings.TrimSpace(p)
+		if trimmed == "" {
+			continue
+		}
+		compiled, err := regexp.Compile(trimmed)
+		if err != nil {
+			return fmt.Errorf("invalid exclude-pattern %q: %w", trimmed, err)
+		}
+		s.excludePatterns = append(s.excludePatterns, compiled)
+	}
+	return nil
+}
+
+func (s *Settings) ExcludePatterns() []string {
+	retval := make([]string, 0, len(s.excludePatterns))
+	for _, re := range s.excludePatterns {
+		retval = append(retval, re.String())
+	}
+	return retval
 }
 
 func (s *Settings) ExcludeDirs() []string {
@@ -123,6 +149,11 @@ func (s *Settings) shouldExclude(path string) bool {
 	}
 	if s.UseDefaultExcludes && s.matchesExclude(cleanedPath, pathBase, defaultExcludeEntries) {
 		return true
+	}
+	for _, re := range s.excludePatterns {
+		if re.MatchString(cleanedPath) {
+			return true
+		}
 	}
 	return false
 }

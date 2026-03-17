@@ -50,6 +50,8 @@ func Usage() string {
               Enable debug mode
         -e | --exclude
               Exclude directories or files whose names match the provided value (repeat for multiple; defaults skip VCS metadata)
+        -E | --exclude-pattern
+              Exclude files/directories whose path matches the provided RE2 regex (repeatable; combinable with --exclude)
         -f | --filename-only
               Display only filenames with matches, not the matches themselves
         -h | --hidden
@@ -92,6 +94,9 @@ func Usage() string {
 
         %s// Use multiple excludes when scanning Go sources%s
         %sfindref%s %s--exclude%s %svendor%s %s--exclude%s %sbuild%s %s"^func init"%s
+
+        %s// Exclude all test files from results using a regex pattern%s
+        %sfindref%s %s--exclude-pattern%s %s'_test\.go$'%s %s"func "%s %s./src%s
 
 `,
 		// Top block
@@ -162,6 +167,14 @@ func Usage() string {
 		colors.Green, colors.Restore, // sixth example second exclude option
 		colors.Yellow, colors.Restore, // sixth example second exclude value
 		colors.Cyan, colors.Restore, // sixth example match_regex
+
+		// Seventh Example
+		colors.LightGray, colors.Restore, // seventh example comment
+		colors.Brown, colors.Restore, // seventh example findref
+		colors.Green, colors.Restore, // seventh example option
+		colors.Yellow, colors.Restore, // seventh example exclude-pattern value
+		colors.Cyan, colors.Restore, // seventh example match_regex
+		colors.Blue, colors.Restore, // seventh example start_dir
 	)
 }
 
@@ -498,6 +511,9 @@ func main() {
 	excludeValues := multiValueFlag{}
 	flag.Var(&excludeValues, "exclude", "Exclude directories or files whose names match the provided value (repeatable)")
 	flag.Var(&excludeValues, "e", "Alias for --exclude")
+	excludePatternValues := multiValueFlag{}
+	flag.Var(&excludePatternValues, "exclude-pattern", "Exclude files/directories whose path matches the provided RE2 regex (repeatable)")
+	flag.Var(&excludePatternValues, "E", "Alias for --exclude-pattern")
 
 	flag.Usage = func() {
 		fmt.Print(Usage())
@@ -550,6 +566,11 @@ func main() {
 	if len(excludeValues) > 0 {
 		settings.AddExcludes([]string(excludeValues)...)
 	}
+	if len(excludePatternValues) > 0 {
+		if err := settings.AddExcludePatterns([]string(excludePatternValues)...); err != nil {
+			exitWithErr(err)
+		}
+	}
 
 	if configPath != "" && settings.Debug {
 		fmt.Println(colors.Blue+"Using config file:"+colors.Restore, configPath)
@@ -569,6 +590,7 @@ func main() {
 	debug(colors.Blue, "max line length: ", colors.Restore, settings.MaxLineLength)
 	debug(colors.Blue, "no max line length enabled: ", colors.Restore, settings.NoMaxLineLength)
 	debug(colors.Blue, "excluded paths: ", colors.Restore, settings.Excludes())
+	debug(colors.Blue, "excluded patterns: ", colors.Restore, settings.ExcludePatterns())
 
 	rootDir := "."
 
@@ -658,6 +680,7 @@ func main() {
 	debug(colors.Blue, "* max line length: ", colors.Restore, settings.MaxLineLength)
 	debug(colors.Blue, "* no max line length enabled: ", colors.Restore, settings.NoMaxLineLength)
 	debug(colors.Blue, "* excluded paths: ", colors.Restore, settings.Excludes())
+	debug(colors.Blue, "* excluded patterns: ", colors.Restore, settings.ExcludePatterns())
 	debug(colors.Blue, "* matchRegex: ", colors.Restore, settings.MatchRegex.String())
 	debug(colors.Blue, "* rootDir: ", colors.Restore, rootDir)
 	debug(colors.Blue, "* fileRegex: ", colors.Restore, settings.FilenameRegex.String())

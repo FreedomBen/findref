@@ -539,6 +539,184 @@ func expectNotContains(t *testing.T, lines []string, target string) {
 	}
 }
 
+func TestExcludePatternBasic(t *testing.T) {
+	s := NewSettings()
+	if err := s.AddExcludePatterns(`_test\.go$`); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !s.ShouldExcludeFile("src/foo_test.go") {
+		t.Fatalf("expected _test.go file to be excluded by pattern")
+	}
+	if s.ShouldExcludeFile("src/foo.go") {
+		t.Fatalf("did not expect foo.go to be excluded by pattern")
+	}
+}
+
+func TestExcludePatternDir(t *testing.T) {
+	s := NewSettings()
+	if err := s.AddExcludePatterns(`(^|/)generated($|/)`); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !s.ShouldExcludeDir("src/generated") {
+		t.Fatalf("expected generated dir to be excluded by pattern")
+	}
+	if s.ShouldExcludeDir("src/generator") {
+		t.Fatalf("did not expect generator dir to be excluded")
+	}
+}
+
+func TestExcludePatternInvalid(t *testing.T) {
+	s := NewSettings()
+	err := s.AddExcludePatterns("(")
+	if err == nil {
+		t.Fatalf("expected error for invalid regex pattern")
+	}
+	if !strings.Contains(err.Error(), "invalid exclude-pattern") {
+		t.Fatalf("expected error to mention invalid exclude-pattern, got %q", err.Error())
+	}
+}
+
+func TestExcludePatternMultiple(t *testing.T) {
+	s := NewSettings()
+	if err := s.AddExcludePatterns(`_test\.go$`, `\.min\.js$`); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !s.ShouldExcludeFile("src/app_test.go") {
+		t.Fatalf("expected test file to be excluded")
+	}
+	if !s.ShouldExcludeFile("dist/bundle.min.js") {
+		t.Fatalf("expected minified JS to be excluded")
+	}
+	if s.ShouldExcludeFile("src/app.go") {
+		t.Fatalf("did not expect app.go to be excluded")
+	}
+}
+
+func TestExcludePatternCombinedWithLiteral(t *testing.T) {
+	s := NewSettings()
+	s.UseDefaultExcludes = false
+	s.AddExcludes("myvendor")
+	if err := s.AddExcludePatterns(`_test\.go$`); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !s.ShouldExcludeDir("project/myvendor") {
+		t.Fatalf("expected myvendor to be excluded by literal")
+	}
+	if !s.ShouldExcludeFile("src/app_test.go") {
+		t.Fatalf("expected test file to be excluded by pattern")
+	}
+	if s.ShouldExcludeFile("src/app.go") {
+		t.Fatalf("did not expect app.go to be excluded")
+	}
+}
+
+func TestExcludePatternAccessor(t *testing.T) {
+	s := NewSettings()
+	if err := s.AddExcludePatterns(`_test\.go$`, `\.min\.js$`); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	patterns := s.ExcludePatterns()
+	if len(patterns) != 2 {
+		t.Fatalf("expected 2 patterns, got %d", len(patterns))
+	}
+	if patterns[0] != `_test\.go$` {
+		t.Fatalf("expected first pattern %q, got %q", `_test\.go$`, patterns[0])
+	}
+}
+
+func TestIntegrationExcludePatternFlag(t *testing.T) {
+	tmpDir := t.TempDir()
+	rootFile := filepath.Join(tmpDir, "main.go")
+	testFile := filepath.Join(tmpDir, "main_test.go")
+	libFile := filepath.Join(tmpDir, "lib.go")
+
+	mustWriteFile(t, rootFile, "package main\n// TODO: root\n")
+	mustWriteFile(t, testFile, "package main\n// TODO: test\n")
+	mustWriteFile(t, libFile, "package main\n// TODO: lib\n")
+
+	stdout, stderr := runFindrefMain(t, []string{
+		"--no-color", "--filename-only",
+		"--exclude-pattern", `_test\.go$`,
+		"TODO", tmpDir,
+	})
+	if stderr != "" {
+		t.Fatalf("expected empty stderr, got %q", stderr)
+	}
+	lines := splitLines(stdout)
+	expectContains(t, lines, rootFile)
+	expectContains(t, lines, libFile)
+	expectNotContains(t, lines, testFile)
+}
+
+func TestIntegrationExcludePatternWithExclude(t *testing.T) {
+	tmpDir := t.TempDir()
+	rootFile := filepath.Join(tmpDir, "main.go")
+	testFile := filepath.Join(tmpDir, "main_test.go")
+	vendorDir := filepath.Join(tmpDir, "myvendor")
+	vendorFile := filepath.Join(vendorDir, "lib.go")
+
+	mustWriteFile(t, rootFile, "package main\n// TODO: root\n")
+	mustWriteFile(t, testFile, "package main\n// TODO: test\n")
+	mustWriteFile(t, vendorFile, "// TODO: vendor lib\n")
+
+	stdout, stderr := runFindrefMain(t, []string{
+		"--no-color", "--filename-only",
+		"--exclude", "myvendor",
+		"--exclude-pattern", `_test\.go$`,
+		"TODO", tmpDir,
+	})
+	if stderr != "" {
+		t.Fatalf("expected empty stderr, got %q", stderr)
+	}
+	lines := splitLines(stdout)
+	expectContains(t, lines, rootFile)
+	expectNotContains(t, lines, testFile)
+	expectNotContains(t, lines, vendorFile)
+}
+
+func TestIntegrationExcludePatternShortFlag(t *testing.T) {
+	tmpDir := t.TempDir()
+	rootFile := filepath.Join(tmpDir, "main.go")
+	testFile := filepath.Join(tmpDir, "main_test.go")
+
+	mustWriteFile(t, rootFile, "package main\n// TODO: root\n")
+	mustWriteFile(t, testFile, "package main\n// TODO: test\n")
+
+	stdout, stderr := runFindrefMain(t, []string{
+		"--no-color", "--filename-only",
+		"-E", `_test\.go$`,
+		"TODO", tmpDir,
+	})
+	if stderr != "" {
+		t.Fatalf("expected empty stderr, got %q", stderr)
+	}
+	lines := splitLines(stdout)
+	expectContains(t, lines, rootFile)
+	expectNotContains(t, lines, testFile)
+}
+
+func TestConfigFileExcludePattern(t *testing.T) {
+	base := t.TempDir()
+	workDir := filepath.Join(base, "work")
+	homeDir := filepath.Join(base, "home")
+
+	mustWriteFile(t, filepath.Join(workDir, ".findref.yaml"),
+		"filename_only: true\nexclude_pattern:\n  - '_test\\.go$'\n")
+	mustWriteFile(t, filepath.Join(workDir, "main.go"), "package main\n// TODO: main\n")
+	mustWriteFile(t, filepath.Join(workDir, "main_test.go"), "package main\n// TODO: test\n")
+
+	t.Setenv("HOME", homeDir)
+	t.Setenv("XDG_CONFIG_HOME", filepath.Join(homeDir, ".config"))
+
+	stdout, stderr := runFindrefMainInDir(t, []string{"--no-color", "TODO"}, workDir)
+	if stderr != "" {
+		t.Fatalf("expected empty stderr, got %q", stderr)
+	}
+	lines := splitLines(stdout)
+	expectContains(t, lines, "main.go")
+	expectNotContains(t, lines, "main_test.go")
+}
+
 func TestFindConfigFilePrefersCwd(t *testing.T) {
 	base := t.TempDir()
 	workDir := filepath.Join(base, "work")
