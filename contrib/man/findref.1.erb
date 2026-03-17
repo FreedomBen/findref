@@ -52,8 +52,15 @@ still filters it.
 Verbose logging that prints traversal decisions, exclude matches, and worker activity.
 .TP
 .BR -e ", " --exclude " " \fIvalue\fR
-Skip files or directories whose cleaned path or basename matches
-.IR value .
+Skip files or directories whose cleaned path or basename equals the plain string
+.IR value
+(not a regex or glob).
+A bare name such as
+.B tmp
+matches any file or directory with that basename at any depth.
+A value that contains a path separator, such as
+.BR src/generated ,
+matches paths that end with that suffix.
 Provide the flag multiple times to stack rules. Default excludes remain active unless
 .BR --all
 is set.
