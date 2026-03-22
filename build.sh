@@ -32,7 +32,12 @@ ARCHES=("amd64" "386")
 
 echo -e "${color_cyan}Building findref version '${VERSION}' for OSes '${OSES[@]}', and arches '${ARCHES[@]}'...${color_restore}"
 
-root_dir=findref-bin/${VERSION}
+if [ ! -d ../findref-bin ]; then
+    echo -e "${color_cyan}../findref-bin not found, cloning...${color_restore}"
+    git clone git@github.com:FreedomBen/findref-bin.git ../findref-bin
+fi
+
+root_dir=../findref-bin/${VERSION}
 for os in ${OSES[@]}; do
     for arch in ${ARCHES[@]}; do
         echo -e "${color_cyan}Building version ${VERSION} for OS ${os}, arch ${arch}${color_restore}"

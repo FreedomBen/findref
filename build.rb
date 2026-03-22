@@ -297,6 +297,7 @@ end
 #
 def main(release)
   die('Must pass release version as first arg') if release.nil? || release.empty?
+  Helpers.ensure_findref_bin_repo!
   OSES_ARCHES.each do |os, arches|
     arches.each do |arch|
       dest_dirs = [Helpers.latest_release_name, release].map{ |rel| "#{Helpers.findref_bin_repo}/#{rel}/#{os}/#{arch}" }

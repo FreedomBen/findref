@@ -69,8 +69,18 @@ module Helpers
     releases.first
   end
 
+  FINDREF_BIN_REPO_URL = 'git@github.com:FreedomBen/findref-bin.git'.freeze
+
   def self.findref_bin_repo
-    'findref-bin'
+    '../findref-bin'
+  end
+
+  def self.ensure_findref_bin_repo!
+    return if Dir.exist?(findref_bin_repo)
+
+    puts "#{findref_bin_repo} not found, cloning from #{FINDREF_BIN_REPO_URL}..."
+    system('git', 'clone', FINDREF_BIN_REPO_URL, findref_bin_repo) \
+      || raise("Failed to clone #{FINDREF_BIN_REPO_URL}")
   end
 
   def self.releases
