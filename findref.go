@@ -533,6 +533,11 @@ func main() {
 		os.Exit(0)
 	}
 
+	if *nPtr || *nocolorPtr {
+		debug("Color output is disabled")
+		colors.ZeroColors()
+	}
+
 	if *vPtr || *versionPtr {
 		printVersion()
 		os.Exit(0)
@@ -545,11 +550,6 @@ func main() {
 	if *mcpPtr {
 		mcpServe()
 		return
-	}
-
-	if *nPtr || *nocolorPtr {
-		debug("Color output is disabled")
-		colors.ZeroColors()
 	}
 
 	if *xPtr && (*lPtr != *maxLineLengthPtr || *lPtr != MaxLineLengthDefault) {
