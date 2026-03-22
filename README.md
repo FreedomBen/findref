@@ -1,7 +1,7 @@
 # fr / findref
 
 
-![Version](https://img.shields.io/badge/Version-v1.6.0-green)
+![Version](https://img.shields.io/badge/Version-v1.6.1-green)
 
 `findref` (commonly aliased to `fr`) helps you find strings, or match regular expressions, in a directory of files.  It is inspired by `git grep` which is a good tool, but has limitations that made writing a replacement a worthy endeavor.
 
@@ -214,7 +214,7 @@ put it somewhere in your [PATH](http://www.linfo.org/path_env_var.html).
 I recommend putting it in `~/bin` if you are the only user (`sudo` isn't required
 to install in that location), or `/usr/local/bin` if there are multiple users on the system:
 
-#### Current Release Version: 1.6.0
+#### Current Release Version: 1.6.1
 
 These links will always point to the latest released version, so they are includable in
 scripts to get the latest version without having to adjust the version number for new
@@ -223,14 +223,14 @@ on the [ARCHIVES.md](ARCHIVES.md) page.
 
 | Version | Linux | macOS | Windows | FreeBSD | OpenBSD |
 |:-------:|:-----:|:-----:|:-------:|:-------:|:--------|
-| latest | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/amd64/findref.zip) - [arm](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/arm/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/arm64/findref.zip) | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/darwin/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/darwin/amd64/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/darwin/arm64/findref.zip) | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/windows/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/windows/amd64/findref.zip) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/freebsd/amd64/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/freebsd/arm64/findref.zip) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/openbsd/amd64/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/openbsd/arm64/findref.zip) |
+| latest | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/amd64/findref.zip) - [arm](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/arm/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/arm64/findref.zip) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/darwin/amd64/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/darwin/arm64/findref.zip) | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/windows/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/windows/amd64/findref.zip) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/freebsd/amd64/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/freebsd/arm64/findref.zip) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/openbsd/amd64/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/openbsd/arm64/findref.zip) |
 
-These links are perma-links to the binaries for version 1.6.0, meaning even after
-a new version is released, these will still get you version 1.6.0.
+These links are perma-links to the binaries for version 1.6.1, meaning even after
+a new version is released, these will still get you version 1.6.1.
 
 | Version | Linux | macOS | Windows | FreeBSD | OpenBSD |
 |:-------:|:-----:|:-----:|:-------:|:-------:|:--------|
-| 1.6.0 | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.6.0/linux/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.6.0/linux/amd64/findref.zip) - [arm](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.6.0/linux/arm/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.6.0/linux/arm64/findref.zip) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.6.0/darwin/amd64/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.6.0/darwin/arm64/findref.zip) | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.6.0/windows/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.6.0/windows/amd64/findref.zip) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.6.0/freebsd/amd64/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.6.0/freebsd/arm64/findref.zip) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.6.0/openbsd/amd64/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.6.0/openbsd/arm64/findref.zip) |
+| 1.6.1 | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.6.1/linux/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.6.1/linux/amd64/findref.zip) - [arm](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.6.1/linux/arm/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.6.1/linux/arm64/findref.zip) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.6.1/darwin/amd64/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.6.1/darwin/arm64/findref.zip) | [386](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.6.1/windows/386/findref.zip) - [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.6.1/windows/amd64/findref.zip) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.6.1/freebsd/amd64/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.6.1/freebsd/arm64/findref.zip) | [amd64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.6.1/openbsd/amd64/findref.zip) - [arm64](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/1.6.1/openbsd/arm64/findref.zip) |
 
 ### Linux packages
 
@@ -238,10 +238,10 @@ If you prefer native packages over the raw zip archives, every Linux build now s
 
 **Current release downloads (amd64)**
 
-- [Debian / Ubuntu (.deb)](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/amd64/findref_1.6.0_amd64.deb)
-- [Fedora / RHEL / openSUSE (.rpm)](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/amd64/findref-1.6.0-1.x86_64.rpm)
-- [Alpine (.apk)](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/amd64/findref-1.6.0.x86_64.apk)
-- [Arch Linux (.pkg.tar.zst)](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/amd64/findref-1.6.0-1-x86_64.pkg.tar.zst)
+- [Debian / Ubuntu (.deb)](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/amd64/findref_1.6.1_amd64.deb)
+- [Fedora / RHEL / openSUSE (.rpm)](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/amd64/findref-1.6.1-1.x86_64.rpm)
+- [Alpine (.apk)](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/amd64/findref-1.6.1.x86_64.apk)
+- [Arch Linux (.pkg.tar.zst)](https://raw.githubusercontent.com/FreedomBen/findref-bin/master/latest/linux/amd64/findref-1.6.1-1-x86_64.pkg.tar.zst)
 
 Swap `amd64` in the URL for `386`, `arm`, or `arm64` to grab the other architectures (the Arch package is amd64-only). The Debian packages use `amd64`, `arm64`, `armhf`, `i386` suffixes; RPM uses `x86_64`, `aarch64`, `armv7hl`, `i386`; APK uses `x86_64`, `aarch64`, `armhf`, `x86`. Replace `latest` with a concrete version (see [ARCHIVES.md](ARCHIVES.md)) if you need to pin to a specific release.
 
