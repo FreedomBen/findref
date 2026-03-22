@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 #
-# Deprecated.  Use the Rakefile `rake`
+# ARCHIVED: This script is no longer used and no longer works.
+# It is kept here for posterity. Use the Rakefile (`rake`) instead.
 #
 
 set -e
