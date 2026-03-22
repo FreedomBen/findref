@@ -71,8 +71,15 @@ module Helpers
 
   FINDREF_BIN_REPO_URL = 'git@github.com:FreedomBen/findref-bin.git'.freeze
 
+  FINDREF_BIN_REPO_NAME = 'findref-bin'.freeze
+  FINDREF_BIN_REPO_PATH = '../findref-bin'.freeze
+
   def self.findref_bin_repo
-    '../findref-bin'
+    FINDREF_BIN_REPO_PATH
+  end
+
+  def self.findref_bin_repo_name
+    FINDREF_BIN_REPO_NAME
   end
 
   def self.ensure_findref_bin_repo!
@@ -102,7 +109,7 @@ module Helpers
   end
 
   def self.url(release, os, arch)
-    "https://raw.githubusercontent.com/FreedomBen/#{findref_bin_repo}/master/#{release}/#{os}/#{arch}/#{zip_name}"
+    "https://raw.githubusercontent.com/FreedomBen/#{findref_bin_repo_name}/master/#{release}/#{os}/#{arch}/#{zip_name}"
   end
 
   def self.link(release, os, arch)
