@@ -14,12 +14,6 @@ time linear in the size of the input](https://swtch.com/~rsc/regexp/regexp1.html
 `findref` faster than many other tools.
 
 
-## Breaking change: `-i` flag reassigned
-
-Starting in v1.7.0, the `-i` short flag has been reassigned from `--ignore-case` to `--include` (a new whitelist filter for files). If you use `-i` for case-insensitive matching, switch to `-c` (or continue using the long form `--ignore-case`, which is unchanged). The `-I` short flag was also added for the new `--include-pattern` option.
-
-To maintain the old behavior, stick with v1.6.2
-
 ## How it compares to other tools (or why it is better in my opinion):
 
 **grep**:  `findref` adds much simpler recursive search that doesn't require a bunch of
@@ -325,3 +319,9 @@ docker run \
 ```
 
 After the build your binary should be sitting in the root directory of the repo!
+
+## Breaking change: `-i` flag reassigned
+
+Starting in v1.7.0, the `-i` short flag has been reassigned from `--ignore-case` to `--include` (a new whitelist filter for files). If you use `-i` for case-insensitive matching, switch to `-c` (or continue using the long form `--ignore-case`, which is unchanged). The `-I` short flag was also added for the new `--include-pattern` option.
+
+To maintain the old behavior, download [v1.6.2 from the archives](ARCHIVES.md).
