@@ -544,7 +544,8 @@ func main() {
 	}
 
 	if *helpPtr {
-		usageAndExit()
+		flag.Usage()
+		os.Exit(0)
 	}
 
 	if *mcpPtr {
