@@ -1,5 +1,12 @@
 # Repository Guidelines
 
+## Agent Instructions
+
+- `README.md`, `ARCHIVES.md`, and `install.sh` are generated from their corresponding `.erb` templates (`README.md.erb`, `ARCHIVES.md.erb`, `install.sh.erb`) via Rake. Always edit the `.erb` source files, never the rendered output directly.
+- Always update README.md.erb and other documentation when making changes that impact the existing documentation
+- Always write tests for new or changed functionality
+- When fixing broken tests after a change, be thoughtful about whether the test needs to change or if the application is actually broken
+
 ## Project Structure & Module Organization
 Core Go sources live in the repository root: `findref.go` exposes the CLI entrypoint and version, while `match.go`, `settings.go`, `stats.go`, and `colors.go` encapsulate search logic, configuration, metrics, and terminal styling. Reusable helpers sit in `file_list.go` and `helpers.rb`, the latter supporting the build pipeline. Unit tests currently target the critical helpers inside `findref_test.go`. Release artifacts are produced under `findref-bin/`, and static screenshots live in `images/`. The ERB templates (`README.md.erb`, `ARCHIVES.md.erb`, `install.sh.erb`) feed the documentation and installer scripts through the Rake tasks.
 
