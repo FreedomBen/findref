@@ -49,10 +49,10 @@ function __fish_findref_positional_count
             case '--'
                 set after_dd 1
                 continue
-            case '-e' '--exclude' '-E' '--exclude-pattern' '-l' '--max-line-length' '--write-config'
+            case '-e' '--exclude' '-E' '--exclude-pattern' '-i' '--include' '-I' '--include-pattern' '-l' '--max-line-length' '--write-config'
                 set expect_value 1
                 continue
-            case '--exclude=*' '-e=*' '--exclude-pattern=*' '-E=*' '--max-line-length=*' '-l=*' '--write-config=*'
+            case '--exclude=*' '-e=*' '--exclude-pattern=*' '-E=*' '--include=*' '-i=*' '--include-pattern=*' '-I=*' '--max-line-length=*' '-l=*' '--write-config=*'
                 continue
             case '-*'
                 continue
@@ -120,7 +120,7 @@ complete -c findref -s h -l hidden -f -d 'Include hidden files and directories'
 complete -c findref -s v -l version -f -d 'Print current version and exit'
 complete -c findref -s n -l no-color -f -d 'Disable colorized output'
 complete -c findref -s m -l match-case -f -d 'Match regex case explicitly'
-complete -c findref -s i -l ignore-case -f -d 'Ignore regex case (override smart-case)'
+complete -c findref -s c -l ignore-case -f -d 'Ignore regex case (override smart-case)'
 complete -c findref -s f -l filename-only -f -d 'Print only filenames that contain matches'
 complete -c findref -s x -l no-max-line-length -f -d 'Remove the maximum line length limit'
 complete -c findref -l write-config -fr -d 'Generate a default config file and exit' -a '$__fish_findref_write_config_targets'
@@ -131,6 +131,8 @@ complete -c findref -l help -f -d 'Show usage information'
 complete -c findref -s l -l max-line-length -fr -d 'Set maximum line length' -a '(__fish_findref_max_line_lengths)'
 complete -c findref -s e -l exclude -fr -d 'Exclude matching directories or files' -a '(__fish_findref_exclude_suggestions)'
 complete -c findref -s E -l exclude-pattern -fr -d 'Exclude paths matching RE2 regex (repeatable)'
+complete -c findref -s i -l include -fr -d 'Include only matching files (repeatable)' -a '(__fish_complete_path)'
+complete -c findref -s I -l include-pattern -fr -d 'Include only files matching RE2 regex (repeatable)'
 
 complete -c findref -n '__fish_findref_needs_match_regex' -f -d 'Regular expression to search for' -a '(__fish_findref_match_examples)'
 complete -c findref -n '__fish_findref_needs_start_dir' -f -d 'Directory to start searching from' -a '(__fish_findref_start_dirs)'

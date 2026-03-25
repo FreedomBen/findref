@@ -45,7 +45,7 @@ func Usage() string {
     %sOptions:%s
         %s
         -a | --all
-             Aggressively search for matches (implies: -i -h) and disables default excludes
+             Aggressively search for matches (implies: -c -h) and disables default excludes
         -d | --debug
               Enable debug mode
         -e | --exclude
@@ -54,10 +54,14 @@ func Usage() string {
               Exclude files/directories whose path matches the provided RE2 regex (repeatable; combinable with --exclude)
         -f | --filename-only
               Display only filenames with matches, not the matches themselves
+        -c | --ignore-case
+              Ignore case in regex (overrides smart-case)
         -h | --hidden
               Include hidden files and files in hidden directories
-        -i | --ignore-case
-              Ignore case in regex (overrides smart-case)
+        -i | --include
+              Include only files whose names match the provided value (repeatable; whitelist approach)
+        -I | --include-pattern
+              Include only files whose path matches the provided RE2 regex (repeatable; combinable with --include)
         -m | --match-case
               Match regex case (if unset smart-case is used)
         -n | --no-color
@@ -99,6 +103,12 @@ func Usage() string {
 
         %s// Exclude all test files from results using a regex pattern%s
         %sfindref%s %s--exclude-pattern%s %s'_test\.go$'%s %s"func "%s %s./src%s
+
+        %s// Search only Go files using an include pattern%s
+        %sfindref%s %s--include-pattern%s %s'\.go$'%s %s"func "%s %s./src%s
+
+        %s// Search only in specific files by name%s
+        %sfindref%s %s--include%s %smain.go%s %s"package main"%s
 
 `,
 		// Top block
@@ -177,6 +187,21 @@ func Usage() string {
 		colors.Yellow, colors.Restore, // seventh example exclude-pattern value
 		colors.Cyan, colors.Restore, // seventh example match_regex
 		colors.Blue, colors.Restore, // seventh example start_dir
+
+		// Eighth Example (include-pattern)
+		colors.LightGray, colors.Restore, // eighth example comment
+		colors.Brown, colors.Restore, // eighth example findref
+		colors.Green, colors.Restore, // eighth example option
+		colors.Yellow, colors.Restore, // eighth example include-pattern value
+		colors.Cyan, colors.Restore, // eighth example match_regex
+		colors.Blue, colors.Restore, // eighth example start_dir
+
+		// Ninth Example (include)
+		colors.LightGray, colors.Restore, // ninth example comment
+		colors.Brown, colors.Restore, // ninth example findref
+		colors.Green, colors.Restore, // ninth example option
+		colors.Yellow, colors.Restore, // ninth example include value
+		colors.Cyan, colors.Restore, // ninth example match_regex
 	)
 }
 
@@ -387,6 +412,11 @@ func processFile(path string, info os.FileInfo, err error) error {
 		return FILE_PROCESSING_COMPLETE
 	}
 
+	if !settings.ShouldIncludeFile(path) {
+		debug(colors.Blue, "File", path, "does not match include filter and will be skipped", colors.Restore)
+		return FILE_PROCESSING_COMPLETE
+	}
+
 	if settings.PassesFileFilter(path) {
 		debug(colors.Blue+"Passes file filter:", path)
 		if settings.IsHidden(path) {
@@ -493,11 +523,11 @@ func main() {
 	vPtr := flag.Bool("v", false, "Alias for --version")
 	nPtr := flag.Bool("n", false, "Alias for --no-color")
 	mPtr := flag.Bool("m", false, "Alias for --match-case")
-	iPtr := flag.Bool("i", false, "Alias for --ignore-case")
+	cPtr := flag.Bool("c", false, "Alias for --ignore-case")
 	fPtr := flag.Bool("f", false, "Alias for --filename-only")
 	xPtr := flag.Bool("x", false, "Alias for --no-max-line-length")
 	lPtr := flag.Int("l", MaxLineLengthDefault, "Alias for --max-line-length")
-	allPtr := flag.Bool("all", false, "Include hidden files and ignore case (implies: -i -h)")
+	allPtr := flag.Bool("all", false, "Include hidden files and ignore case (implies: -c -h)")
 	helpPtr := flag.Bool("help", false, "Show usage")
 	statsPtr := flag.Bool("stats", false, "Track and display statistics")
 	debugPtr := flag.Bool("debug", false, "Enable debug mode")
@@ -518,6 +548,12 @@ func main() {
 	excludePatternValues := multiValueFlag{}
 	flag.Var(&excludePatternValues, "exclude-pattern", "Exclude files/directories whose path matches the provided RE2 regex (repeatable)")
 	flag.Var(&excludePatternValues, "E", "Alias for --exclude-pattern")
+	includeValues := multiValueFlag{}
+	flag.Var(&includeValues, "include", "Include only files whose names match the provided value (repeatable)")
+	flag.Var(&includeValues, "i", "Alias for --include")
+	includePatternValues := multiValueFlag{}
+	flag.Var(&includePatternValues, "include-pattern", "Include only files whose path matches the provided RE2 regex (repeatable)")
+	flag.Var(&includePatternValues, "I", "Alias for --include-pattern")
 
 	flag.Usage = func() {
 		fmt.Print(Usage())
@@ -564,7 +600,7 @@ func main() {
 	settings.IncludeHidden = (*hiddenPtr || *hPtr) || allEnabled
 	settings.NoMaxLineLength = *noMaxLineLengthPtr || *xPtr
 	*matchCasePtr = *matchCasePtr || *mPtr
-	*ignoreCasePtr = (*ignoreCasePtr || *iPtr) || allEnabled
+	*ignoreCasePtr = (*ignoreCasePtr || *cPtr) || allEnabled
 	settings.UseDefaultExcludes = !allEnabled
 
 	if *lPtr != MaxLineLengthDefault {
@@ -578,6 +614,14 @@ func main() {
 	}
 	if len(excludePatternValues) > 0 {
 		if err := settings.AddExcludePatterns([]string(excludePatternValues)...); err != nil {
+			exitWithErr(err)
+		}
+	}
+	if len(includeValues) > 0 {
+		settings.AddIncludes([]string(includeValues)...)
+	}
+	if len(includePatternValues) > 0 {
+		if err := settings.AddIncludePatterns([]string(includePatternValues)...); err != nil {
 			exitWithErr(err)
 		}
 	}
@@ -601,6 +645,8 @@ func main() {
 	debug(colors.Blue, "no max line length enabled: ", colors.Restore, settings.NoMaxLineLength)
 	debug(colors.Blue, "excluded paths: ", colors.Restore, settings.Excludes())
 	debug(colors.Blue, "excluded patterns: ", colors.Restore, settings.ExcludePatterns())
+	debug(colors.Blue, "included paths: ", colors.Restore, settings.Includes())
+	debug(colors.Blue, "included patterns: ", colors.Restore, settings.IncludePatterns())
 
 	rootDir := "."
 
@@ -691,6 +737,8 @@ func main() {
 	debug(colors.Blue, "* no max line length enabled: ", colors.Restore, settings.NoMaxLineLength)
 	debug(colors.Blue, "* excluded paths: ", colors.Restore, settings.Excludes())
 	debug(colors.Blue, "* excluded patterns: ", colors.Restore, settings.ExcludePatterns())
+	debug(colors.Blue, "* included paths: ", colors.Restore, settings.Includes())
+	debug(colors.Blue, "* included patterns: ", colors.Restore, settings.IncludePatterns())
 	debug(colors.Blue, "* matchRegex: ", colors.Restore, settings.MatchRegex.String())
 	debug(colors.Blue, "* rootDir: ", colors.Restore, rootDir)
 	debug(colors.Blue, "* fileRegex: ", colors.Restore, settings.FilenameRegex.String())

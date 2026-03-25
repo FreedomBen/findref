@@ -624,6 +624,164 @@ func TestDefaultExcludesDoNotExcludeCommonDirs(t *testing.T) {
 }
 
 // ---------------------------------------------------------------------------
+// Settings: inclusion logic
+// ---------------------------------------------------------------------------
+
+func TestIncludeBareName(t *testing.T) {
+	s := NewSettings()
+	s.UseDefaultExcludes = false
+	s.AddIncludes("main.go")
+
+	if !s.ShouldIncludeFile("main.go") {
+		t.Error("should include bare 'main.go'")
+	}
+	if !s.ShouldIncludeFile("cmd/main.go") {
+		t.Error("should include 'cmd/main.go'")
+	}
+	if !s.ShouldIncludeFile("/abs/path/main.go") {
+		t.Error("should include '/abs/path/main.go'")
+	}
+	if s.ShouldIncludeFile("main_test.go") {
+		t.Error("should NOT include 'main_test.go'")
+	}
+	if s.ShouldIncludeFile("other.go") {
+		t.Error("should NOT include 'other.go'")
+	}
+}
+
+func TestIncludePathWithSeparator(t *testing.T) {
+	s := NewSettings()
+	s.UseDefaultExcludes = false
+	s.AddIncludes("src/main.go")
+
+	if !s.ShouldIncludeFile("project/src/main.go") {
+		t.Error("should include 'project/src/main.go' as suffix match")
+	}
+	if !s.ShouldIncludeFile("src/main.go") {
+		t.Error("should include exact 'src/main.go'")
+	}
+	if s.ShouldIncludeFile("other/main.go") {
+		t.Error("should NOT include 'other/main.go'")
+	}
+}
+
+func TestIncludePatternsRegex(t *testing.T) {
+	s := NewSettings()
+	s.UseDefaultExcludes = false
+	if err := s.AddIncludePatterns(`\.go$`, `\.py$`); err != nil {
+		t.Fatal(err)
+	}
+
+	if !s.ShouldIncludeFile("src/foo.go") {
+		t.Error("should include Go file")
+	}
+	if !s.ShouldIncludeFile("lib/bar.py") {
+		t.Error("should include Python file")
+	}
+	if s.ShouldIncludeFile("src/app.js") {
+		t.Error("should NOT include JS file")
+	}
+	if s.ShouldIncludeFile("README.md") {
+		t.Error("should NOT include markdown file")
+	}
+}
+
+func TestIncludePatternInvalid(t *testing.T) {
+	s := NewSettings()
+	err := s.AddIncludePatterns("[invalid")
+	if err == nil {
+		t.Error("expected error for invalid regex")
+	}
+}
+
+func TestIncludePatternEmpty(t *testing.T) {
+	s := NewSettings()
+	if err := s.AddIncludePatterns("", "  "); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(s.includePatterns) != 0 {
+		t.Errorf("expected 0 patterns, got %d", len(s.includePatterns))
+	}
+}
+
+func TestNoIncludesMatchesEverything(t *testing.T) {
+	s := NewSettings()
+	s.UseDefaultExcludes = false
+
+	// With no includes set, everything should be included
+	if !s.ShouldIncludeFile("anything.txt") {
+		t.Error("with no includes, all files should be included")
+	}
+	if !s.ShouldIncludeFile("src/foo.go") {
+		t.Error("with no includes, all files should be included")
+	}
+	if s.HasIncludes() {
+		t.Error("HasIncludes should be false when no includes are set")
+	}
+}
+
+func TestIncludeAndExcludeCombined(t *testing.T) {
+	s := NewSettings()
+	s.UseDefaultExcludes = false
+	if err := s.AddIncludePatterns(`\.go$`); err != nil {
+		t.Fatal(err)
+	}
+	s.AddExcludes("vendor")
+
+	// Go file outside vendor: included
+	if !s.ShouldIncludeFile("src/foo.go") {
+		t.Error("should include Go file in src")
+	}
+	// Go file in vendor: included by include pattern (exclude for "vendor" applies
+	// at the directory level during walk, not at the file level)
+	if !s.ShouldIncludeFile("vendor/lib.go") {
+		t.Error("ShouldIncludeFile should return true for vendor Go file (exclude is checked separately)")
+	}
+	// Non-Go file: not included
+	if s.ShouldIncludeFile("src/readme.md") {
+		t.Error("should NOT include non-Go file")
+	}
+}
+
+func TestIncludeMultipleNames(t *testing.T) {
+	s := NewSettings()
+	s.UseDefaultExcludes = false
+	s.AddIncludes("Makefile", "Rakefile")
+
+	if !s.ShouldIncludeFile("Makefile") {
+		t.Error("should include Makefile")
+	}
+	if !s.ShouldIncludeFile("project/Rakefile") {
+		t.Error("should include Rakefile")
+	}
+	if s.ShouldIncludeFile("README.md") {
+		t.Error("should NOT include README.md")
+	}
+}
+
+func TestIncludeNameAndPatternCombined(t *testing.T) {
+	s := NewSettings()
+	s.UseDefaultExcludes = false
+	s.AddIncludes("Makefile")
+	if err := s.AddIncludePatterns(`\.go$`); err != nil {
+		t.Fatal(err)
+	}
+
+	// Matches by name
+	if !s.ShouldIncludeFile("Makefile") {
+		t.Error("should include Makefile by name")
+	}
+	// Matches by pattern
+	if !s.ShouldIncludeFile("src/foo.go") {
+		t.Error("should include Go file by pattern")
+	}
+	// Matches neither
+	if s.ShouldIncludeFile("README.md") {
+		t.Error("should NOT include README.md")
+	}
+}
+
+// ---------------------------------------------------------------------------
 // Settings: hidden file detection
 // ---------------------------------------------------------------------------
 
@@ -895,7 +1053,7 @@ func TestIntegrationIgnoreCaseFlag(t *testing.T) {
 	mustWriteFile(t, filepath.Join(tmpDir, "a.txt"), "Hello World\n")
 	mustWriteFile(t, filepath.Join(tmpDir, "b.txt"), "hello world\n")
 
-	stdout, _ := runFindrefMain(t, []string{"--no-color", "--filename-only", "-i", "Hello", tmpDir})
+	stdout, _ := runFindrefMain(t, []string{"--no-color", "--filename-only", "-c", "Hello", tmpDir})
 	lines := splitLines(stdout)
 	expectContains(t, lines, filepath.Join(tmpDir, "a.txt"))
 	expectContains(t, lines, filepath.Join(tmpDir, "b.txt"))

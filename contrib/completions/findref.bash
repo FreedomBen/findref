@@ -56,7 +56,7 @@ _findref_completion() {
         -v --version
         -n --no-color
         -m --match-case
-        -i --ignore-case
+        -c --ignore-case
         -f --filename-only
         -x --no-max-line-length
         --help
@@ -66,6 +66,8 @@ _findref_completion() {
         -l --max-line-length
         -e --exclude
         -E --exclude-pattern
+        -i --include
+        -I --include-pattern
         --write-config
     )
     # Keep in sync with defaultExcludeDirs in settings.go
@@ -85,6 +87,12 @@ _findref_completion() {
         --exclude-pattern|-E)
             expecting_value="exclude-pattern"
             ;;
+        --include|-i)
+            expecting_value="include"
+            ;;
+        --include-pattern|-I)
+            expecting_value="include-pattern"
+            ;;
         --max-line-length|-l)
             expecting_value="max-length"
             ;;
@@ -99,6 +107,12 @@ _findref_completion() {
     elif [[ $cur == --exclude-pattern=* ]]; then
         expecting_value="exclude-pattern"
         prev="--exclude-pattern"
+    elif [[ $cur == --include=* ]]; then
+        expecting_value="include"
+        prev="--include"
+    elif [[ $cur == --include-pattern=* ]]; then
+        expecting_value="include-pattern"
+        prev="--include-pattern"
     elif [[ $cur == --max-line-length=* ]]; then
         expecting_value="max-length"
         prev="--max-line-length"
@@ -151,6 +165,43 @@ _findref_completion() {
                 return 0
                 ;;
             exclude-pattern)
+                # Regex pattern — no meaningful completions, just let the user type
+                return 0
+                ;;
+            include)
+                local prefix=""
+                local value="$cur"
+                if [[ $cur == --include=* ]]; then
+                    prefix="--include="
+                    value="${cur#*=}"
+                elif [[ $cur == -i=* ]]; then
+                    prefix="-i="
+                    value="${cur#*=}"
+                else
+                    value="$cur"
+                fi
+                local -a suggestions=()
+                while IFS= read -r line; do
+                    suggestions+=("$line")
+                done < <(compgen -d -- "$value")
+                while IFS= read -r line; do
+                    suggestions+=("$line")
+                done < <(compgen -f -- "$value")
+                if [[ -n $prefix ]]; then
+                    local -a prefixed=()
+                    local unique
+                    unique=$(printf '%s\n' "${suggestions[@]}" | awk 'NF' | LC_ALL=C sort -u)
+                    while IFS= read -r item; do
+                        prefixed+=("$prefix$item")
+                    done <<<"$unique"
+                    COMPREPLY=("${prefixed[@]}")
+                else
+                    COMPREPLY=($(printf '%s\n' "${suggestions[@]}" | awk 'NF' | LC_ALL=C sort -u))
+                    __findref_safe_compopt -o filenames -o nospace
+                fi
+                return 0
+                ;;
+            include-pattern)
                 # Regex pattern — no meaningful completions, just let the user type
                 return 0
                 ;;
@@ -255,11 +306,11 @@ _findref_completion() {
             continue
         fi
         case "$token" in
-            --exclude|--exclude-pattern|--max-line-length|-e|-E|-l)
+            --exclude|--exclude-pattern|--include|--include-pattern|--max-line-length|-e|-E|-i|-I|-l)
                 pending_option="$token"
                 continue
                 ;;
-            --exclude=*|--exclude-pattern=*|--max-line-length=*|-l=*)
+            --exclude=*|--exclude-pattern=*|--include=*|--include-pattern=*|--max-line-length=*|-l=*)
                 continue
                 ;;
             -*)

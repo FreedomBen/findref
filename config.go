@@ -33,6 +33,8 @@ type FileConfig struct {
 	NoMaxLineLength *bool    `yaml:"no_max_line_length"`
 	Exclude         []string `yaml:"exclude"`
 	ExcludePattern  []string `yaml:"exclude_pattern"`
+	Include         []string `yaml:"include"`
+	IncludePattern  []string `yaml:"include_pattern"`
 	MatchRegex      string   `yaml:"match_regex"`
 	StartDir        string   `yaml:"start_dir"`
 	FilenameRegex   string   `yaml:"filename_regex"`
@@ -152,6 +154,14 @@ exclude:
 	b.WriteString("# exclude_pattern:\n")
 	b.WriteString("#   - '_test\\.go$'\n")
 	b.WriteString("#   - '(^|/)generated($|/)'\n")
+	b.WriteString("\n# Include only files whose names match (whitelist approach). If set, only matching files are searched.\n")
+	b.WriteString("# include:\n")
+	b.WriteString("#   - main.go\n")
+	b.WriteString("#   - README.md\n")
+	b.WriteString("\n# RE2 regex patterns to include. Only files whose path matches a pattern are searched.\n")
+	b.WriteString("# include_pattern:\n")
+	b.WriteString("#   - '\\.go$'\n")
+	b.WriteString("#   - '\\.py$'\n")
 	return b.String()
 }
 
@@ -259,6 +269,20 @@ func configArgs(cfg *FileConfig) []string {
 		trimmed := strings.TrimSpace(ep)
 		if trimmed != "" {
 			args = append(args, "--exclude-pattern", trimmed)
+		}
+	}
+
+	for _, inc := range cfg.Include {
+		trimmed := strings.TrimSpace(inc)
+		if trimmed != "" {
+			args = append(args, "--include", trimmed)
+		}
+	}
+
+	for _, ip := range cfg.IncludePattern {
+		trimmed := strings.TrimSpace(ip)
+		if trimmed != "" {
+			args = append(args, "--include-pattern", trimmed)
 		}
 	}
 

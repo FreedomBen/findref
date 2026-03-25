@@ -54,6 +54,8 @@ type Settings struct {
 	UseDefaultExcludes bool
 	excludes           []excludeEntry
 	excludePatterns    []*regexp.Regexp
+	includes           []excludeEntry
+	includePatterns    []*regexp.Regexp
 }
 
 func NewSettings() *Settings {
@@ -69,6 +71,8 @@ func NewSettings() *Settings {
 		HiddenFileRegex:    regexp.MustCompile(`(^|\/)\.`),
 		excludes:           []excludeEntry{},
 		excludePatterns:    []*regexp.Regexp{},
+		includes:           []excludeEntry{},
+		includePatterns:    []*regexp.Regexp{},
 		UseDefaultExcludes: true,
 	}
 	return s
@@ -131,6 +135,62 @@ func (s *Settings) Excludes() []string {
 		retval = append(retval, defaultExcludeDirs...)
 	}
 	return retval
+}
+
+func (s *Settings) AddIncludes(paths ...string) {
+	s.includes = append(s.includes, buildExcludeEntries(paths...)...)
+}
+
+func (s *Settings) AddIncludePatterns(patterns ...string) error {
+	for _, p := range patterns {
+		trimmed := strings.TrimSpace(p)
+		if trimmed == "" {
+			continue
+		}
+		compiled, err := regexp.Compile(trimmed)
+		if err != nil {
+			return fmt.Errorf("invalid include-pattern %q: %w", trimmed, err)
+		}
+		s.includePatterns = append(s.includePatterns, compiled)
+	}
+	return nil
+}
+
+func (s *Settings) IncludePatterns() []string {
+	retval := make([]string, 0, len(s.includePatterns))
+	for _, re := range s.includePatterns {
+		retval = append(retval, re.String())
+	}
+	return retval
+}
+
+func (s *Settings) Includes() []string {
+	retval := make([]string, 0, len(s.includes))
+	for _, entry := range s.includes {
+		retval = append(retval, entry.value)
+	}
+	return retval
+}
+
+func (s *Settings) HasIncludes() bool {
+	return len(s.includes) > 0 || len(s.includePatterns) > 0
+}
+
+func (s *Settings) ShouldIncludeFile(path string) bool {
+	if !s.HasIncludes() {
+		return true
+	}
+	cleanedPath := filepath.Clean(path)
+	pathBase := filepath.Base(cleanedPath)
+	if s.matchesExclude(cleanedPath, pathBase, s.includes) {
+		return true
+	}
+	for _, re := range s.includePatterns {
+		if re.MatchString(cleanedPath) {
+			return true
+		}
+	}
+	return false
 }
 
 func (s *Settings) ShouldExcludeDir(path string) bool {

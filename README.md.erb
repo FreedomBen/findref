@@ -14,6 +14,12 @@ time linear in the size of the input](https://swtch.com/~rsc/regexp/regexp1.html
 `findref` faster than many other tools.
 
 
+## Breaking change: `-i` flag reassigned
+
+Starting in v1.7.0, the `-i` short flag has been reassigned from `--ignore-case` to `--include` (a new whitelist filter for files). If you use `-i` for case-insensitive matching, switch to `-c` (or continue using the long form `--ignore-case`, which is unchanged). The `-I` short flag was also added for the new `--include-pattern` option.
+
+To maintain the old behavior, stick with v1.6.2
+
 ## How it compares to other tools (or why it is better in my opinion):
 
 **grep**:  `findref` adds much simpler recursive search that doesn't require a bunch of
@@ -52,7 +58,7 @@ Even without passing any `--exclude` flags, `findref` prunes directories and loc
 2. `$XDG_CONFIG_HOME/findref/config.yaml` (falls back to `~/.config/findref/config.yaml`)
 3. `~/.findref.yaml`
 
-If no file is present, behavior stays the same. When a file is found, the values are applied as if they were flags; anything you put on the command line still wins. The YAML keys mirror the long flag names: `all`, `debug`, `stats`, `hidden`, `version`, `no_color`, `match_case`, `ignore_case`, `filename_only`, `max_line_length`, `no_max_line_length`, `exclude` (list), `exclude_pattern` (list), and the positional arguments `match_regex`, `start_dir`, `filename_regex`.
+If no file is present, behavior stays the same. When a file is found, the values are applied as if they were flags; anything you put on the command line still wins. The YAML keys mirror the long flag names: `all`, `debug`, `stats`, `hidden`, `version`, `no_color`, `match_case`, `ignore_case`, `filename_only`, `max_line_length`, `no_max_line_length`, `exclude` (list), `exclude_pattern` (list), `include` (list), `include_pattern` (list), and the positional arguments `match_regex`, `start_dir`, `filename_regex`.
 
 Example:
 
@@ -116,7 +122,7 @@ Simple usage that starts looking recursively in the current directory, and check
   <img src="images/findref-simple.gif" alt="findref simple usage">
 </p>
 
-To go case insensitive, simply add -i or --ignore-case as the first arg:
+To go case insensitive, simply add -c or --ignore-case as the first arg:
 
     findref --ignore-case getMethodName
 
